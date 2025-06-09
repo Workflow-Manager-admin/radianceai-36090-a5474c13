@@ -267,8 +267,16 @@ function AnimatedProductCard({ step, product, expanded, onToggle }) {
                   Brand: {product.brand}
                 </div>
                 <div style={{color: "#e7b3ff", fontSize: 13.8, margin: "3px 0 2px 0"}}>
-                  Price: <span style={{color:'#fadadd', fontWeight:600}}>${product.price}</span>
+                  Price: <span style={{color:'#fadadd', fontWeight:600}}>
+                    {product.currency === "INR" || product.isLocalIN ? "₹" : "$"}
+                    {product.price}
+                  </span>
                   <span style={{marginLeft:7, color:"#fadadd"}}>Rating: ★ {product.rating}</span>
+                  {product.isLocalIN && (
+                    <span style={{ color: "#f339db", fontSize: 11, marginLeft: 7 }}>
+                      India
+                    </span>
+                  )}
                 </div>
                 <div style={{color: "#fff", fontSize:13.5, opacity: 0.78, minHeight: 20, marginTop: 3}}>
                   {product.description && product.description.length > 60

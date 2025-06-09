@@ -3,30 +3,90 @@
  * apiClient: sets up fetch calls for APIs.
  */
 
-const DUMMYJSON_URL = "https://dummyjson.com/products";
-
 /**
  * PUBLIC_INTERFACE
- * Fetch a list of recommended products from DummyJSON API.
+ * Fetch a list of recommended Indian skincare products (IN region, INR pricing)
+ * Uses the Purplle API (India) via RapidAPI, or fallback to Indianized DummyJSON mock if unavailable.
  * Optionally filter based on quiz result mapping.
  * @param {Object} params (optional): e.g., { category, minRating, limit}
- * @returns {Promise<Array>} Product list
+ * @returns {Promise<Array>} Product list with INR price and metadata
  */
 export const fetchRecommendedProducts = async (params = {}) => {
-  let url = `${DUMMYJSON_URL}?limit=${params.limit || 12}`;
-  if (params.category) url += `&category=${encodeURIComponent(params.category)}`;
+  // Try Purplle API (demo endpoint); if fails fallback to local Indianized mock
+  // If adapting to an actual API, replace endpoint/headers accordingly.
+  const PURPLLE_API_URL =
+    "https://apidojo-indiabestbuy-v1.p.rapidapi.com/skin-care/top?" +
+    `limit=${params.limit || 12}` +
+    (params.category ? `&cat=${encodeURIComponent(params.category)}` : "");
+
+  const purplleHeaders = {
+    "X-RapidAPI-Key": "demo_key_for_public", // <-- Replace with real key
+    "X-RapidAPI-Host": "apidojo-indiabestbuy-v1.p.rapidapi.com"
+  };
+
   try {
-    const resp = await fetch(url);
-    const data = await resp.json();
-    let products = Array.isArray(data.products) ? data.products : [];
-    // Optionally filter by minRating
-    if (params.minRating) {
-      products = products.filter((p) => p.rating >= params.minRating);
+    // --- PRIMARY: Try Indian Purplle/RapidAPI endpoint (demo/for illustration) ---
+    const resp = await fetch(PURPLLE_API_URL, { headers: purplleHeaders });
+    if (resp.ok) {
+      const data = await resp.json();
+      // For Purplle: map fields to unified format
+      if (Array.isArray(data.products)) {
+        let products = data.products;
+        if (params.minRating) {
+          products = products.filter((p) => (p.rating || 4) >= params.minRating);
+        }
+        // Normalize to unified structure
+        return products.map((p, idx) => ({
+          id: p.id || p.product_id || idx,
+          title: p.name || p.title || "",
+          brand: p.brand || p.brand_name || "",
+          price: p.price || p.price_inr || p.salePrice || p.display_price || 0,
+          currency: "INR",
+          description: p.description || (p.desc ? p.desc : ""),
+          thumbnail: p.image_url || (p.images && p.images[0]) || p.thumbnail || "",
+          rating: p.rating || p.stars || 4.2,
+          stock: p.stock || 25,
+          link: p.product_url || p.url || "",
+          category: p.category || params.category || "skincare",
+          keywords: p.keywords || [],
+          isLocalIN: true
+        }));
+      }
     }
-    return products;
+    // Fallback on error
+    throw new Error("Primary Indian API unavailable");
   } catch (e) {
-    // Could log error
-    return [];
+    // --- FALLBACK: "Indianize" DummyJSON/mock ---
+    const DUMMYJSON_URL = "https://dummyjson.com/products";
+    let url = `${DUMMYJSON_URL}?limit=${params.limit || 12}`;
+    if (params.category) url += `&category=${encodeURIComponent(params.category)}`;
+    try {
+      const resp = await fetch(url);
+      const data = await resp.json();
+      let products = Array.isArray(data.products) ? data.products : [];
+      if (params.minRating) {
+        products = products.filter((p) => p.rating >= params.minRating);
+      }
+      // "Convert" price to INR, localize names/brands a bit for demo
+      return products.map((p, idx) => ({
+        ...p,
+        price: Math.round((p.price || 10) * 80 + 59), // USD to rough INR
+        currency: "INR",
+        brand: (p.brand + " India"),
+        title: p.title.replace(/[\s]*-.*$/, "") + " (IN)",
+        description: p.description,
+        link: p.link || p.url || "",
+        rating: p.rating,
+        stock: p.stock,
+        thumbnail: p.thumbnail,
+        keywords: p.keywords || [],
+        category: p.category || params.category || "skincare",
+        isLocalIN: false
+      }));
+    } catch (err) {
+      // Could log error
+      return [];
+    }
   }
 };
 

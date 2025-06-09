@@ -125,7 +125,11 @@ function AnimatedProductCard({ product, expanded, onToggle }) {
             }}
           >
             <span style={{ color: "#fadadd", fontWeight: 600 }}>
-              ${product.price}
+              {product.currency === "INR" || product.isLocalIN ? "₹" : "$"}
+              {product.price}
+              {product.isLocalIN && (
+                <span style={{ color: "#f339db", fontSize: 11, marginLeft: 4 }}>India</span>
+              )}
             </span>
             <span style={{ color: "#f339db" }}>★ {product.rating}</span>
             {product.stock < 15 && (

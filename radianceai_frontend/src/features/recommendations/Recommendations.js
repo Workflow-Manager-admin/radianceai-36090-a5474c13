@@ -78,10 +78,18 @@ function ProductCard({ product }) {
           marginBottom: 2,
         }}
       >
-        <span style={{ color: "#27275e", fontWeight: 700 }}>${product.price}</span>
+        <span style={{ color: "#27275e", fontWeight: 700 }}>
+          {product.currency === "INR" || product.isLocalIN ? "₹" : "$"}
+          {product.price}
+        </span>
         <span style={{ color: "#fadadd" }} title="Product rating">
           ★ {product.rating}
         </span>
+        {product.isLocalIN && (
+          <span style={{ color: "#f339db", fontSize: 11, marginLeft: 5 }}>
+            India
+          </span>
+        )}
       </div>
       <div style={{
         fontSize: 13.3,
