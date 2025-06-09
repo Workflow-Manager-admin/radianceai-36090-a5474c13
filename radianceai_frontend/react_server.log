@@ -162,3 +162,25 @@ src/hooks/useProducts.js
   Line 102:8:  Parsing error: Missing semicolon. (102:8)
 
 webpack compiled with 2 errors
+Compiling...
+Failed to compile.
+
+Attempted import error: '../hooks/useProducts' does not contain a default export (imported as 'useProducts').
+ERROR in ./src/context/GlobalStateContext.js 31:19-30
+export 'default' (imported as 'useProducts') was not found in '../hooks/useProducts' (possible exports: useProducts)
+
+ERROR in ./src/context/GlobalStateContext.js 50:64-75
+export 'default' (imported as 'useProducts') was not found in '../hooks/useProducts' (possible exports: useProducts)
+
+webpack compiled with 2 errors
+Compiling...
+Failed to compile.
+
+Attempted import error: '../hooks/useProducts' does not contain a default export (imported as 'useProducts').
+ERROR in ./src/context/GlobalStateContext.js 31:19-30
+export 'default' (imported as 'useProducts') was not found in '../hooks/useProducts' (possible exports: useProducts)
+
+ERROR in ./src/context/GlobalStateContext.js 50:64-75
+export 'default' (imported as 'useProducts') was not found in '../hooks/useProducts' (possible exports: useProducts)
+
+webpack compiled with 2 errors
