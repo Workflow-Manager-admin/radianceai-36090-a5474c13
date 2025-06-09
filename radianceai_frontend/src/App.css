@@ -4,6 +4,9 @@
   --text-color: #ffffff;
   --text-secondary: rgba(255, 255, 255, 0.7);
   --border-color: rgba(255, 255, 255, 0.1);
+
+  /* Apple-like smooth gradient for backgrounds */
+  --navbar-gradient: linear-gradient(103deg, #190155 0%, #1e0957 54%, #00ffff 101%);
 }
 
 body {
@@ -19,6 +22,92 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+/* --- Apple-like Top Navbar --- */
+.top-navbar {
+  background: rgba(23,9,87,0.98);
+  backdrop-filter: blur(12px);
+  border-radius: 0 0 22px 22px;
+  box-shadow: 0 8px 24px 0 rgba(0,0,0,0.12);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  z-index: 101;
+  height: 62px;
+  display: flex;
+  align-items: center;
+  transition: box-shadow 0.22s cubic-bezier(.27,1.36,.48,1), background 0.2s;
+  will-change: background, box-shadow;
+}
+
+@media (max-width: 700px) {
+  .top-navbar {
+    padding-left: 0;
+    padding-right: 0;
+    height: 56px;
+    border-radius: 0 0 16px 16px;
+  }
+}
+/* --- Persistent Animated Bottom NavBar --- */
+.bottom-navbar {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100vw;
+  background: rgba(37,23,78,0.93);
+  backdrop-filter: blur(8px);
+  border-radius: 22px 22px 0 0;
+  padding: 8px 0 4px 0;
+  box-shadow: 0 -4px 18px 0 rgba(70, 40, 120, 0.12);
+  transition: box-shadow 0.18s cubic-bezier(.27,1.36,.48,1), background 0.22s;
+  z-index: 120;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 54px;
+  will-change: background, box-shadow;
+}
+@media (max-width: 600px) {
+  .bottom-navbar {
+    min-height: 48px;
+    border-radius: 13px 13px 0 0;
+    padding: 4px 0 1px 0;
+  }
+}
+/* Navigation Icon Buttons */
+.nav-action-btn {
+  flex: 1 1 0px;
+  outline: none;
+  border: none;
+  margin: 0 4px;
+  background: none;
+  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 7px 2px 3px 2px;
+  cursor: pointer;
+  opacity: 0.86;
+  transition:
+    background 0.18s,
+    box-shadow 0.22s cubic-bezier(.27,1.36,.48,1),
+    transform 0.18s cubic-bezier(.27,1.36,.48,1),
+    opacity 0.16s;
+}
+.nav-action-btn:active { opacity: 1; background: rgba(250,218,221,0.08);}
+.nav-action-btn[aria-current="page"], .nav-action-btn:focus-visible {
+  outline: 2.5px solid #fadadd;
+  opacity: 1;
+}
+/* Responsive adjustment to prevent overlaying navbars */
+@media (max-height: 600px) {
+  .bottom-navbar {
+    min-height: 38px;
+    font-size: 11px;
+  }
+  .top-navbar { height: 50px;}
 }
 
 .navbar {

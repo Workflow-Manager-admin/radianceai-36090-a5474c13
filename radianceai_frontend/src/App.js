@@ -1,7 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
-import Navbar from './components/Navbar';
+import TopNavBar from './components/TopNavBar';
+import BottomNavBar from './components/BottomNavBar';
 import Quiz from './features/quiz/Quiz';
 import Recommendations from './features/recommendations/Recommendations';
 import RoutineBuilder from './features/routine/RoutineBuilder';
@@ -15,12 +16,21 @@ import Home from './features/home/Home';
 
 function App() {
   // PUBLIC_INTERFACE
-  // Main skeleton with routing
+  // Main skeleton with persistent animated Apple-like top/bottom nav
+  // Ensures proper bottom margin for responsive nav, fixes mobile overlays
   return (
     <Router>
       <div className="app">
-        <Navbar />
-        <main style={{ paddingTop: '80px' }}>
+        <TopNavBar />
+        <main
+          style={{
+            paddingTop: 70,
+            paddingBottom: 78,
+            minHeight: "calc(100vh - 140px)",
+            background: "none",
+            transition: "padding-bottom 0.25s cubic-bezier(.27,1.36,.48,1)",
+          }}
+        >
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/quiz" element={<Quiz />} />
@@ -35,6 +45,7 @@ function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
+        <BottomNavBar />
       </div>
     </Router>
   );
