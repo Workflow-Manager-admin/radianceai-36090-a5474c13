@@ -17,6 +17,44 @@ import Home from './features/home/Home';
 import { AppleFadeTransition } from "./utils/animation";
 
 /**
+ * DEEP UI ANALYSIS NOTES (2024-06-09)
+ *
+ * Examined for high z-index overlays, pointer-events, stacking and animation wrappers.
+ * 
+ * OVERLAY DEBUGGER: Temporary diagnostic overlay is present (OverlayDebugger): z-index: 99999, pointer-events: none.
+ * - Harmless/helpful, does not block interactions. REMOVE when not debugging.
+ * 
+ * MAIN CONTAINER: <div className="app">
+ * - min-height: 100vh; display: flex; flex-direction: column; pointer-events: auto !important (App.css)
+ * 
+ * MAIN <main> tag:
+ * - pointer-events: auto !important (App.css)
+ * - Used only for layout/padding, not positioning overlays.
+ * 
+ * ANIMATION WRAPPERS:
+ * - AppleFadeTransition and motion wrappers use pointer-events: auto !important (App.css, utils/animation.js).
+ * - Do not create overlays or passive layers with pointer-events: none.
+ * 
+ * NAVBARS:
+ * - .top-navbar: z-index: 101, fixed top, pointer events enabled (App.css)
+ * - .bottom-navbar: z-index: 121, fixed bottom, pointer events enabled (App.css)
+ * 
+ * MODALS/OVERLAYS:
+ * - .quiz-modal-overlay: z-index: 4020, pointer-events: auto !important, semi-transparent color.
+ *   This overlay only appears when quiz modal is open. It is visible and dismiss interaction is enabled (by pointer-events: auto and opacity).
+ * 
+ * No invisible overlays or accidental stacking found in App.js or its immediate containers/wrappers.
+ * All overlays that appear (modal and debug overlay) have intentional pointer-events and stacking context.
+ * 
+ * No animation wrappers (AnimatePresence, AppleFadeTransition, motion.div) unexpectedly create overlays that would block clicks.
+ * 
+ * No unexpected pointer-events: none or high z-index elements in .app, main, navbars, overlay, or AppleFadeTransition.
+ * 
+ * If UI clicks are blocked: (a) Check for custom modals outside the above, (b) Confirm OverlayDebugger is removed, (c) Inspect .quiz-modal-overlay state and display.
+ */
+// End UI analysis notes
+
+/**
  * Diagnostic Overlay: Temporarily add a visual overlay with high z-index and pointer-events to aid troubleshooting.
  * Remove/comment this component out after confirming/solving UI blocking bugs.
  */
