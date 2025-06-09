@@ -67,9 +67,54 @@ export const fetchWeather = async (lat, lon) => {
 };
 
 /**
- * Placeholder: sendEmail (e.g., via EmailJS)
+ * PUBLIC_INTERFACE
+ * sendEmail: Send email via EmailJS, for reminders/routine summaries.
+ * This requires configuration in EmailJS dashboard.
+ * @param {Object} payload { toEmail, toName, type: "reminder"|"summary", data: {...} }
  */
 export const sendEmail = async (payload) => {
-  // EmailJS/email integrations would go here.
-  return true;
+  // Import emailjs if present, otherwise fallback
+  try {
+    if (!window.emailjs) {
+      // Optionally: Load EmailJS from CDN dynamically.
+      // NOTE: For production, install and import EmailJS:
+      // import emailjs from '@emailjs/browser'
+      // But here we load from CDN for demo.
+      await new Promise((resolve, reject) => {
+        const script = document.createElement("script");
+        script.src = "https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js";
+        script.async = true;
+        script.onload = resolve;
+        script.onerror = reject;
+        document.body.appendChild(script);
+      });
+    }
+    // Init if not already
+    if (!window.emailjs.___init) {
+      window.emailjs.init("YOUR_EMAILJS_USER_ID"); // <-- Set in EmailFeatures config
+      window.emailjs.___init = true;
+    }
+
+    // Map type to template
+    const { toEmail, toName, type, data } = payload;
+    // Map EmailJS template (you should define these in your account)
+    let templateParams = {
+      to_email: toEmail,
+      to_name: toName,
+      ...data,
+    };
+    let templateId = "routine_summary_template"; // fallback
+    if (type === "reminder") templateId = "routine_reminder_template";
+    if (type === "summary") templateId = "routine_summary_template";
+
+    // Must be configured at https://dashboard.emailjs.com/
+    // service_id and template_id must match those defined in the dashboard
+    const serviceId = payload.serviceId || "YOUR_SERVICE_ID"; // e.g., 'service_xxxx'
+    const res = await window.emailjs.send(serviceId, templateId, templateParams);
+
+    return res?.status === 200 ? true : false;
+  } catch (e) {
+    // Optionally log or pass up error
+    return false;
+  }
 };
