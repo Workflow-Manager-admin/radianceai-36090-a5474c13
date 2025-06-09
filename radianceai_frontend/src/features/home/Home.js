@@ -114,15 +114,15 @@ const Home = () => {
       // Ensure each slide result has consistent fields {videoUrl, productId, title, poster}
       return recommended.map((p, i) => ({
         videoUrl: p.video || p.videoUrl || DEMO_VIDEO_URLS[i % DEMO_VIDEO_URLS.length].videoUrl,
-        productId: p.id,
+        productId: String(p.id),
         title: p.title || "",
         poster: p.thumbnail || "",
       }));
     }
-    // Fallback: use demo slides, each with a dummy productId
+    // Fallback: use demo slides, each with a dummy productId (string for consistency)
     return DEMO_VIDEO_URLS.map((v, i) => ({
       videoUrl: v.videoUrl,
-      productId: i + 1, // Dummy ID
+      productId: `${i + 1}`, // Dummy ID as string
       title: v.title || "",
       poster: "",
     }));

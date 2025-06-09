@@ -65,7 +65,7 @@ function VideoSlideshow({
   const handleSlideClick = () => {
     const cur = slides[current];
     if (cur?.productId) {
-      navigate(`/products/${cur.productId}`);
+      navigate(`/products/${String(cur.productId)}`);
     }
   };
 
