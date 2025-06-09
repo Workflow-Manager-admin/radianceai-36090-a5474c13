@@ -25,7 +25,7 @@ function getNavBtn(label) {
 describe("TopNavBar Navigation Integration", () => {
   NAV_TEST_CONFIG.forEach(({ label, path, contentMatch }) => {
     test(`Clicking '${label}' in TopNavBar updates view and URL`, async () => {
-      render(<App />, { wrapper: MemoryRouter });
+      render(<App />);
       // For Home, no click — already there
       if (label !== "Home") {
         // Click navbar button
@@ -53,7 +53,7 @@ describe("TopNavBar Navigation Integration", () => {
   });
 
   test("URL and visible view stay in sync for multiple rapid navigations", async () => {
-    render(<App />, { wrapper: MemoryRouter });
+    render(<App />);
 
     // Rapidly click nav links in succession
     for (const { label, path, contentMatch } of NAV_TEST_CONFIG) {

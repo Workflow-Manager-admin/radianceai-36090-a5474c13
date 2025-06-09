@@ -6440,3 +6440,234 @@ LoaderRunnerError: Module '/home/kavia/workspace/code-generation/radianceai-3609
 
 1 ERROR in child compilations (Use 'stats.children: true' resp. '--stats-children' for more details)
 webpack compiled with 18 errors and 1 warning
+Compiling...
+Failed to compile.
+
+Loading PostCSS "postcss-preset-env" plugin failed: Cannot find module 'autoprefixer'
+Require stack:
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/postcss-preset-env/dist/index.cjs
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/postcss-loader/dist/utils.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/postcss-loader/dist/index.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/postcss-loader/dist/cjs.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/loader-runner/lib/loadLoader.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/loader-runner/lib/LoaderRunner.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/NormalModule.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack-manifest-plugin/dist/index.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/react-scripts/config/webpack.config.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/react-scripts/scripts/start.js
+
+(@/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/src/App.css)
+WARNING in [eslint] 
+src/features/home/Home.js
+  Line 93:24:  'loading' is assigned a value but never used  no-unused-vars
+
+src/features/recommendations/Recommendations.js
+  Line 162:9:  'navigate' is assigned a value but never used  no-unused-vars
+
+src/hooks/useWeather.js
+  Line 26:9:   'resolvedLat' is assigned a value but never used  no-unused-vars
+  Line 26:28:  'resolvedLon' is assigned a value but never used  no-unused-vars
+
+ERROR in ./src/App.css (./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[2]!./node_modules/source-map-loader/dist/cjs.js!./src/App.css)
+Module Error (from ./node_modules/postcss-loader/dist/cjs.js):
+Loading PostCSS "postcss-preset-env" plugin failed: Cannot find module 'autoprefixer'
+Require stack:
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/postcss-preset-env/dist/index.cjs
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/postcss-loader/dist/utils.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/postcss-loader/dist/index.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/postcss-loader/dist/cjs.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/loader-runner/lib/loadLoader.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/loader-runner/lib/LoaderRunner.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/NormalModule.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack-manifest-plugin/dist/index.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/react-scripts/config/webpack.config.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/react-scripts/scripts/start.js
+
+(@/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/src/App.css)
+
+ERROR in ./src/index.css (./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[2]!./node_modules/source-map-loader/dist/cjs.js!./src/index.css)
+Module Error (from ./node_modules/postcss-loader/dist/cjs.js):
+Loading PostCSS "postcss-preset-env" plugin failed: Cannot find module 'autoprefixer'
+Require stack:
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/postcss-preset-env/dist/index.cjs
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/postcss-loader/dist/utils.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/postcss-loader/dist/index.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/postcss-loader/dist/cjs.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/loader-runner/lib/loadLoader.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/loader-runner/lib/LoaderRunner.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/NormalModule.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack-manifest-plugin/dist/index.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/react-scripts/config/webpack.config.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/react-scripts/scripts/start.js
+
+(@/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/src/index.css)
+
+ERROR in Child compilation failed:
+Module build failed (from ./node_modules/html-webpack-plugin/lib/loader.js):
+LoaderRunnerError: Module '/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/html-webpack-plugin/lib/loader.js' is not a loader (must have normal or pitch function)
+    at handleResult (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/loader-runner/lib/loadLoader.js:49:19)
+    at loadLoader (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/loader-runner/lib/loadLoader.js:35:10)
+    at iteratePitchingLoaders (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/loader-runner/lib/LoaderRunner.js:182:2)
+    at runLoaders (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/loader-runner/lib/LoaderRunner.js:398:2)
+    at NormalModule._doBuild (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/NormalModule.js:965:3)
+    at NormalModule.build (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/NormalModule.js:1155:15)
+    at /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/Compilation.js:1422:12
+    at NormalModule.needBuild (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/NormalModule.js:1477:32)
+    at Compilation._buildModule (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/Compilation.js:1403:10)
+    at /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/util/AsyncQueue.js:340:10
+    at Hook.eval [as callAsync] (eval at create (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/tapable/lib/HookCodeFactory.js:33:10), <anonymous>:6:1)
+    at AsyncQueue._startProcessing (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/util/AsyncQueue.js:330:26)
+    at AsyncQueue._ensureProcessing (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/util/AsyncQueue.js:317:12)
+    at process.processImmediate (node:internal/timers:476:21)
+ModuleBuildError: Module build failed (from ./node_modules/html-webpack-plugin/lib/loader.js):
+LoaderRunnerError: Module '/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/html-webpack-plugin/lib/loader.js' is not a loader (must have normal or pitch function)
+    at handleResult (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/loader-runner/lib/loadLoader.js:49:19)
+    at loadLoader (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/loader-runner/lib/loadLoader.js:35:10)
+    at iteratePitchingLoaders (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/loader-runner/lib/LoaderRunner.js:182:2)
+    at runLoaders (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/loader-runner/lib/LoaderRunner.js:398:2)
+    at NormalModule._doBuild (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/NormalModule.js:965:3)
+    at NormalModule.build (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/NormalModule.js:1155:15)
+    at /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/Compilation.js:1422:12
+    at NormalModule.needBuild (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/NormalModule.js:1477:32)
+    at Compilation._buildModule (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/Compilation.js:1403:10)
+    at /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/util/AsyncQueue.js:340:10
+    at Hook.eval [as callAsync] (eval at create (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/tapable/lib/HookCodeFactory.js:33:10), <anonymous>:6:1)
+    at AsyncQueue._startProcessing (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/util/AsyncQueue.js:330:26)
+    at AsyncQueue._ensureProcessing (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/util/AsyncQueue.js:317:12)
+    at process.processImmediate (node:internal/timers:476:21)
+    at processResult (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/NormalModule.js:891:19)
+    at /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/NormalModule.js:1037:5
+    at /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/loader-runner/lib/LoaderRunner.js:400:11
+    at /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/loader-runner/lib/LoaderRunner.js:185:11
+    at handleResult (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/loader-runner/lib/loadLoader.js:49:10)
+    at loadLoader (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/loader-runner/lib/loadLoader.js:35:10)
+    at iteratePitchingLoaders (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/loader-runner/lib/LoaderRunner.js:182:2)
+    at runLoaders (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/loader-runner/lib/LoaderRunner.js:398:2)
+    at NormalModule._doBuild (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/NormalModule.js:965:3)
+    at NormalModule.build (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/NormalModule.js:1155:15)
+    at /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/Compilation.js:1422:12
+    at NormalModule.needBuild (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/NormalModule.js:1477:32)
+    at Compilation._buildModule (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/Compilation.js:1403:10)
+    at /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/util/AsyncQueue.js:340:10
+    at Hook.eval [as callAsync] (eval at create (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/tapable/lib/HookCodeFactory.js:33:10), <anonymous>:6:1)
+    at AsyncQueue._startProcessing (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/util/AsyncQueue.js:330:26)
+    at AsyncQueue._ensureProcessing (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/util/AsyncQueue.js:317:12)
+    at process.processImmediate (node:internal/timers:476:21)
+
+webpack compiled with 3 errors and 1 warning
+Compiling...
+Failed to compile.
+
+Loading PostCSS "postcss-preset-env" plugin failed: Cannot find module 'autoprefixer'
+Require stack:
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/postcss-preset-env/dist/index.cjs
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/postcss-loader/dist/utils.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/postcss-loader/dist/index.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/postcss-loader/dist/cjs.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/loader-runner/lib/loadLoader.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/loader-runner/lib/LoaderRunner.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/NormalModule.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack-manifest-plugin/dist/index.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/react-scripts/config/webpack.config.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/react-scripts/scripts/start.js
+
+(@/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/src/App.css)
+WARNING in [eslint] 
+src/features/home/Home.js
+  Line 93:24:  'loading' is assigned a value but never used  no-unused-vars
+
+src/features/recommendations/Recommendations.js
+  Line 162:9:  'navigate' is assigned a value but never used  no-unused-vars
+
+src/hooks/useWeather.js
+  Line 26:9:   'resolvedLat' is assigned a value but never used  no-unused-vars
+  Line 26:28:  'resolvedLon' is assigned a value but never used  no-unused-vars
+
+ERROR in ./src/App.css (./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[2]!./node_modules/source-map-loader/dist/cjs.js!./src/App.css)
+Module Error (from ./node_modules/postcss-loader/dist/cjs.js):
+Loading PostCSS "postcss-preset-env" plugin failed: Cannot find module 'autoprefixer'
+Require stack:
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/postcss-preset-env/dist/index.cjs
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/postcss-loader/dist/utils.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/postcss-loader/dist/index.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/postcss-loader/dist/cjs.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/loader-runner/lib/loadLoader.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/loader-runner/lib/LoaderRunner.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/NormalModule.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack-manifest-plugin/dist/index.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/react-scripts/config/webpack.config.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/react-scripts/scripts/start.js
+
+(@/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/src/App.css)
+
+ERROR in ./src/index.css (./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[2]!./node_modules/source-map-loader/dist/cjs.js!./src/index.css)
+Module Error (from ./node_modules/postcss-loader/dist/cjs.js):
+Loading PostCSS "postcss-preset-env" plugin failed: Cannot find module 'autoprefixer'
+Require stack:
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/postcss-preset-env/dist/index.cjs
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/postcss-loader/dist/utils.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/postcss-loader/dist/index.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/postcss-loader/dist/cjs.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/loader-runner/lib/loadLoader.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/loader-runner/lib/LoaderRunner.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/NormalModule.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack-manifest-plugin/dist/index.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/react-scripts/config/webpack.config.js
+- /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/react-scripts/scripts/start.js
+
+(@/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/src/index.css)
+
+ERROR in Child compilation failed:
+Module build failed (from ./node_modules/html-webpack-plugin/lib/loader.js):
+LoaderRunnerError: Module '/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/html-webpack-plugin/lib/loader.js' is not a loader (must have normal or pitch function)
+    at handleResult (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/loader-runner/lib/loadLoader.js:49:19)
+    at loadLoader (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/loader-runner/lib/loadLoader.js:35:10)
+    at iteratePitchingLoaders (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/loader-runner/lib/LoaderRunner.js:182:2)
+    at runLoaders (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/loader-runner/lib/LoaderRunner.js:398:2)
+    at NormalModule._doBuild (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/NormalModule.js:965:3)
+    at NormalModule.build (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/NormalModule.js:1155:15)
+    at /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/Compilation.js:1422:12
+    at NormalModule.needBuild (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/NormalModule.js:1480:26)
+    at Compilation._buildModule (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/Compilation.js:1403:10)
+    at /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/util/AsyncQueue.js:340:10
+    at Hook.eval [as callAsync] (eval at create (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/tapable/lib/HookCodeFactory.js:33:10), <anonymous>:6:1)
+    at AsyncQueue._startProcessing (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/util/AsyncQueue.js:330:26)
+    at AsyncQueue._ensureProcessing (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/util/AsyncQueue.js:317:12)
+    at process.processImmediate (node:internal/timers:476:21)
+ModuleBuildError: Module build failed (from ./node_modules/html-webpack-plugin/lib/loader.js):
+LoaderRunnerError: Module '/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/html-webpack-plugin/lib/loader.js' is not a loader (must have normal or pitch function)
+    at handleResult (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/loader-runner/lib/loadLoader.js:49:19)
+    at loadLoader (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/loader-runner/lib/loadLoader.js:35:10)
+    at iteratePitchingLoaders (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/loader-runner/lib/LoaderRunner.js:182:2)
+    at runLoaders (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/loader-runner/lib/LoaderRunner.js:398:2)
+    at NormalModule._doBuild (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/NormalModule.js:965:3)
+    at NormalModule.build (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/NormalModule.js:1155:15)
+    at /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/Compilation.js:1422:12
+    at NormalModule.needBuild (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/NormalModule.js:1480:26)
+    at Compilation._buildModule (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/Compilation.js:1403:10)
+    at /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/util/AsyncQueue.js:340:10
+    at Hook.eval [as callAsync] (eval at create (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/tapable/lib/HookCodeFactory.js:33:10), <anonymous>:6:1)
+    at AsyncQueue._startProcessing (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/util/AsyncQueue.js:330:26)
+    at AsyncQueue._ensureProcessing (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/util/AsyncQueue.js:317:12)
+    at process.processImmediate (node:internal/timers:476:21)
+    at processResult (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/NormalModule.js:891:19)
+    at /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/NormalModule.js:1037:5
+    at /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/loader-runner/lib/LoaderRunner.js:400:11
+    at /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/loader-runner/lib/LoaderRunner.js:185:11
+    at handleResult (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/loader-runner/lib/loadLoader.js:49:10)
+    at loadLoader (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/loader-runner/lib/loadLoader.js:35:10)
+    at iteratePitchingLoaders (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/loader-runner/lib/LoaderRunner.js:182:2)
+    at runLoaders (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/loader-runner/lib/LoaderRunner.js:398:2)
+    at NormalModule._doBuild (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/NormalModule.js:965:3)
+    at NormalModule.build (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/NormalModule.js:1155:15)
+    at /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/Compilation.js:1422:12
+    at NormalModule.needBuild (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/NormalModule.js:1480:26)
+    at Compilation._buildModule (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/Compilation.js:1403:10)
+    at /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/util/AsyncQueue.js:340:10
+    at Hook.eval [as callAsync] (eval at create (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/tapable/lib/HookCodeFactory.js:33:10), <anonymous>:6:1)
+    at AsyncQueue._startProcessing (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/util/AsyncQueue.js:330:26)
+    at AsyncQueue._ensureProcessing (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/webpack/lib/util/AsyncQueue.js:317:12)
+    at process.processImmediate (node:internal/timers:476:21)
+
+1 ERROR in child compilations (Use 'stats.children: true' resp. '--stats-children' for more details)
+webpack compiled with 4 errors and 1 warning
