@@ -153,3 +153,6 @@ export function useProducts(options = {}) {
     error
   };
 }
+
+// Support both named and default import for compatibility
+export default useProducts;
