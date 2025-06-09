@@ -38,20 +38,39 @@ export function useProducts(options = {}) {
       let resp = await fetch("https://dummyjson.com/products?limit=100");
       let data = await resp.json();
       if (!data || !data.products) return [];
-      return data.products.map((p) => ({
-        id: p.id,
-        title: p.title,
-        description: p.description,
-        price: p.price,
-        brand: p.brand,
-        category: p.category,
-        rating: p.rating || 4.2,
-        thumbnail: p.thumbnail,
-        images: p.images,
-        currency: p.currency || "USD",
-        isLocalIN: region === "IN", // Demo: mark as local for Indian region
-        link: p.link,
-      }));
+      // Brand official/representative image map (can be extended)
+      const brandImageMap = {
+        "DermaCo": "https://cdn.shopify.com/s/files/1/0283/0165/2747/products/the-dermaco-face-serum-niacinamide-10-percent-30-ml-44516721406142.jpg",
+        "Kiehl's": "https://www.kiehls.com.sg/dw/image/v2/BDTJ_PRD/on/demandware.static/-/Sites-masterCatalog_Kiehls/default/dwc9f5beec/2020/Products/Face/Serums/Ultra_Pure_Hyaluronic_Acid_Serum_30ml_ProductPageZoom.jpg",
+        "Minimalist": "https://beminimalist.co/cdn/shop/files/Salicylic_Acid_2_percent_Face_Serum-minimalist-skincare-1_600x.jpg",
+        "Plum": "https://cdn.plumgoodness.com/products/Green-Tea-Face-Wash-1_800x.jpg",
+        "Wow": "https://cdn01.wowsts.com/pub/media/catalog/product/w/o/wow_skin_science_vitamin_c_face_wash_with_built_in_brush_100ml_front.jpg"
+      };
+      return data.products.map((p) => {
+        let normalizedBrand = ("" + p.brand).trim();
+        if (/^the derma\s*co$/i.test(normalizedBrand)) normalizedBrand = "DermaCo";
+        if (/^wow skin science$/i.test(normalizedBrand)) normalizedBrand = "Wow";
+        if (/^kiehl'?s/i.test(normalizedBrand)) normalizedBrand = "Kiehl's";
+        if (/^minimalist/i.test(normalizedBrand)) normalizedBrand = "Minimalist";
+        if (/^plum/i.test(normalizedBrand)) normalizedBrand = "Plum";
+        let thumbnail = p.thumbnail;
+        // Prefer official brand thumbnail if brand matches
+        if (brandImageMap[normalizedBrand]) thumbnail = brandImageMap[normalizedBrand];
+        return {
+          id: p.id,
+          title: p.title,
+          description: p.description,
+          price: p.price,
+          brand: normalizedBrand,
+          category: p.category,
+          rating: p.rating || 4.2,
+          thumbnail,
+          images: p.images,
+          currency: p.currency || "USD",
+          isLocalIN: region === "IN",
+          link: p.link,
+        };
+      });
     } catch (e) {
       setError(e);
       return [];
