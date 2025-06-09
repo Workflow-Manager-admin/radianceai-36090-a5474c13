@@ -72,18 +72,31 @@ const tileVariants = {
 };
 
 const DEMO_VIDEO_URLS = [
-  // Copyright-free demo/sample videos. In production, replace with real product showcase videos.
+  // Updated: Official/promo demo videos for best-selling products by each brand.
   {
-    src: "https://www.w3schools.com/html/mov_bbb.mp4",
-    title: "Top Seller: Multivitamin Moisturizer"
+    // DermaCo 1% Hyaluronic Sunscreen Aqua Gel
+    src: "https://www.youtube.com/embed/AE-dpl7f8iI?autoplay=1&mute=1&controls=0&modestbranding=1&loop=1&playlist=AE-dpl7f8iI",
+    title: "DermaCo 1% Hyaluronic Sunscreen Aqua Gel"
   },
   {
-    src: "https://www.pexels.com/video/854168/download/",
-    title: "Blockbuster: Vitamin C Glow Serum"
+    // Kiehl's Ultra Facial Cream - official promo
+    src: "https://www.youtube.com/embed/Wp_wUuTmTi0?autoplay=1&mute=1&controls=0&modestbranding=1&loop=1&playlist=Wp_wUuTmTi0",
+    title: "Kiehl's Ultra Facial Cream"
   },
   {
-    src: "https://www.w3schools.com/html/movie.mp4",
-    title: "Classic: Gentle Foaming Cleanser"
+    // Minimalist 10% Niacinamide Face Serum - representative vlog/demo
+    src: "https://www.youtube.com/embed/WHojAXQy0Q4?autoplay=1&mute=1&controls=0&modestbranding=1&loop=1&playlist=WHojAXQy0Q4",
+    title: "Minimalist 10% Niacinamide Face Serum"
+  },
+  {
+    // Plum Green Tea Oil-Free Moisturizer - brand spot
+    src: "https://www.youtube.com/embed/l7g80FWVG9c?autoplay=1&mute=1&controls=0&modestbranding=1&loop=1&playlist=l7g80FWVG9c",
+    title: "Plum Green Tea Oil-Free Moisturizer"
+  },
+  {
+    // Wow Skin Science Vitamin C Face Wash - brand promo
+    src: "https://www.youtube.com/embed/fcA1eQ9BP7k?autoplay=1&mute=1&controls=0&modestbranding=1&loop=1&playlist=fcA1eQ9BP7k",
+    title: "Wow Vitamin C Face Wash"
   }
 ];
 
