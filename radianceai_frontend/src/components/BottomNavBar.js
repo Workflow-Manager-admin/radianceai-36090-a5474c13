@@ -90,15 +90,7 @@ const BottomNavBar = () => {
       }}
       aria-label="Bottom navigation"
     >
-      <div style={{
-        width: "100%",
-        maxWidth: 560,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        gap: 0,
-        padding: "0 25px",
-      }}>
+      <div className="bottom-navbar-inner">
         {NAV_ITEMS.map(item => {
           const active = location.pathname === item.to;
           return (
@@ -106,35 +98,11 @@ const BottomNavBar = () => {
               key={item.key}
               onClick={() => navigate(item.to)}
               aria-label={item.label}
-              className="nav-action-btn"
-              style={{
-                flex: 1,
-                background: "none",
-                border: "none",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 0,
-                padding: "9px 2px 5px 2px",
-                opacity: active ? 1 : 0.72,
-                transform: active ? "translateY(-4px) scale(1.1)" : "none",
-                transition: "all .19s cubic-bezier(.36,1.94,.48,1)",
-                borderRadius: 16,
-                outline: active ? "2.5px solid #fadadd" : "none"
-              }}
+              className={`nav-action-btn${active ? " nav-action-btn--active" : ""}`}
+              tabIndex={0}
             >
-              {item.icon}
-              <div style={{
-                fontSize: 12.2,
-                marginTop: 1,
-                color: "#fff",
-                letterSpacing: ".01em",
-                fontWeight: active ? 700 : 500,
-                textShadow: active ? "0 1px 8px #fadadd70" : undefined
-              }}>
-                {item.label}
-              </div>
+              <span className="nav-action-icon">{item.icon}</span>
+              <span className="nav-action-label">{item.label}</span>
             </button>
           );
         })}
