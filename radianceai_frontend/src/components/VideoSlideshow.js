@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 /**
  * PUBLIC_INTERFACE
@@ -9,7 +10,8 @@ import { motion, AnimatePresence } from "framer-motion";
  *     {
  *       src: string (URL to mp4/webm),
  *       poster: string (URL to poster image/thumbnail, optional),
- *       title: string (Product/video title, optional)
+ *       title: string (Product/video title, optional),
+ *       productId: string|number (product's route id/slug, required for click-to-details)
  *     }
  *   interval: number (milliseconds between slides, default 6200)
  */
@@ -23,6 +25,8 @@ export function VideoSlideshow({
   const [current, setCurrent] = useState(0);
   const timerRef = useRef(null);
   const numVideos = videos.length;
+  const videoElementRef = useRef(null);
+  const navigate = useNavigate();
 
   // Auto-advance logic
   useEffect(() => {
@@ -32,6 +36,22 @@ export function VideoSlideshow({
     }, interval);
     return () => clearTimeout(timerRef.current);
   }, [current, numVideos, interval]);
+
+  // Reliable autoplay via imperative playback (cross-browser)
+  useEffect(() => {
+    // Try to play() video after mount/change (required for some browsers)
+    if (videoElementRef.current) {
+      // Always mute before attempting play for policy compliance
+      videoElementRef.current.muted = true;
+      const playPromise = videoElementRef.current.play();
+      // Optionally, handle user interaction required cases here (if ever necessary)
+      if (playPromise && typeof playPromise.then === "function") {
+        playPromise.catch(() => {
+          // Ignore error: browsers may block, but will play after first user gesture
+        });
+      }
+    }
+  }, [current, videos]);
 
   // Manual controls (arrows/clicks if needed)
   const goTo = (idx) => {
@@ -46,6 +66,15 @@ export function VideoSlideshow({
     clearTimeout(timerRef.current);
     return () => {};
   }, [paused]);
+
+  // Handle click on slide: go to product details
+  const handleSlideClick = () => {
+    const cur = videos[current];
+    if (cur?.productId) {
+      // Default: product details route is /products/:id (adjust as needed)
+      navigate(`/products/${cur.productId}`);
+    }
+  };
 
   if (!videos || numVideos === 0) return null;
 
@@ -64,7 +93,8 @@ export function VideoSlideshow({
         boxShadow: "0 6px 44px 2px #fadadd36",
         background: "var(--gradient-glow, #fadadd44)",
         zIndex: 5,
-        marginBottom: 18
+        marginBottom: 18,
+        cursor: "pointer"
       }}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
@@ -73,6 +103,9 @@ export function VideoSlideshow({
       tabIndex={-1}
       aria-roledescription="carousel"
       aria-label="Bestseller product highlights"
+      onClick={handleSlideClick}
+      role="button"
+      title={videos[current]?.title ? `View details for ${videos[current].title}` : "View product details"}
     >
       <AnimatePresence initial={false} mode="wait">
         <motion.div
@@ -94,6 +127,7 @@ export function VideoSlideshow({
           }}
         >
           <video
+            ref={videoElementRef}
             key={videos[current]?.src}
             src={videos[current]?.src}
             poster={videos[current]?.poster || ""}
@@ -109,6 +143,8 @@ export function VideoSlideshow({
             playsInline
             aria-label={videos[current]?.title || "Product video"}
             onEnded={() => setCurrent((c) => (c + 1) % numVideos)}
+            // Block pointer events so underlying div handles click, or remove this if you want native controls
+            tabIndex={-1}
           />
           {videos[current]?.title && (
             <div
@@ -147,6 +183,8 @@ export function VideoSlideshow({
           gap: 11,
           zIndex: 10
         }}
+        // Don't propagate dot clicks to slideshow navigation
+        onClick={e => e.stopPropagation()}
       >
         {videos.map((v, idx) => (
           <button
