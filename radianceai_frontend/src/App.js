@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'r
 import { AnimatePresence } from "framer-motion";
 import './App.css';
 import TopNavBar from './components/TopNavBar';
-import BottomNavBar from './components/BottomNavBar';
 import Quiz from './features/quiz/Quiz';
 import Recommendations from './features/recommendations/Recommendations';
 import RoutineBuilder from './features/routine/RoutineBuilder';
@@ -87,57 +86,57 @@ function AppRoutes() {
     <AnimatePresence mode="wait">
       {/* This key ensures AnimatePresence triggers on route change */}
       <Routes location={location} key={location.pathname}>
-        <Route path="/" element={
-          <AppleFadeTransition><Home /></AppleFadeTransition>
-        } />
-        <Route path="/quiz" element={
-          <AppleFadeTransition><Quiz /></AppleFadeTransition>
-        } />
-        <Route path="/recommendations" element={
-          <AppleFadeTransition><Recommendations /></AppleFadeTransition>
-        } />
-        <Route path="/routine" element={
-          <AppleFadeTransition><RoutineBuilder /></AppleFadeTransition>
-        } />
-        <Route path="/products" element={
-          <AppleFadeTransition><ProductList /></AppleFadeTransition>
-        } />
-        <Route path="/progress" element={
-          <AppleFadeTransition><ProgressTracker /></AppleFadeTransition>
-        } />
-        <Route path="/weather" element={
-          <AppleFadeTransition><WeatherSuggestions /></AppleFadeTransition>
-        } />
-        <Route path="/email" element={
-          <AppleFadeTransition><EmailFeatures /></AppleFadeTransition>
-        } />
-        <Route path="/geolocation" element={
-          <AppleFadeTransition><Geolocation /></AppleFadeTransition>
-        } />
-        <Route path="/chat" element={
-          <AppleFadeTransition><Chatbot /></AppleFadeTransition>
-        } />
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="/"
+          element={<AppleFadeTransition><Home /></AppleFadeTransition>}
+        />
+        <Route path="/quiz"
+          element={<AppleFadeTransition><Quiz /></AppleFadeTransition>}
+        />
+        <Route path="/recommendations"
+          element={<AppleFadeTransition><Recommendations /></AppleFadeTransition>}
+        />
+        <Route path="/routine"
+          element={<AppleFadeTransition><RoutineBuilder /></AppleFadeTransition>}
+        />
+        <Route path="/products"
+          element={<AppleFadeTransition><ProductList /></AppleFadeTransition>}
+        />
+        <Route path="/progress"
+          element={<AppleFadeTransition><ProgressTracker /></AppleFadeTransition>}
+        />
+        <Route path="/weather"
+          element={<AppleFadeTransition><WeatherSuggestions /></AppleFadeTransition>}
+        />
+        <Route path="/email"
+          element={<AppleFadeTransition><EmailFeatures /></AppleFadeTransition>}
+        />
+        <Route path="/geolocation"
+          element={<AppleFadeTransition><Geolocation /></AppleFadeTransition>}
+        />
+        <Route path="/chat"
+          element={<AppleFadeTransition><Chatbot /></AppleFadeTransition>}
+        />
+        <Route path="*"
+          element={<Navigate to="/" replace />}
+        />
       </Routes>
     </AnimatePresence>
   );
 }
 
+// PUBLIC_INTERFACE
+// Main skeleton with persistent animated Apple-like top nav
 function App() {
-  // PUBLIC_INTERFACE
-  // Main skeleton with persistent animated Apple-like top/bottom nav
-  // Ensures proper bottom margin for responsive nav, fixes mobile overlays
   // DEBUG: Temporarily mount z-index overlay visual checker to assist troubleshooting
   return (
     <Router>
       <div className="app">
-        <OverlayDebugger/> 
+        <OverlayDebugger />
         <TopNavBar />
         <main
           style={{
             paddingTop: 70,
-            paddingBottom: 78,
-            minHeight: "calc(100vh - 140px)",
+            minHeight: "calc(100vh - 70px)",
             background: "none",
             transition: "padding-bottom 0.25s cubic-bezier(.27,1.36,.48,1)",
             willChange: "padding-bottom, background",
@@ -145,7 +144,7 @@ function App() {
         >
           <AppRoutes />
         </main>
-        <BottomNavBar />
+        {/* BottomNavBar removed */}
       </div>
     </Router>
   );
