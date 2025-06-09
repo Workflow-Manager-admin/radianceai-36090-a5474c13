@@ -68,24 +68,27 @@ function OptionButton({ label, selected, onClick, disabled, ariaLabel, style }) 
       aria-label={ariaLabel || label}
       style={{
         background: selected
-          ? "linear-gradient(90deg, #fadadd 40%, #e7b3ff 90%)"
-          : "rgba(255,255,255,0.07)",
-        color: selected ? "#23155f" : "#fff",
-        fontWeight: selected ? 600 : 500,
+          ? "linear-gradient(92deg,#fadadd 45%,#f339db 100%)"
+          : "rgba(255,255,255,0.12)",
+        color: selected ? "#27174e" : "#190155",
+        fontWeight: selected ? 700 : 500,
         border: selected
-          ? "2px solid #f339db"
-          : "2px solid rgba(255,255,255,0.09)",
-        borderRadius: 14,
-        padding: "15px 22px",
-        marginBottom: 10,
+          ? "2.2px solid #f339db"
+          : "2.2px solid #e7b3ff2e",
+        borderRadius: 15,
+        padding: "17px 0px",
+        margin: "0 0",
         cursor: disabled ? "not-allowed" : "pointer",
         opacity: disabled ? 0.5 : 1,
-        fontSize: 18,
+        fontSize: 18.1,
+        width: "100%",
+        minHeight: 53,
         boxShadow: selected
-          ? "0 2px 18px 0 #fadadd61"
-          : "0 1px 10px 0 rgba(0,0,0,0.05)",
+          ? "0 2px 16px 0 #fadadd61"
+          : "0 1px 8px 0 rgba(0,0,0,0.04)",
         outline: selected ? "2.5px solid #f339db88" : "none",
-        transition: "all 0.16s cubic-bezier(.29,1.1,.48,1)",
+        letterSpacing: ".01em",
+        transition: "box-shadow 0.16s, background 0.18s, color 0.18s, border 0.16s",
         ...style,
       }}
       onClick={onClick}
@@ -242,20 +245,22 @@ const QuizModal = ({
             }}
             style={{
               background:
-                "linear-gradient(102deg, #200982 0%, #1a1c44 70%, #fadadd15 100%)",
-              borderRadius: 26,
+                "linear-gradient(101deg, #fff 0%, #fadadd 60%, #e7b3ff 100%)",
+              borderRadius: 28,
               boxShadow:
-                "0 8px 44px 0 rgba(85,17,123,.24), 0 0.5px 0.7px 0 #fadadd20",
-              maxWidth: 420,
+                "0 9px 48px 0 #fadadd39, 0 1.2px 2.4px 0 #e7b3ff30",
+              maxWidth: 430,
               width: "98vw",
-              minHeight: 335,
-              padding: "40px 22px 26px 22px",
+              minWidth: 312,
+              minHeight: 355,
+              padding: "42px 24px 30px 24px",
               margin: "0 auto",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
               outline: "none",
               position: "relative",
+              transition: "box-shadow 0.18s, background 0.18s",
             }}
             tabIndex={-1}
             onClick={(e) => e.stopPropagation()}
@@ -267,19 +272,26 @@ const QuizModal = ({
               onClick={onClose}
               style={{
                 position: "absolute",
-                top: 18,
-                right: 16,
-                background: "none",
+                top: 10,
+                right: 10,
+                background: "#ffeafdcc",
                 border: "none",
-                color: "#fadadd",
+                color: "#f339db",
                 fontWeight: 800,
-                fontSize: 23,
+                fontSize: 27,
+                borderRadius: 19,
+                width: 34,
+                height: 34,
                 cursor: "pointer",
-                opacity: 0.7,
-                transition: "opacity 0.18s",
+                opacity: 0.82,
+                boxShadow: "0 1.5px 10px #fadadd3b",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                transition: "opacity 0.18s, background 0.18s",
               }}
             >
-              ×
+              &times;
             </button>
             <StepProgressDots steps={quizSteps} currentStep={step} />
             <motion.div
@@ -321,12 +333,14 @@ const QuizModal = ({
               <form onSubmit={onNext}>
                 <div
                   style={{
-                    margin: "15px 0 14px 0",
+                    margin: "16px 0 18px 0",
                     display: "flex",
                     flexDirection: "column",
-                    alignItems: "center",
-                    maxWidth: 360,
-                    gap: 0,
+                    alignItems: "stretch",
+                    justifyContent: "center",
+                    width: "100%",
+                    maxWidth: 368,
+                    gap: 14,
                   }}
                 >
                   {/* Choice (radio style) */}
@@ -370,7 +384,9 @@ const QuizModal = ({
                   style={{
                     display: "flex",
                     justifyContent: "space-between",
-                    marginTop: 15,
+                    gap: 13,
+                    marginTop: 18,
+                    width: "100%",
                   }}
                 >
                   <button
