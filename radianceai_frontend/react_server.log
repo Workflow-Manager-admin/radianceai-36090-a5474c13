@@ -2,9 +2,9 @@
 > react-kavia@0.1.0 start
 > react-scripts start
 
-(node:54902) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+(node:57752) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-(node:54902) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+(node:57752) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
 Starting the development server...
 
 Compiled successfully!
@@ -19,40 +19,74 @@ To create a production build, use npm run build.
 
 webpack compiled successfully
 Compiling...
-Failed to compile.
+Compiled with warnings.
 
 [eslint] 
-src/features/quiz/Quiz.js
-  Line 467:1:  Import in body of module; reorder to top  import/first
-  Line 468:1:  Import in body of module; reorder to top  import/first
+src/features/home/Home.js
+  Line 106:24:  'loading' is assigned a value but never used  no-unused-vars
 
-Search for the keywords to learn more about each error.
-ERROR in [eslint] 
-src/features/quiz/Quiz.js
-  Line 467:1:  Import in body of module; reorder to top  import/first
-  Line 468:1:  Import in body of module; reorder to top  import/first
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
 
-Search for the keywords to learn more about each error.
+WARNING in [eslint] 
+src/features/home/Home.js
+  Line 106:24:  'loading' is assigned a value but never used  no-unused-vars
 
-webpack compiled with 1 error
+webpack compiled with 1 warning
 Compiling...
 Failed to compile.
 
 [eslint] 
-src/features/quiz/Quiz.js
-  Line 467:1:  Import in body of module; reorder to top  import/first
-  Line 468:1:  Import in body of module; reorder to top  import/first
+src/components/VideoSlideshow.js
+  Line 46:9:    'numVideos' is not defined  no-undef
+  Line 48:35:   'numVideos' is not defined  no-undef
+  Line 51:16:   'numVideos' is not defined  no-undef
+  Line 67:16:   'videos' is not defined     no-undef
+  Line 71:46:   'numVideos' is not defined  no-undef
+  Line 85:17:   'videos' is not defined     no-undef
+  Line 92:8:    'videos' is not defined     no-undef
+  Line 92:18:   'numVideos' is not defined  no-undef
+  Line 121:14:  'videos' is not defined     no-undef
+  Line 121:59:  'videos' is not defined     no-undef
+  Line 144:18:  'videos' is not defined     no-undef
+  Line 145:18:  'videos' is not defined     no-undef
+  Line 146:21:  'videos' is not defined     no-undef
+  Line 157:25:  'videos' is not defined     no-undef
+  Line 158:56:  'numVideos' is not defined  no-undef
+  Line 162:12:  'videos' is not defined     no-undef
+  Line 180:16:  'videos' is not defined     no-undef
+  Line 202:10:  'videos' is not defined     no-undef
 
 Search for the keywords to learn more about each error.
 WARNING in [eslint] 
-src/features/recommendations/Recommendations.js
-  Line 164:9:  'navigate' is assigned a value but never used                                                                                          no-unused-vars
-  Line 226:5:  React Hook React.useMemo has a missing dependency: 'mapQuizToCategoriesAndConcerns'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+src/components/VideoSlideshow.js
+  Line 40:9:  'numSlides' is assigned a value but never used                                                                                                                                                                                          no-unused-vars
+  Line 51:6:  React Hook useEffect has an unnecessary dependency: 'numVideos'. Either exclude it or remove the dependency array. Outer scope values like 'numVideos' aren't valid dependencies because mutating them doesn't re-render the component  react-hooks/exhaustive-deps
+  Line 67:6:  React Hook useEffect has an unnecessary dependency: 'videos'. Either exclude it or remove the dependency array. Outer scope values like 'videos' aren't valid dependencies because mutating them doesn't re-render the component        react-hooks/exhaustive-deps
+
+src/features/home/Home.js
+  Line 106:24:  'loading' is assigned a value but never used  no-unused-vars
 
 ERROR in [eslint] 
-src/features/quiz/Quiz.js
-  Line 467:1:  Import in body of module; reorder to top  import/first
-  Line 468:1:  Import in body of module; reorder to top  import/first
+src/components/VideoSlideshow.js
+  Line 46:9:    'numVideos' is not defined  no-undef
+  Line 48:35:   'numVideos' is not defined  no-undef
+  Line 51:16:   'numVideos' is not defined  no-undef
+  Line 67:16:   'videos' is not defined     no-undef
+  Line 71:46:   'numVideos' is not defined  no-undef
+  Line 85:17:   'videos' is not defined     no-undef
+  Line 92:8:    'videos' is not defined     no-undef
+  Line 92:18:   'numVideos' is not defined  no-undef
+  Line 121:14:  'videos' is not defined     no-undef
+  Line 121:59:  'videos' is not defined     no-undef
+  Line 144:18:  'videos' is not defined     no-undef
+  Line 145:18:  'videos' is not defined     no-undef
+  Line 146:21:  'videos' is not defined     no-undef
+  Line 157:25:  'videos' is not defined     no-undef
+  Line 158:56:  'numVideos' is not defined  no-undef
+  Line 162:12:  'videos' is not defined     no-undef
+  Line 180:16:  'videos' is not defined     no-undef
+  Line 202:10:  'videos' is not defined     no-undef
 
 Search for the keywords to learn more about each error.
 
@@ -61,239 +95,99 @@ Compiling...
 Failed to compile.
 
 [eslint] 
-src/features/quiz/Quiz.js
-Syntax error: Identifier 'useContext' has already been declared. (470:9) (470:9)
+src/components/VideoSlideshow.js
+  Line 71:46:   'numVideos' is not defined  no-undef
+  Line 85:17:   'videos' is not defined     no-undef
+  Line 92:8:    'videos' is not defined     no-undef
+  Line 92:18:   'numVideos' is not defined  no-undef
+  Line 121:14:  'videos' is not defined     no-undef
+  Line 121:59:  'videos' is not defined     no-undef
+  Line 144:18:  'videos' is not defined     no-undef
+  Line 145:18:  'videos' is not defined     no-undef
+  Line 146:21:  'videos' is not defined     no-undef
+  Line 157:25:  'videos' is not defined     no-undef
+  Line 158:56:  'numVideos' is not defined  no-undef
+  Line 162:12:  'videos' is not defined     no-undef
+  Line 180:16:  'videos' is not defined     no-undef
+  Line 202:10:  'videos' is not defined     no-undef
+
+Search for the keywords to learn more about each error.
 WARNING in [eslint] 
-src/features/recommendations/Recommendations.js
-  Line 164:9:  'navigate' is assigned a value but never used                                                                                          no-unused-vars
-  Line 226:5:  React Hook React.useMemo has a missing dependency: 'mapQuizToCategoriesAndConcerns'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+src/components/VideoSlideshow.js
+  Line 54:37:  'paused' was used before it was defined  no-use-before-define
 
-ERROR in ./src/features/quiz/Quiz.js
-Module build failed (from ./node_modules/babel-loader/lib/index.js):
-SyntaxError: /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/src/features/quiz/Quiz.js: Identifier 'useContext' has already been declared. (470:9)
-
-  468 | import { GlobalStateContext } from "../../context/GlobalStateContext";
-  469 |
-> 470 | import { useContext } from "react";
-      |          ^
-  471 | import { GlobalStateContext } from "../../context/GlobalStateContext";
-  472 |
-  473 | const Quiz = () => {
-    at constructor (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:360:19)
-    at FlowParserMixin.raise (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:3327:19)
-    at FlowScopeHandler.checkRedeclarationInScope (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:1555:19)
-    at FlowScopeHandler.declareName (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:1521:12)
-    at FlowScopeHandler.declareName (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:1622:11)
-    at FlowParserMixin.declareNameFromIdentifier (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:7476:16)
-    at FlowParserMixin.checkIdentifier (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:7472:12)
-    at FlowParserMixin.checkLVal (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:7413:12)
-    at FlowParserMixin.finishImportSpecifier (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:13898:10)
-    at FlowParserMixin.parseImportSpecifier (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:5680:17)
-    at FlowParserMixin.parseNamedImportSpecifiers (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:14033:36)
-    at FlowParserMixin.parseImportSpecifiersAndAfter (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:13875:37)
-    at FlowParserMixin.parseImport (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:13868:17)
-    at FlowParserMixin.parseStatementContent (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:12514:27)
-    at FlowParserMixin.parseStatementLike (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:12406:17)
-    at FlowParserMixin.parseStatementLike (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:5140:24)
-    at FlowParserMixin.parseModuleItem (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:12383:17)
-    at FlowParserMixin.parseBlockOrModuleBlockBody (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:12960:36)
-    at FlowParserMixin.parseBlockBody (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:12953:10)
-    at FlowParserMixin.parseProgram (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:12280:10)
-    at FlowParserMixin.parseTopLevel (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:12270:25)
-    at FlowParserMixin.parseTopLevel (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:5909:28)
-    at FlowParserMixin.parse (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:14120:10)
-    at parse (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:14154:38)
-    at parser (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/core/lib/parser/index.js:41:34)
-    at parser.next (<anonymous>)
-    at normalizeFile (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/core/lib/transformation/normalize-file.js:64:37)
-    at normalizeFile.next (<anonymous>)
-    at run (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/core/lib/transformation/index.js:22:50)
-    at run.next (<anonymous>)
-    at transform (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/core/lib/transform.js:22:33)
-    at transform.next (<anonymous>)
-    at step (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/gensync/index.js:261:32)
-    at /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/gensync/index.js:273:13
-    at async.call.result.err.err (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/gensync/index.js:223:11)
+src/features/home/Home.js
+  Line 106:24:  'loading' is assigned a value but never used  no-unused-vars
 
 ERROR in [eslint] 
-src/features/quiz/Quiz.js
-  Line 470:9:  Parsing error: Identifier 'useContext' has already been declared. (470:9)
+src/components/VideoSlideshow.js
+  Line 71:46:   'numVideos' is not defined  no-undef
+  Line 85:17:   'videos' is not defined     no-undef
+  Line 92:8:    'videos' is not defined     no-undef
+  Line 92:18:   'numVideos' is not defined  no-undef
+  Line 121:14:  'videos' is not defined     no-undef
+  Line 121:59:  'videos' is not defined     no-undef
+  Line 144:18:  'videos' is not defined     no-undef
+  Line 145:18:  'videos' is not defined     no-undef
+  Line 146:21:  'videos' is not defined     no-undef
+  Line 157:25:  'videos' is not defined     no-undef
+  Line 158:56:  'numVideos' is not defined  no-undef
+  Line 162:12:  'videos' is not defined     no-undef
+  Line 180:16:  'videos' is not defined     no-undef
+  Line 202:10:  'videos' is not defined     no-undef
 
-webpack compiled with 2 errors and 1 warning
+Search for the keywords to learn more about each error.
+
+webpack compiled with 1 error and 1 warning
 Compiling...
 Failed to compile.
 
 [eslint] 
-src/features/quiz/Quiz.js
-Syntax error: Identifier 'useContext' has already been declared. (468:9) (468:9)
+src/components/VideoSlideshow.js
+  Line 71:46:  'numVideos' is not defined  no-undef
+
+Search for the keywords to learn more about each error.
 WARNING in [eslint] 
-src/features/recommendations/Recommendations.js
-  Line 164:9:  'navigate' is assigned a value but never used                                                                                          no-unused-vars
-  Line 226:5:  React Hook React.useMemo has a missing dependency: 'mapQuizToCategoriesAndConcerns'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+src/components/VideoSlideshow.js
+  Line 54:37:  'paused' was used before it was defined  no-use-before-define
 
-ERROR in ./src/features/quiz/Quiz.js
-Module build failed (from ./node_modules/babel-loader/lib/index.js):
-SyntaxError: /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/src/features/quiz/Quiz.js: Identifier 'useContext' has already been declared. (468:9)
-
-  466 |  * Quiz main entry (full page view).
-  467 |  */
-> 468 | import { useContext } from "react";
-      |          ^
-  469 | import { GlobalStateContext } from "../../context/GlobalStateContext";
-  470 |
-  471 | import { useContext } from "react";
-    at constructor (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:360:19)
-    at FlowParserMixin.raise (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:3327:19)
-    at FlowScopeHandler.checkRedeclarationInScope (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:1555:19)
-    at FlowScopeHandler.declareName (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:1521:12)
-    at FlowScopeHandler.declareName (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:1622:11)
-    at FlowParserMixin.declareNameFromIdentifier (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:7476:16)
-    at FlowParserMixin.checkIdentifier (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:7472:12)
-    at FlowParserMixin.checkLVal (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:7413:12)
-    at FlowParserMixin.finishImportSpecifier (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:13898:10)
-    at FlowParserMixin.parseImportSpecifier (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:5680:17)
-    at FlowParserMixin.parseNamedImportSpecifiers (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:14033:36)
-    at FlowParserMixin.parseImportSpecifiersAndAfter (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:13875:37)
-    at FlowParserMixin.parseImport (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:13868:17)
-    at FlowParserMixin.parseStatementContent (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:12514:27)
-    at FlowParserMixin.parseStatementLike (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:12406:17)
-    at FlowParserMixin.parseStatementLike (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:5140:24)
-    at FlowParserMixin.parseModuleItem (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:12383:17)
-    at FlowParserMixin.parseBlockOrModuleBlockBody (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:12960:36)
-    at FlowParserMixin.parseBlockBody (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:12953:10)
-    at FlowParserMixin.parseProgram (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:12280:10)
-    at FlowParserMixin.parseTopLevel (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:12270:25)
-    at FlowParserMixin.parseTopLevel (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:5909:28)
-    at FlowParserMixin.parse (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:14120:10)
-    at parse (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:14154:38)
-    at parser (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/core/lib/parser/index.js:41:34)
-    at parser.next (<anonymous>)
-    at normalizeFile (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/core/lib/transformation/normalize-file.js:64:37)
-    at normalizeFile.next (<anonymous>)
-    at run (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/core/lib/transformation/index.js:22:50)
-    at run.next (<anonymous>)
-    at transform (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/core/lib/transform.js:22:33)
-    at transform.next (<anonymous>)
-    at step (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/gensync/index.js:261:32)
-    at /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/gensync/index.js:273:13
-    at async.call.result.err.err (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/gensync/index.js:223:11)
+src/features/home/Home.js
+  Line 106:24:  'loading' is assigned a value but never used  no-unused-vars
 
 ERROR in [eslint] 
-src/features/quiz/Quiz.js
-  Line 468:9:  Parsing error: Identifier 'useContext' has already been declared. (468:9)
+src/components/VideoSlideshow.js
+  Line 71:46:  'numVideos' is not defined  no-undef
 
-webpack compiled with 2 errors and 1 warning
-Compiling...
-Failed to compile.
+Search for the keywords to learn more about each error.
 
-[eslint] 
-src/features/quiz/Quiz.js
-Syntax error: Identifier 'useContext' has already been declared. (468:9) (468:9)
-WARNING in [eslint] 
-src/features/recommendations/Recommendations.js
-  Line 164:9:  'navigate' is assigned a value but never used                                                                                          no-unused-vars
-  Line 226:5:  React Hook React.useMemo has a missing dependency: 'mapQuizToCategoriesAndConcerns'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
-
-ERROR in ./src/features/quiz/Quiz.js
-Module build failed (from ./node_modules/babel-loader/lib/index.js):
-SyntaxError: /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/src/features/quiz/Quiz.js: Identifier 'useContext' has already been declared. (468:9)
-
-  466 |  * Quiz main entry (full page view).
-  467 |  */
-> 468 | import { useContext } from "react";
-      |          ^
-  469 | import { GlobalStateContext } from "../../context/GlobalStateContext";
-  470 |
-  471 | const Quiz = () => {
-    at constructor (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:360:19)
-    at FlowParserMixin.raise (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:3327:19)
-    at FlowScopeHandler.checkRedeclarationInScope (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:1555:19)
-    at FlowScopeHandler.declareName (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:1521:12)
-    at FlowScopeHandler.declareName (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:1622:11)
-    at FlowParserMixin.declareNameFromIdentifier (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:7476:16)
-    at FlowParserMixin.checkIdentifier (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:7472:12)
-    at FlowParserMixin.checkLVal (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:7413:12)
-    at FlowParserMixin.finishImportSpecifier (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:13898:10)
-    at FlowParserMixin.parseImportSpecifier (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:5680:17)
-    at FlowParserMixin.parseNamedImportSpecifiers (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:14033:36)
-    at FlowParserMixin.parseImportSpecifiersAndAfter (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:13875:37)
-    at FlowParserMixin.parseImport (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:13868:17)
-    at FlowParserMixin.parseStatementContent (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:12514:27)
-    at FlowParserMixin.parseStatementLike (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:12406:17)
-    at FlowParserMixin.parseStatementLike (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:5140:24)
-    at FlowParserMixin.parseModuleItem (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:12383:17)
-    at FlowParserMixin.parseBlockOrModuleBlockBody (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:12960:36)
-    at FlowParserMixin.parseBlockBody (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:12953:10)
-    at FlowParserMixin.parseProgram (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:12280:10)
-    at FlowParserMixin.parseTopLevel (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:12270:25)
-    at FlowParserMixin.parseTopLevel (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:5909:28)
-    at FlowParserMixin.parse (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:14120:10)
-    at parse (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/parser/lib/index.js:14154:38)
-    at parser (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/core/lib/parser/index.js:41:34)
-    at parser.next (<anonymous>)
-    at normalizeFile (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/core/lib/transformation/normalize-file.js:64:37)
-    at normalizeFile.next (<anonymous>)
-    at run (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/core/lib/transformation/index.js:22:50)
-    at run.next (<anonymous>)
-    at transform (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/@babel/core/lib/transform.js:22:33)
-    at transform.next (<anonymous>)
-    at step (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/gensync/index.js:261:32)
-    at /home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/gensync/index.js:273:13
-    at async.call.result.err.err (/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/node_modules/gensync/index.js:223:11)
-
-ERROR in [eslint] 
-src/features/quiz/Quiz.js
-  Line 468:9:  Parsing error: Identifier 'useContext' has already been declared. (468:9)
-
-webpack compiled with 2 errors and 1 warning
+webpack compiled with 1 error and 1 warning
 Compiling...
 Compiled with warnings.
 
 [eslint] 
-src/features/recommendations/Recommendations.js
-  Line 164:9:  'navigate' is assigned a value but never used                                                                                          no-unused-vars
-  Line 226:5:  React Hook React.useMemo has a missing dependency: 'mapQuizToCategoriesAndConcerns'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+src/features/home/Home.js
+  Line 106:24:  'loading' is assigned a value but never used  no-unused-vars
 
 Search for the keywords to learn more about each warning.
 To ignore, add // eslint-disable-next-line to the line before.
 
 WARNING in [eslint] 
-src/features/recommendations/Recommendations.js
-  Line 164:9:  'navigate' is assigned a value but never used                                                                                          no-unused-vars
-  Line 226:5:  React Hook React.useMemo has a missing dependency: 'mapQuizToCategoriesAndConcerns'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+src/features/home/Home.js
+  Line 106:24:  'loading' is assigned a value but never used  no-unused-vars
 
 webpack compiled with 1 warning
 Compiling...
 Compiled with warnings.
 
 [eslint] 
-src/features/recommendations/Recommendations.js
-  Line 164:9:  'navigate' is assigned a value but never used                                                                                          no-unused-vars
-  Line 226:5:  React Hook React.useMemo has a missing dependency: 'mapQuizToCategoriesAndConcerns'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+src/features/home/Home.js
+  Line 106:24:  'loading' is assigned a value but never used  no-unused-vars
 
 Search for the keywords to learn more about each warning.
 To ignore, add // eslint-disable-next-line to the line before.
 
 WARNING in [eslint] 
-src/features/recommendations/Recommendations.js
-  Line 164:9:  'navigate' is assigned a value but never used                                                                                          no-unused-vars
-  Line 226:5:  React Hook React.useMemo has a missing dependency: 'mapQuizToCategoriesAndConcerns'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
-
-webpack compiled with 1 warning
-Compiling...
-Compiled with warnings.
-
-[eslint] 
-src/features/recommendations/Recommendations.js
-  Line 164:9:  'navigate' is assigned a value but never used                                                                                          no-unused-vars
-  Line 226:5:  React Hook React.useMemo has a missing dependency: 'mapQuizToCategoriesAndConcerns'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
-
-Search for the keywords to learn more about each warning.
-To ignore, add // eslint-disable-next-line to the line before.
-
-WARNING in [eslint] 
-src/features/recommendations/Recommendations.js
-  Line 164:9:  'navigate' is assigned a value but never used                                                                                          no-unused-vars
-  Line 226:5:  React Hook React.useMemo has a missing dependency: 'mapQuizToCategoriesAndConcerns'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+src/features/home/Home.js
+  Line 106:24:  'loading' is assigned a value but never used  no-unused-vars
 
 webpack compiled with 1 warning

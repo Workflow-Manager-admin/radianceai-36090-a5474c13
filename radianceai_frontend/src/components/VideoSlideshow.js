@@ -6,77 +6,71 @@ import { useNavigate } from "react-router-dom";
  * PUBLIC_INTERFACE
  * VideoSlideshow: A full-width, autoplaying, animated video carousel/hero.
  * Props:
- *   videos: Array of
+ *   slides: Array of
  *     {
- *       src: string (URL to mp4/webm),
- *       poster: string (URL to poster image/thumbnail, optional),
- *       title: string (Product/video title, optional),
- *       productId: string|number (product's route id/slug, required for click-to-details)
+ *       videoUrl: string (URL to mp4/webm or embeddable direct video),
+ *       productId: string|number,
+ *       poster: string (optional),
+ *       title: string (optional),
  *     }
  *   interval: number (milliseconds between slides, default 6200)
  */
 const AUTOPLAY_INTERVAL = 6200;
 
 export function VideoSlideshow({
-  videos = [],
+  slides = [],
   interval = AUTOPLAY_INTERVAL,
   aspectRatio = "21/9"
 }) {
   const [current, setCurrent] = useState(0);
   const timerRef = useRef(null);
-  const numVideos = videos.length;
   const videoElementRef = useRef(null);
   const navigate = useNavigate();
-
-  // Auto-advance logic
-  useEffect(() => {
-    if (numVideos === 0) return;
-    timerRef.current = setTimeout(() => {
-      setCurrent((c) => (c + 1) % numVideos);
-    }, interval);
-    return () => clearTimeout(timerRef.current);
-  }, [current, numVideos, interval]);
-
-  // Reliable autoplay via imperative playback (cross-browser)
-  useEffect(() => {
-    // Try to play() video after mount/change (required for some browsers)
-    if (videoElementRef.current) {
-      // Always mute before attempting play for policy compliance
-      videoElementRef.current.muted = true;
-      const playPromise = videoElementRef.current.play();
-      // Optionally, handle user interaction required cases here (if ever necessary)
-      if (playPromise && typeof playPromise.then === "function") {
-        playPromise.catch(() => {
-          // Ignore error: browsers may block, but will play after first user gesture
-        });
-      }
-    }
-  }, [current, videos]);
-
-  // Manual controls (arrows/clicks if needed)
-  const goTo = (idx) => {
-    if (idx === current || idx < 0 || idx >= numVideos) return;
-    setCurrent(idx);
-  };
+  const numSlides = slides.length;
 
   // Pause on hover/focus
   const [paused, setPaused] = useState(false);
-  useEffect(() => {
-    if (!paused) return;
-    clearTimeout(timerRef.current);
-    return () => {};
-  }, [paused]);
 
-  // Handle click on slide: go to product details
+  // Reliable autoplay logic (resilient to browser throttling/tab switching)
+  useEffect(() => {
+    if (numSlides === 0) return;
+    clearTimeout(timerRef.current);
+    if (!paused) {
+      timerRef.current = setTimeout(() => {
+        setCurrent((c) => (c + 1) % numSlides);
+      }, interval);
+    }
+    return () => clearTimeout(timerRef.current);
+  }, [current, numSlides, interval, paused]);
+
+  // Reliable autoplay: forcibly call play() after new video loads, handle browser quirks
+  useEffect(() => {
+    if (videoElementRef.current) {
+      videoElementRef.current.muted = true;
+      const playPromise = videoElementRef.current.play();
+      if (playPromise && typeof playPromise.then === "function") {
+        playPromise.catch(() => {
+          // If autoplay fails, wait for user gesture, else ignore.
+        });
+      }
+    }
+  }, [current, slides]);
+
+  // Manual controls (arrows/clicks if needed)
+  const goTo = (idx) => {
+    if (idx === current || idx < 0 || idx >= numSlides) return;
+    setCurrent(idx);
+  };
+
+  // Handle click on slide: go to product details for current slide
   const handleSlideClick = () => {
-    const cur = videos[current];
+    const cur = slides[current];
     if (cur?.productId) {
-      // Default: product details route is /products/:id (adjust as needed)
       navigate(`/products/${cur.productId}`);
     }
   };
 
-  if (!videos || numVideos === 0) return null;
+  if (!slides || numSlides === 0) return null;
 
   return (
     <div
@@ -105,7 +99,7 @@ export function VideoSlideshow({
       aria-label="Bestseller product highlights"
       onClick={handleSlideClick}
       role="button"
-      title={videos[current]?.title ? `View details for ${videos[current].title}` : "View product details"}
+      title={slides[current]?.title ? `View details for ${slides[current].title}` : "View product details"}
     >
       <AnimatePresence initial={false} mode="wait">
         <motion.div
@@ -128,9 +122,9 @@ export function VideoSlideshow({
         >
           <video
             ref={videoElementRef}
-            key={videos[current]?.src}
-            src={videos[current]?.src}
-            poster={videos[current]?.poster || ""}
+            key={slides[current]?.videoUrl}
+            src={slides[current]?.videoUrl}
+            poster={slides[current]?.poster || ""}
             style={{
               width: "100%",
               height: "100%",
@@ -141,12 +135,11 @@ export function VideoSlideshow({
             muted
             loop={false}
             playsInline
-            aria-label={videos[current]?.title || "Product video"}
-            onEnded={() => setCurrent((c) => (c + 1) % numVideos)}
-            // Block pointer events so underlying div handles click, or remove this if you want native controls
+            aria-label={slides[current]?.title || "Product video"}
+            onEnded={() => setCurrent((c) => (c + 1) % numSlides)}
             tabIndex={-1}
           />
-          {videos[current]?.title && (
+          {slides[current]?.title && (
             <div
               className="video-title"
               style={{
@@ -164,7 +157,7 @@ export function VideoSlideshow({
                 pointerEvents: "none"
               }}
             >
-              {videos[current].title}
+              {slides[current].title}
             </div>
           )}
         </motion.div>
@@ -183,12 +176,11 @@ export function VideoSlideshow({
           gap: 11,
           zIndex: 10
         }}
-        // Don't propagate dot clicks to slideshow navigation
         onClick={e => e.stopPropagation()}
       >
-        {videos.map((v, idx) => (
+        {slides.map((v, idx) => (
           <button
-            key={v.src + idx}
+            key={v.videoUrl + idx}
             onClick={() => goTo(idx)}
             aria-label={`Go to slide ${idx + 1} (${v.title || "Product"})`}
             style={{

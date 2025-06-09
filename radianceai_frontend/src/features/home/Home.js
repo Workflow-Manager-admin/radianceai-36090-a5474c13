@@ -110,16 +110,24 @@ const Home = () => {
     deduplicate: true
   });
 
-  // Map product data to video (mocking video source for now)
+  // Map product data to video (paired with productId)
   const videoSlides = useMemo(() => {
     if (Array.isArray(recommended) && recommended.length > 0) {
-      // If real .video or .videoUrl exists, use that. Otherwise, fallback.
+      // Try to use official or fallback videos - maintain mapping to productId.
       return recommended.map((p, i) => ({
-        src: p.video || p.videoUrl || DEMO_VIDEO_URLS[i % DEMO_VIDEO_URLS.length].src,
-        title: p.title
+        videoUrl: p.video || p.videoUrl || DEMO_VIDEO_URLS[i % DEMO_VIDEO_URLS.length].src,
+        productId: p.id,
+        title: p.title || "",
+        poster: p.thumbnail || "",
       }));
     }
-    return DEMO_VIDEO_URLS;
+    // If fallback, no real products; map dummy product IDs (for demo)
+    return DEMO_VIDEO_URLS.map((v, i) => ({
+      videoUrl: v.src,
+      productId: i + 1, // Dummy ID for fallback mode
+      title: v.title || "",
+      poster: "",
+    }));
   }, [recommended]);
 
   // PUBLIC_INTERFACE
@@ -128,7 +136,7 @@ const Home = () => {
     <div className="container">
       <MotionWrapper>
         {/* VideoSlideshow Hero */}
-        <VideoSlideshow videos={videoSlides} />
+        <VideoSlideshow slides={videoSlides} />
         <div className="hero" style={{
           paddingBottom: 10,
           gap: 19
