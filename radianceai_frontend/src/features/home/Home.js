@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { MotionWrapper } from "../../utils/animation";
 import { motion } from "framer-motion";
+import useProducts from "../../hooks/useProducts";
+import VideoSlideshow from "../../components/VideoSlideshow";
 
 /**
  * PUBLIC_INTERFACE
@@ -69,14 +71,51 @@ const tileVariants = {
   whileTap: { scale: 0.98 }
 };
 
+const DEMO_VIDEO_URLS = [
+  // Copyright-free demo/sample videos. In production, replace with real product showcase videos.
+  {
+    src: "https://www.w3schools.com/html/mov_bbb.mp4",
+    title: "Top Seller: Multivitamin Moisturizer"
+  },
+  {
+    src: "https://www.pexels.com/video/854168/download/",
+    title: "Blockbuster: Vitamin C Glow Serum"
+  },
+  {
+    src: "https://www.w3schools.com/html/movie.mp4",
+    title: "Classic: Gentle Foaming Cleanser"
+  }
+];
+
 const Home = () => {
   const navigate = useNavigate();
+  // Fetch 3 bestsellers—if product doesn't include video, fallback to demo.
+  const { recommended, loading } = useProducts({
+    sortBy: "rating",
+    limit: 3,
+    minRating: 4,
+    deduplicate: true
+  });
+
+  // Map product data to video (mocking video source for now)
+  const videoSlides = useMemo(() => {
+    if (Array.isArray(recommended) && recommended.length > 0) {
+      // If real .video or .videoUrl exists, use that. Otherwise, fallback.
+      return recommended.map((p, i) => ({
+        src: p.video || p.videoUrl || DEMO_VIDEO_URLS[i % DEMO_VIDEO_URLS.length].src,
+        title: p.title
+      }));
+    }
+    return DEMO_VIDEO_URLS;
+  }, [recommended]);
 
   // PUBLIC_INTERFACE
   // Main home page: hero + animated option tiles
   return (
     <div className="container">
       <MotionWrapper>
+        {/* VideoSlideshow Hero */}
+        <VideoSlideshow videos={videoSlides} />
         <div className="hero" style={{
           paddingBottom: 10,
           gap: 19
