@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { AppleFadeTransition, MotionWrapper } from "../../utils/animation";
+import { GlobalStateContext } from "../../context/GlobalStateContext";
 
 /**
  * PUBLIC_INTERFACE
@@ -469,10 +470,17 @@ const Quiz = () => {
   const [quizOpen, setQuizOpen] = useState(true);
   const [completedData, setCompletedData] = useState(null);
 
+  // Access quiz setter from global context
+  const { quiz } = useContext(GlobalStateContext);
+
   // When the quiz is completed
   function handleQuizComplete(data) {
     setCompletedData(data);
     setQuizOpen(false);
+    // Persist answers globally so recommendations can use them
+    if (quiz && typeof quiz.setQuizAnswers === "function") {
+      quiz.setQuizAnswers(data);
+    }
     // Here you would typically trigger navigation to recommendations
   }
 

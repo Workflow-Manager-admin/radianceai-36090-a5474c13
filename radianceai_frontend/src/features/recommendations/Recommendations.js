@@ -153,9 +153,11 @@ function ProductCarousel({ products, scrollRef }) {
 }
 
 const Recommendations = () => {
-  // Access global state for selected skin concerns/categories (from quiz, etc)
-  const { quizState } = useContext(GlobalStateContext);
-  // quizState format expected: { concerns: [...], categories: [...] }
+  // Access quiz answers from global context (provided by GlobalStateProvider and useQuiz)
+  const { quiz } = useContext(GlobalStateContext);
+  // quiz.quizAnswers format: { skinType, goals, budget }
+  // Defensive fallback: quiz may be undefined on first render
+  const quizAnswers = quiz?.quizAnswers || {};
 
   // --- Parse query param for category ---
   const location = useLocation();
@@ -169,17 +171,73 @@ const Recommendations = () => {
     setCategoryParam(cat);
   }, [location.search]);
 
-  // Enhanced hook: fetches and filters products for relevant skin concerns/category—no duplicates
+  // Mapping quiz answers to product categories/concerns
+  function mapQuizToCategoriesAndConcerns(quizAnswers) {
+    // Map quiz goals to product categories
+    const goalToCategory = {
+      "Hydration":            ["moisturizer", "serum"],
+      "Reduce Acne/Blemishes":["acne", "cleanser", "serum"],
+      "Even Skin Tone":       ["serum", "toner", "brightening"],
+      "Anti-Aging":           ["serum", "moisturizer", "anti-aging"],
+      "Minimize Pores":       ["cleanser", "toner", "mask"],
+      "Brightening":          ["serum", "brightening", "mask"],
+      "Reduce Redness":       ["soothing", "cream", "serum"],
+      "Sun Protection":       ["sunscreen", "spf"],
+      "Soothe Sensitivity":   ["soothing", "moisturizer", "cream"],
+    };
+
+    // The quiz stores goals as an array, other fields as strings.
+    const goals = quizAnswers.goals || [];
+    const categories = [];
+    const concerns = [];
+
+    for (const goal of goals) {
+      if (goalToCategory[goal]) {
+        for (const cat of goalToCategory[goal]) {
+          // Separate 'concerns' like 'acne'/'brightening' and categories like 'serum'
+          if (
+            ["acne", "anti-aging", "brightening", "soothing"].includes(
+              cat.toLowerCase()
+            )
+          ) {
+            concerns.push(cat);
+          } else {
+            categories.push(cat);
+          }
+        }
+      }
+    }
+
+    // Fallback/default if user has not answered/wrong data
+    if (categories.length === 0 && categoryParam) {
+      categories.push(categoryParam);
+    }
+
+    return {
+      categories: [...new Set(categories)],
+      concerns: [...new Set(concerns)],
+    };
+  }
+
+  // Get tailored filters based on quiz answers
+  const { categories: quizCategories, concerns: quizConcerns } = React.useMemo(
+    () => mapQuizToCategoriesAndConcerns(quizAnswers),
+    // Rerun mapping if quiz answers or categoryParam changes
+    [quizAnswers, categoryParam]
+  );
+
+  // Pass mapped concerns/categories to product hook
   const filterCategories = React.useMemo(() => {
+    // URL param beats quiz by user intent, fallback to mapped quiz categories, then []
     if (categoryParam) return [categoryParam];
-    if (quizState?.categories) return quizState.categories;
+    if (quizCategories) return quizCategories;
     return [];
-  }, [categoryParam, quizState]);
+  }, [categoryParam, quizCategories]);
 
   const filterConcerns = React.useMemo(() => {
-    // Optionally: Sync concern to cat param if wanted, else stick with quiz
-    return quizState?.concerns || [];
-  }, [quizState]);
+    // Quiz concerns, or none
+    return quizConcerns || [];
+  }, [quizConcerns]);
 
   const { recommended } = useProducts({
     concerns: filterConcerns,
