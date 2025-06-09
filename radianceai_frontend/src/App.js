@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { AnimatePresence } from "framer-motion";
 import './App.css';
@@ -16,6 +16,31 @@ import Chatbot from './features/chatbot/Chatbot';
 import Home from './features/home/Home';
 import { AppleFadeTransition } from "./utils/animation";
 
+/**
+ * Diagnostic Overlay: Temporarily add a visual overlay with high z-index and pointer-events to aid troubleshooting.
+ * Remove/comment this component out after confirming/solving UI blocking bugs.
+ */
+const OverlayDebugger = () => {
+  useEffect(() => {
+    const overlay = document.createElement('div');
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100vw';
+    overlay.style.height = '100vh';
+    overlay.style.zIndex = '99999';
+    overlay.style.pointerEvents = 'none'; // should never block clicks itself
+    overlay.style.background =
+      'repeating-linear-gradient(135deg, rgba(243,57,219,0.01), rgba(243,57,219,0.03) 16px, transparent 16px, transparent 32px)';
+    overlay.style.border = '4px solid #f339db22';
+    overlay.style.boxSizing = 'border-box';
+    overlay.style.opacity = '0.55';
+    overlay.setAttribute('data-debug','zindex');
+    document.body.appendChild(overlay);
+    return () => { document.body.removeChild(overlay); };
+  }, []);
+  return null;
+};
 // PUBLIC_INTERFACE
 // AppRoutes: Handles animated route transitions globally
 function AppRoutes() {
@@ -64,9 +89,11 @@ function App() {
   // PUBLIC_INTERFACE
   // Main skeleton with persistent animated Apple-like top/bottom nav
   // Ensures proper bottom margin for responsive nav, fixes mobile overlays
+  // DEBUG: Temporarily mount z-index overlay visual checker to assist troubleshooting
   return (
     <Router>
       <div className="app">
+        <OverlayDebugger/> 
         <TopNavBar />
         <main
           style={{
