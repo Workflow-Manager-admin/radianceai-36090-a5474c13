@@ -1,7 +1,8 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
 import { motion } from "framer-motion";
-import { fetchRecommendedProducts } from "../../api/apiClient";
 import { AppleFadeTransition } from "../../utils/animation";
+import { useProducts } from "../../hooks/useProducts";
+import { GlobalStateContext } from "../../context/GlobalStateContext";
 
 // PUBLIC_INTERFACE
 /**
@@ -151,19 +152,34 @@ function ProductCarousel({ products, scrollRef }) {
 }
 
 const Recommendations = () => {
-  const [products, setProducts] = useState([]);
+  // Access global state for selected skin concerns/categories (from quiz, etc)
+  const { quizState } = useContext(GlobalStateContext);
+  // quizState format expected: { concerns: [...], categories: [...] }
+  
+  // Enhanced hook: fetches and filters products for relevant skin concerns—no duplicates
+  const { recommended } = useProducts({
+    concerns: quizState?.concerns || [],
+    categories: quizState?.categories || [],
+    limit: 15,
+    minRating: 4,
+    deduplicate: true
+  });
+
   const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState([]);
+
   const scrollRef = useRef();
 
   useEffect(() => {
-    // TODO: Take quiz state as param for personalized fetch
     setLoading(true);
-    fetchRecommendedProducts({ limit: 15, minRating: 4 })
-      .then(setProducts)
-      .finally(() => setLoading(false));
-  }, []);
+    // recommended is reactive to quizState (concerns/categories)
+    // It must return only unique, relevant products per concern/category
+    if (recommended && Array.isArray(recommended)) {
+      setProducts(recommended);
+      setLoading(false);
+    }
+  }, [recommended]);
 
-  // Optional: arrow scroll controls
   const scrollBy = (dx) => {
     if (scrollRef.current) {
       scrollRef.current.scrollBy({ left: dx, behavior: "smooth" });
