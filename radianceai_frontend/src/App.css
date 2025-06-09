@@ -318,6 +318,12 @@ main {
   background: #fadadd33;
   backdrop-filter: blur(2.5px);
   animation: modalFadePop .7s cubic-bezier(.37,1.5,.44,1.01);
+  pointer-events: auto !important; /* Prevent click-throughs and enable outside click dismiss */
+}
+
+/* Ensure quiz modal content always allows user interaction */
+.quiz-modal-content {
+  pointer-events: auto !important;
 }
 @keyframes modalFadePop {
   0% { opacity: 0; transform: scale(.89);}
