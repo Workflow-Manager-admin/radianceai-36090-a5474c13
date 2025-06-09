@@ -17,7 +17,8 @@ import { useNavigate } from "react-router-dom";
  */
 const AUTOPLAY_INTERVAL = 6200;
 
-export function VideoSlideshow({
+// PUBLIC_INTERFACE
+function VideoSlideshow({
   slides = [],
   interval = AUTOPLAY_INTERVAL,
   aspectRatio = "21/9"
@@ -27,8 +28,6 @@ export function VideoSlideshow({
   const videoElementRef = useRef(null);
   const navigate = useNavigate();
   const numSlides = slides.length;
-
-  // Pause on hover/focus
   const [paused, setPaused] = useState(false);
 
   // Reliable autoplay logic (resilient to browser throttling/tab switching)
@@ -56,7 +55,7 @@ export function VideoSlideshow({
     }
   }, [current, slides]);
 
-  // Manual controls (arrows/clicks if needed)
+  // Manual controls
   const goTo = (idx) => {
     if (idx === current || idx < 0 || idx >= numSlides) return;
     setCurrent(idx);
