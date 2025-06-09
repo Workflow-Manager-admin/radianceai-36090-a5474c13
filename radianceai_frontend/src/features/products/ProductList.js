@@ -277,13 +277,51 @@ function ProductList() {
   const [expandedId, setExpandedId] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Fetch product list
+  // --- BRANDS for filter (should match those in apiClient for demo) ---
+  const availableBrands = [
+    "Mamaearth",
+    "Minimalist",
+    "Himalaya",
+    "The Derma Co",
+    "Plum",
+    "Forest Essentials",
+    "WOW Skin Science"
+  ];
+  const [selectedBrands, setSelectedBrands] = useState([...availableBrands]);
+
+  // Fetch product list, optionally filtered by selected brands
   useEffect(() => {
     setLoading(true);
-    fetchRecommendedProducts({ limit: 14, minRating: 3.7 })
+    fetchRecommendedProducts({
+      limit: 7,
+      minRating: 3.7,
+      brands: selectedBrands
+    })
       .then(setProducts)
       .finally(() => setLoading(false));
-  }, []);
+  }, [selectedBrands]);
+
+  // Handler for toggling brand selection
+  const handleBrandToggle = (brand) => {
+    setSelectedBrands(prev =>
+      prev.includes(brand)
+        ? prev.filter(b => b !== brand)
+        : [...prev, brand]
+    );
+    setExpandedId(null); // Reset expanded state on filter change
+  };
+
+  // Handler for selecting all brands
+  const handleSelectAll = () => {
+    setSelectedBrands([...availableBrands]);
+    setExpandedId(null);
+  };
+
+  // Handler for clearing all brands
+  const handleClearAll = () => {
+    setSelectedBrands([]);
+    setExpandedId(null);
+  };
 
   return (
     <section className="container" style={{ maxWidth: 825, margin: "0 auto" }}>
@@ -298,6 +336,75 @@ function ProductList() {
           }}>
             All Products
           </h2>
+          {/* BRAND FILTER: Interactive filter for Indian brands */}
+          <div style={{
+            display: "flex",
+            gap: 8,
+            alignItems: "center",
+            flexWrap: "wrap",
+            justifyContent: "center",
+            marginBottom: 14,
+            marginTop: 2,
+          }}>
+            <button onClick={handleSelectAll} disabled={selectedBrands.length === availableBrands.length}
+              style={{
+                background: "#e7b3ff",
+                color: "#fff",
+                fontWeight: 600,
+                fontSize: 13.5,
+                borderRadius: 8,
+                border: "none",
+                padding: "6px 13px",
+                marginRight: 3,
+                opacity: selectedBrands.length === availableBrands.length ? 0.55 : 1,
+                cursor: "pointer"
+              }}
+            >All Brands</button>
+            <button onClick={handleClearAll} disabled={selectedBrands.length === 0}
+              style={{
+                background: "#fadadd",
+                color: "#f339db",
+                fontWeight: 600,
+                fontSize: 13.5,
+                borderRadius: 8,
+                border: "none",
+                padding: "6px 13px",
+                marginRight: 6,
+                opacity: selectedBrands.length === 0 ? 0.5 : 1,
+                cursor: "pointer"
+              }}
+            >Clear</button>
+            {availableBrands.map((brand) => (
+              <label key={brand} style={{
+                display: "inline-flex",
+                alignItems: "center",
+                marginRight: 4,
+                marginLeft: 0,
+                fontSize: 14.3,
+                fontWeight: 600,
+                color: "#e7b3ff",
+                background: selectedBrands.includes(brand)
+                  ? "linear-gradient(92deg,#fadadd 60%,#e7b3ff 100%)"
+                  : "#fffafd",
+                border: selectedBrands.includes(brand)
+                  ? "2px solid #f339db"
+                  : "2px solid #fadadd55",
+                borderRadius: 8,
+                padding: "4px 10px",
+                marginBottom: 4,
+                cursor: "pointer",
+                userSelect: "none"
+              }}>
+                <input
+                  type="checkbox"
+                  checked={selectedBrands.includes(brand)}
+                  onChange={() => handleBrandToggle(brand)}
+                  style={{ marginRight: 7, accentColor: "#f339db", cursor: "pointer" }}
+                />
+                {brand}
+              </label>
+            ))}
+          </div>
           <div style={{
             color: "#e7b3ff",
             fontWeight: 500,
@@ -306,7 +413,10 @@ function ProductList() {
             fontSize: 16.3,
             opacity: 0.93
           }}>
-            Tap a card to see full details and usage tips.
+            {selectedBrands.length === 0 ?
+              "Select one or more brands to view products." :
+              "Tap a card to see full details and usage tips."
+            }
           </div>
         </div>
         <MotionWrapper>
@@ -327,7 +437,7 @@ function ProductList() {
               textAlign: "center",
               fontSize: 18,
             }}>
-              No products available.
+              No products available for the selected brand(s).
             </div>
           ) : (
             <div style={{
