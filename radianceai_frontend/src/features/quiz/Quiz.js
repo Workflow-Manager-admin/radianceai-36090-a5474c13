@@ -380,13 +380,27 @@ const QuizModal = ({
                       />
                     ))}
                 </div>
+                {/* Sticky/fixed nav button bar for accessibility */}
                 <div
+                  className="quiz-modal-nav-row"
                   style={{
                     display: "flex",
                     justifyContent: "space-between",
                     gap: 13,
                     marginTop: 18,
                     width: "100%",
+                    position: "sticky",
+                    bottom: 0,
+                    left: 0,
+                    background: "linear-gradient(180deg, #fadaddEE 60%, #fffafdEE 100%)",
+                    zIndex: 10,
+                    boxShadow: "0 -3px 17px 0 #e7b3ff22",
+                    padding: "12px 0 2px 0",
+                    borderRadius: "0 0 22px 22px",
+                    // Fallback for Safari iOS
+                    minHeight: 64,
+                    marginBottom: "-20px",
+                    // Prevent overlap on small screens
                   }}
                 >
                   <button
