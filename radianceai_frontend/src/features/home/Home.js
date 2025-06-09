@@ -119,10 +119,10 @@ const Home = () => {
         poster: p.thumbnail || "",
       }));
     }
-    // Fallback: use demo slides, each with a dummy productId (string for consistency)
+    // Fallback: use demo slides, each with a unique, unreachable productId (to avoid collision with real products)
     return DEMO_VIDEO_URLS.map((v, i) => ({
       videoUrl: v.videoUrl,
-      productId: `${i + 1}`, // Dummy ID as string
+      productId: `demo-${i + 1}`,
       title: v.title || "",
       poster: "",
     }));
