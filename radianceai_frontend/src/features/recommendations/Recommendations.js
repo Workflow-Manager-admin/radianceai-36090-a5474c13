@@ -174,8 +174,17 @@ const Recommendations = () => {
     setLoading(true);
     // recommended is reactive to quizState (concerns/categories)
     // It must return only unique, relevant products per concern/category
+    const allowedBrands = [
+      "DermaCo",
+      "Kiehl's",
+      "Minimalist",
+      "Plum",
+      "Wow"
+    ];
     if (recommended && Array.isArray(recommended)) {
-      setProducts(recommended);
+      setProducts(recommended.filter(p =>
+        allowedBrands.includes(p.brand)
+      ));
       setLoading(false);
     }
   }, [recommended]);

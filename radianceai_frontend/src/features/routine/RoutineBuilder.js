@@ -402,11 +402,23 @@ const RoutineBuilder = () => {
             // Could add category: step.category,
           });
 
+          // Filter to only allowed brands
+          const allowedBrands = [
+            "DermaCo",
+            "Kiehl's",
+            "Minimalist",
+            "Plum",
+            "Wow"
+          ];
+          const filtered = (products || []).filter(
+            (p) => allowedBrands.includes(p.brand)
+          );
+
           // Fuzzy match by tags/goals first; fallback to any with required keyword
           let matched =
-            products.find((p) => tagsMatch(p, tags)) ||
-            products.find((p) => tagsMatch(p, [step.key])) ||
-            products[Math.floor(Math.random() * products.length)];
+            filtered.find((p) => tagsMatch(p, tags)) ||
+            filtered.find((p) => tagsMatch(p, [step.key])) ||
+            filtered[Math.floor(Math.random() * filtered.length)];
 
           freshProducts[step.key] = matched;
         }

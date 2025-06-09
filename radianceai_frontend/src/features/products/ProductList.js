@@ -277,15 +277,13 @@ function ProductList() {
   const [expandedId, setExpandedId] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // --- BRANDS for filter (should match those in apiClient for demo) ---
+  // --- ALLOWED BRANDS for filter ---
   const availableBrands = [
-    "Mamaearth",
+    "DermaCo",
+    "Kiehl's",
     "Minimalist",
-    "Himalaya",
-    "The Derma Co",
     "Plum",
-    "Forest Essentials",
-    "WOW Skin Science"
+    "Wow"
   ];
   const [selectedBrands, setSelectedBrands] = useState([...availableBrands]);
 

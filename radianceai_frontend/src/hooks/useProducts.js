@@ -87,6 +87,25 @@ export function useProducts(options = {}) {
     if (!Array.isArray(products)) return;
     let results = products.slice();
 
+    // Global: Only use allowed brands
+    const allowedBrands = [
+      "DermaCo",
+      "Kiehl's",
+      "Minimalist",
+      "Plum",
+      "Wow"
+    ];
+    results = results.filter(p =>
+      allowedBrands.includes(
+        ("" + p.brand).trim()
+          .replace(/^the derma co$/i, "DermaCo")
+          .replace(/^wow skin science$/i, "Wow")
+          .replace(/^forest essentials$/i, "")
+          .replace(/^mamaearth$/i, "")
+          .replace(/^himalaya$/i, "")
+      )
+    );
+
     // Filter by categories
     if (categories && categories.length > 0) {
       results = results.filter(p =>
