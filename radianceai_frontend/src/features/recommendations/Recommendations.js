@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef, useContext } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { AppleFadeTransition } from "../../utils/animation";
 import { useProducts } from "../../hooks/useProducts";
@@ -155,14 +156,37 @@ const Recommendations = () => {
   // Access global state for selected skin concerns/categories (from quiz, etc)
   const { quizState } = useContext(GlobalStateContext);
   // quizState format expected: { concerns: [...], categories: [...] }
-  
-  // Enhanced hook: fetches and filters products for relevant skin concerns—no duplicates
+
+  // --- Parse query param for category ---
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [categoryParam, setCategoryParam] = useState(null);
+
+  useEffect(() => {
+    // Parse query string to get ?cat= value
+    const params = new URLSearchParams(location.search);
+    const cat = params.get("cat");
+    setCategoryParam(cat);
+  }, [location.search]);
+
+  // Enhanced hook: fetches and filters products for relevant skin concerns/category—no duplicates
+  const filterCategories = React.useMemo(() => {
+    if (categoryParam) return [categoryParam];
+    if (quizState?.categories) return quizState.categories;
+    return [];
+  }, [categoryParam, quizState]);
+
+  const filterConcerns = React.useMemo(() => {
+    // Optionally: Sync concern to cat param if wanted, else stick with quiz
+    return quizState?.concerns || [];
+  }, [quizState]);
+
   const { recommended } = useProducts({
-    concerns: quizState?.concerns || [],
-    categories: quizState?.categories || [],
+    concerns: filterConcerns,
+    categories: filterCategories,
     limit: 15,
     minRating: 4,
-    deduplicate: true
+    deduplicate: true,
   });
 
   const [loading, setLoading] = useState(true);
@@ -172,8 +196,7 @@ const Recommendations = () => {
 
   useEffect(() => {
     setLoading(true);
-    // recommended is reactive to quizState (concerns/categories)
-    // It must return only unique, relevant products per concern/category
+    // recommended is reactive to quizState (concerns/categories) or the cat param if set
     const allowedBrands = [
       "DermaCo",
       "Kiehl's",
@@ -201,7 +224,11 @@ const Recommendations = () => {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
           <h2 style={{
             color: "#fadadd", fontWeight: 700, fontSize: "1.7rem", margin: "22px 0 6px 0"
-          }}>Recommended Products</h2>
+          }}>
+            {categoryParam
+              ? `Recommended for ${categoryParam.charAt(0).toUpperCase() + categoryParam.slice(1)}`
+              : "Recommended Products"}
+          </h2>
           <div style={{
             display: "flex", gap: 8
           }}>
