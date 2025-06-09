@@ -3,79 +3,139 @@ import { useNavigate, useLocation } from "react-router-dom";
 
 /**
  * PUBLIC_INTERFACE
- * Top navigation bar with Apple-like styling.
+ * Modernized top navigation bar with premium gradients, app branding, and primary navigation items.
  */
+const NAV_ITEMS = [
+  {
+    key: "home",
+    label: "Home",
+    to: "/"
+  },
+  {
+    key: "quiz",
+    label: "Quiz",
+    to: "/quiz"
+  },
+  {
+    key: "routine",
+    label: "Routine",
+    to: "/routine"
+  },
+  {
+    key: "products",
+    label: "Products",
+    to: "/products"
+  },
+  {
+    key: "progress",
+    label: "Progress",
+    to: "/progress"
+  }
+];
+
 const TopNavBar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Soft background + blurred, semi-transparent Apple-style effect
+  // Render navigation buttons in visually cohesive layout with logo
   return (
-    <nav
-      className="top-navbar"
-      style={{
-        background: "rgba(10,18,42,0.98)",
-        backdropFilter: "blur(12px)",
-        borderRadius: "0 0 22px 22px",
-        boxShadow: "0 8px 24px 0 rgba(0,0,0,0.12)",
-        position: "fixed",
-        top: 0,
-        left: 0,
-        width: "100vw",
-        zIndex: 101,
-        height: 62,
-        display: "flex",
-        alignItems: "center",
-        transition: "box-shadow 0.25s cubic-bezier(.27,1.36,.48,1), background 0.3s",
-      }}
-      aria-label="Top navigation"
-    >
-      <div style={{
+    <nav className="top-navbar" aria-label="Top navigation">
+      <div className="top-navbar-inner" style={{
         width: "100%",
-        maxWidth: 1000,
+        maxWidth: 1060,
         margin: "0 auto",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        padding: "0 22px",
+        padding: "0 22px"
       }}>
+        {/* Logo + Brand */}
         <div
-          onClick={() => navigate("/")}
           className="logo"
+          onClick={() => navigate("/")}
           style={{
-            fontWeight: 700,
-            fontSize: 20,
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            letterSpacing: ".05em",
-            color: "var(--base-light, #00ffff)",
             cursor: "pointer",
-            userSelect: "none"
+            userSelect: "none",
+            letterSpacing: ".03em",
+            display: "flex",
+            alignItems: "center"
           }}
+          tabIndex={0}
+          aria-label="RadianceAI Home"
         >
-          <span className="logo-symbol" style={{fontSize:28, color:'var(--base-light, #00ffff)'}}>⦿</span>
-          RadianceAI
+          <span className="logo-symbol" style={{
+            fontSize: 32,
+            marginRight: 7,
+            color: "var(--radiance-ai-accent)"
+          }}>✦</span>
+          <span style={{
+            fontWeight: 900,
+            fontSize: "1.38rem",
+            background: "linear-gradient(92deg, var(--pink), var(--lilac))",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
+            textFillColor: "transparent"
+          }}>
+            RadianceAI
+          </span>
         </div>
-        <div>
-          <button
-            className="btn btn-large"
-            style={{
-              background: "linear-gradient(93deg,#fadadd 20%,#e7b3ff 100%)",
-              color: "#27174e",
-              borderRadius: 14,
-              fontWeight: 600,
-              fontSize: "1rem",
-              padding: "10px 24px",
-              boxShadow: "0 1px 10px 0 rgba(0,0,0,0.07)",
-              transition: "background 0.18s, box-shadow 0.2s",
-              outline: location.pathname === "/quiz" ? "2px solid #e7b3ff" : "none"
-            }}
-            onClick={() => navigate("/quiz")}
-          >
-            Start Quiz
-          </button>
+        
+        {/* Main Navigation Buttons */}
+        <div className="top-navbar-actions" style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 10
+        }}>
+          {NAV_ITEMS.map(item => {
+            const active = location.pathname === item.to;
+            return (
+              <button
+                key={item.key}
+                className={`nav-action-btn${active ? " nav-action-btn--active" : ""}`}
+                tabIndex={0}
+                aria-label={item.label}
+                onClick={() => navigate(item.to)}
+                style={{
+                  border: "none",
+                  outline: active ? `2.5px solid var(--accent)` : "none",
+                  background: "none",
+                  position: "relative",
+                  color: active ? "var(--accent)" : "var(--text-color)",
+                  fontSize: "1.11rem",
+                  fontWeight: 700,
+                  letterSpacing: ".01em",
+                  padding: "8px 15px",
+                  borderRadius: "17px",
+                  boxShadow: active ? "0 2px 16px #fadadd44" : "none",
+                  transition: "all 0.16s var(--motion-snappy)",
+                  backgroundImage: active ? "linear-gradient(93deg,#fadadd 40%,#e7b3ff 98%)" : "none",
+                  zIndex: active ? 2 : 1
+                }}
+              >
+                {item.label}
+                {/* Soft active shadow & animated glow (for active) */}
+                {active && (
+                  <span
+                    style={{
+                      position: "absolute",
+                      left: 7,
+                      right: 7,
+                      bottom: 3,
+                      height: 3,
+                      borderRadius: 4,
+                      background: "linear-gradient(90deg, var(--accent) 60%, var(--lilac))",
+                      boxShadow: "0 2px 14px #fadadd77",
+                      opacity: 0.38,
+                      transition: "background 0.18s"
+                    }}
+                  />
+                )}
+              </button>
+            );
+          })}
         </div>
+
       </div>
     </nav>
   );

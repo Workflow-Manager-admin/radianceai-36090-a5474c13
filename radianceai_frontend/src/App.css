@@ -76,22 +76,50 @@ main {
   color: var(--text-color);
   backdrop-filter: blur(22px);
   border-radius: 0 0 var(--radius-l) var(--radius-l);
-  box-shadow: var(--shadow-1);
+  box-shadow: 0 2.5px 18px #fadadd44, var(--shadow-1);
   position: fixed;
   top: 0; left: 0;
   width: 100vw;
   z-index: 101;
-  height: 66px;
+  height: 68px;
   display: flex;
   align-items: center;
-  padding: 0 12px;
+  padding: 0 0px;
   transition:
     box-shadow 0.22s,
-    background 0.2s;
-  will-change: background, box-shadow;
+    background 0.22s,
+    height 0.18s;
+  will-change: background, box-shadow, height;
+}
+
+.top-navbar-inner {
+  width: 100%;
+  max-width: 1060px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+  min-height: 66px;
+}
+
+.top-navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+@media (max-width: 900px) {
+  .top-navbar-inner { max-width: 97vw; padding: 0 7px;}
+  .top-navbar { height: 58px; }
 }
 @media (max-width: 700px) {
-  .top-navbar { border-radius: 0 0 var(--radius) var(--radius); height: 56px; padding: 0 4px;}
+  .top-navbar { border-radius: 0 0 var(--radius) var(--radius); height: 54px; }
+  .top-navbar-inner { padding: 0 2px; }
+}
+@media (max-width: 540px) {
+  .top-navbar-inner { max-width: 99vw; }
+  .top-navbar { height: 44px; padding: 0;}
 }
 
 .bottom-navbar {
