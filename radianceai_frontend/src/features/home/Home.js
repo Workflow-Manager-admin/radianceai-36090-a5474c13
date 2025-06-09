@@ -71,31 +71,29 @@ const tileVariants = {
   whileTap: { scale: 0.98 }
 };
 
+/** 
+ * Demo video entries should use 'videoUrl' to match product and slideshow expectations 
+ * so all slide objects are { videoUrl, productId, title, poster }.
+ */
 const DEMO_VIDEO_URLS = [
-  // Updated: Official/promo demo videos for best-selling products by each brand.
   {
-    // DermaCo 1% Hyaluronic Sunscreen Aqua Gel
-    src: "https://www.youtube.com/embed/AE-dpl7f8iI?autoplay=1&mute=1&controls=0&modestbranding=1&loop=1&playlist=AE-dpl7f8iI",
+    videoUrl: "https://www.youtube.com/embed/AE-dpl7f8iI?autoplay=1&mute=1&controls=0&modestbranding=1&loop=1&playlist=AE-dpl7f8iI",
     title: "DermaCo 1% Hyaluronic Sunscreen Aqua Gel"
   },
   {
-    // Kiehl's Ultra Facial Cream - official promo
-    src: "https://www.youtube.com/embed/Wp_wUuTmTi0?autoplay=1&mute=1&controls=0&modestbranding=1&loop=1&playlist=Wp_wUuTmTi0",
+    videoUrl: "https://www.youtube.com/embed/Wp_wUuTmTi0?autoplay=1&mute=1&controls=0&modestbranding=1&loop=1&playlist=Wp_wUuTmTi0",
     title: "Kiehl's Ultra Facial Cream"
   },
   {
-    // Minimalist 10% Niacinamide Face Serum - representative vlog/demo
-    src: "https://www.youtube.com/embed/WHojAXQy0Q4?autoplay=1&mute=1&controls=0&modestbranding=1&loop=1&playlist=WHojAXQy0Q4",
+    videoUrl: "https://www.youtube.com/embed/WHojAXQy0Q4?autoplay=1&mute=1&controls=0&modestbranding=1&loop=1&playlist=WHojAXQy0Q4",
     title: "Minimalist 10% Niacinamide Face Serum"
   },
   {
-    // Plum Green Tea Oil-Free Moisturizer - brand spot
-    src: "https://www.youtube.com/embed/l7g80FWVG9c?autoplay=1&mute=1&controls=0&modestbranding=1&loop=1&playlist=l7g80FWVG9c",
+    videoUrl: "https://www.youtube.com/embed/l7g80FWVG9c?autoplay=1&mute=1&controls=0&modestbranding=1&loop=1&playlist=l7g80FWVG9c",
     title: "Plum Green Tea Oil-Free Moisturizer"
   },
   {
-    // Wow Skin Science Vitamin C Face Wash - brand promo
-    src: "https://www.youtube.com/embed/fcA1eQ9BP7k?autoplay=1&mute=1&controls=0&modestbranding=1&loop=1&playlist=fcA1eQ9BP7k",
+    videoUrl: "https://www.youtube.com/embed/fcA1eQ9BP7k?autoplay=1&mute=1&controls=0&modestbranding=1&loop=1&playlist=fcA1eQ9BP7k",
     title: "Wow Vitamin C Face Wash"
   }
 ];
@@ -113,18 +111,18 @@ const Home = () => {
   // Map product data to video (paired with productId)
   const videoSlides = useMemo(() => {
     if (Array.isArray(recommended) && recommended.length > 0) {
-      // Try to use official or fallback videos - maintain mapping to productId.
+      // Ensure each slide result has consistent fields {videoUrl, productId, title, poster}
       return recommended.map((p, i) => ({
-        videoUrl: p.video || p.videoUrl || DEMO_VIDEO_URLS[i % DEMO_VIDEO_URLS.length].src,
+        videoUrl: p.video || p.videoUrl || DEMO_VIDEO_URLS[i % DEMO_VIDEO_URLS.length].videoUrl,
         productId: p.id,
         title: p.title || "",
         poster: p.thumbnail || "",
       }));
     }
-    // If fallback, no real products; map dummy product IDs (for demo)
+    // Fallback: use demo slides, each with a dummy productId
     return DEMO_VIDEO_URLS.map((v, i) => ({
-      videoUrl: v.src,
-      productId: i + 1, // Dummy ID for fallback mode
+      videoUrl: v.videoUrl,
+      productId: i + 1, // Dummy ID
       title: v.title || "",
       poster: "",
     }));
