@@ -71,36 +71,213 @@ main {
 }
 
 /* --- NAVIGATION BARS --- */
+/* --- MODERN PREMIUM TOP NAVBAR --- */
 .top-navbar {
   background: var(--navbar-gradient);
   color: var(--text-color);
-  backdrop-filter: blur(22px);
-  border-radius: 0 0 var(--radius-l) var(--radius-l);
-  box-shadow: 0 2.5px 18px #fadadd44, var(--shadow-1);
+  backdrop-filter: blur(24px);
+  border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+  box-shadow: 0 4.5px 32px 0 #fadadd66, 0 10px 36px #e7b3ff2a, var(--shadow-1);
   position: fixed;
   top: 0; left: 0;
   width: 100vw;
   z-index: 101;
-  height: 68px;
+  height: 72px;
+  min-height: 58px;
   display: flex;
   align-items: center;
-  padding: 0 0px;
+  justify-content: flex-start;
+  padding: 0px;
   transition:
-    box-shadow 0.22s,
+    box-shadow 0.19s,
     background 0.22s,
     height 0.18s;
   will-change: background, box-shadow, height;
+  overflow: visible;
+  border-bottom: 1.5px solid var(--border-color);
 }
 
+/* Inner container (to align contents, center brand + nav) */
 .top-navbar-inner {
   width: 100%;
-  max-width: 1060px;
+  max-width: 1130px;
   margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 18px;
-  min-height: 66px;
+  padding: 0 30px 0 19px;
+  min-height: 68px;
+  position: relative;
+}
+
+/* Extra glow layer for on-brand premium look */
+.navbar-glow {
+  pointer-events: none;
+}
+
+/* Logo container (brand + orb) */
+.logo-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none !important;
+  color: var(--accent);
+  font-family: inherit;
+  font-weight: bold;
+  font-size: 1.5rem;
+  letter-spacing: 0.01em;
+  padding: 0 3px 0 0;
+  user-select: none;
+  background: none !important;
+}
+
+.logo-link:hover .logo-symbol,
+.logo-link:focus .logo-symbol {
+  color: #d2195b;
+  background: none;
+}
+
+.logo-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  box-shadow: 0 3px 24px #e7b3ff43, 0 7px 30px #fadadd12;
+  background: linear-gradient(105deg, #fadadd 35%, #e7b3ff 90%);
+  margin-right: 4px;
+}
+
+.logo-word {
+  font-size: 1.31rem;
+  font-weight: 800;
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  color: var(--text-color);
+  background: none;
+}
+
+.logo-symbol {
+  color: var(--radiance-ai-accent);
+  font-weight: bold;
+  letter-spacing: .01em;
+  background: linear-gradient(90deg,#f339db 18%,#fadadd 90%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text; text-fill-color: transparent;
+  font-size: 1.14em;
+  margin-right: 1.8px;
+}
+
+.logo-accent {
+  color: #b35aff;
+  font-weight: 900;
+  letter-spacing: .06em;
+  margin-left: 1.3px;
+  font-size: 1em;
+  background: linear-gradient(86deg,#fecbf7 20%,#b35aff 80%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text; text-fill-color: transparent;
+}
+
+.brand-tagline {
+  font-weight: 500;
+  font-size: 0.99em;
+  color: var(--accent);
+  letter-spacing: .03em;
+  opacity: 0.7;
+  margin-left: 11px;
+  background: none;
+  user-select: none;
+}
+
+.top-navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  z-index: 2;
+  margin-right: 7px;
+}
+
+/* Modern nav action buttons (topbar version has more weight and contrast) */
+.topbar-nav-btn {
+  border: none;
+  background: none;
+  border-radius: var(--radius-s);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 13px;
+  margin: 0 4.7px 0 0;
+  color: var(--text-color);
+  font-size: 16px;
+  font-weight: 600;
+  opacity: 0.96;
+  letter-spacing: 0.01em;
+  transition:
+    background 0.16s var(--motion-snappy),
+    color 0.11s,
+    box-shadow 0.12s,
+    transform 0.11s;
+  box-shadow: none;
+  position: relative;
+}
+
+.topbar-nav-btn:last-child { margin-right: 0; }
+
+.topbar-nav-btn:hover,
+.topbar-nav-btn:focus-visible {
+  background: linear-gradient(99deg, #f339db22 54%, #fadadd3d 100%);
+  color: #d2195b !important;
+  outline: none;
+  opacity: 1;
+  box-shadow: 0 2.5px 17px #fadadd1b;
+  transform: scale(1.04);
+  z-index: 2;
+}
+.topbar-nav-btn:active {
+  background: #fadaddcc;
+  color: #b343a5 !important;
+}
+
+.topbar-nav-btn.nav-action-btn--active,
+.topbar-nav-btn[aria-current="page"] {
+  background: linear-gradient(98deg,#fadaddbb 60%, #f339db33 110%);
+  color: #d2195b !important;
+  font-weight: 800 !important;
+  box-shadow: 0 1.5px 14px #fadadd29, 0 0.5px 6px #f339db1a;
+  outline: 2.5px solid #f339db38;
+  z-index: 2;
+  opacity: 1;
+}
+
+/* Hide nav links and .brand-tagline on small screens (keep logo only, for mobile harmony!) */
+@media (max-width: 900px) {
+  .top-navbar-inner { max-width: 99vw; padding: 0 8px 0 6px;}
+  .top-navbar { height: 60px; min-height: 48px; border-radius: 0 0 var(--radius) var(--radius);}
+  .brand-tagline { display: none !important;}
+  .topbar-nav-btn { font-size: 0.98em; padding: 6px 7.5px;}
+}
+@media (max-width: 700px) {
+  .top-navbar { height: 52px; min-height: 37px; }
+  .top-navbar-inner { padding: 0 2px;}
+  .brand-tagline { display: none !important;}
+  .topbar-nav-btn { font-size: 0.91em; padding: 5.5px 6.5px; }
+  .logo-mark { width: 28px; height: 28px; }
+  .logo-word { font-size: 1.07rem;}
+}
+@media (max-width: 540px) {
+  .top-navbar-inner { max-width: 100vw; padding: 0 1px;}
+  .top-navbar { height: 39px; padding: 0;}
+  .topbar-nav-btn { font-size: 12.5px; padding: 4px 4.1px;}
+  .logo-word { font-size: 0.93rem;}
+}
+@media (max-width: 460px) {
+  .logo-word { display: none !important;}
+  .brand-tagline { display: none !important;}
 }
 
 .top-navbar-actions {
