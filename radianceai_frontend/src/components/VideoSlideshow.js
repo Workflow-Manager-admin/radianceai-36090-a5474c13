@@ -181,7 +181,13 @@ export function VideoSlideshow({
         {slides.map((v, idx) => (
           <button
             key={v.videoUrl + idx}
-            onClick={() => goTo(idx)}
+            onClick={() => {
+              goTo(idx);
+              // If this is a different slide, also navigate to that product's detail page
+              if (slides[idx]?.productId) {
+                navigate(`/products/${slides[idx].productId}`);
+              }
+            }}
             aria-label={`Go to slide ${idx + 1} (${v.title || "Product"})`}
             style={{
               width: 16,
@@ -200,6 +206,8 @@ export function VideoSlideshow({
               outline: idx === current ? "2.2px solid #f339db44" : "none"
             }}
             tabIndex={0}
+            role="button"
+            title={v.title ? `View details for ${v.title}` : "View product details"}
           />
         ))}
       </div>

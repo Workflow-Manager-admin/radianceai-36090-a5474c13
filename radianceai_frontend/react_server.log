@@ -2,9 +2,9 @@
 > react-kavia@0.1.0 start
 > react-scripts start
 
-(node:57752) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+(node:60274) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-(node:57752) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+(node:60274) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
 Starting the development server...
 
 Compiled successfully!
@@ -22,172 +22,14 @@ Compiling...
 Compiled with warnings.
 
 [eslint] 
-src/features/home/Home.js
-  Line 106:24:  'loading' is assigned a value but never used  no-unused-vars
+src/components/VideoSlideshow.js
+  Line 182:11:  The element button has an implicit role of button. Defining this explicitly is redundant and should be avoided  jsx-a11y/no-redundant-roles
 
 Search for the keywords to learn more about each warning.
 To ignore, add // eslint-disable-next-line to the line before.
 
 WARNING in [eslint] 
-src/features/home/Home.js
-  Line 106:24:  'loading' is assigned a value but never used  no-unused-vars
-
-webpack compiled with 1 warning
-Compiling...
-Failed to compile.
-
-[eslint] 
 src/components/VideoSlideshow.js
-  Line 46:9:    'numVideos' is not defined  no-undef
-  Line 48:35:   'numVideos' is not defined  no-undef
-  Line 51:16:   'numVideos' is not defined  no-undef
-  Line 67:16:   'videos' is not defined     no-undef
-  Line 71:46:   'numVideos' is not defined  no-undef
-  Line 85:17:   'videos' is not defined     no-undef
-  Line 92:8:    'videos' is not defined     no-undef
-  Line 92:18:   'numVideos' is not defined  no-undef
-  Line 121:14:  'videos' is not defined     no-undef
-  Line 121:59:  'videos' is not defined     no-undef
-  Line 144:18:  'videos' is not defined     no-undef
-  Line 145:18:  'videos' is not defined     no-undef
-  Line 146:21:  'videos' is not defined     no-undef
-  Line 157:25:  'videos' is not defined     no-undef
-  Line 158:56:  'numVideos' is not defined  no-undef
-  Line 162:12:  'videos' is not defined     no-undef
-  Line 180:16:  'videos' is not defined     no-undef
-  Line 202:10:  'videos' is not defined     no-undef
-
-Search for the keywords to learn more about each error.
-WARNING in [eslint] 
-src/components/VideoSlideshow.js
-  Line 40:9:  'numSlides' is assigned a value but never used                                                                                                                                                                                          no-unused-vars
-  Line 51:6:  React Hook useEffect has an unnecessary dependency: 'numVideos'. Either exclude it or remove the dependency array. Outer scope values like 'numVideos' aren't valid dependencies because mutating them doesn't re-render the component  react-hooks/exhaustive-deps
-  Line 67:6:  React Hook useEffect has an unnecessary dependency: 'videos'. Either exclude it or remove the dependency array. Outer scope values like 'videos' aren't valid dependencies because mutating them doesn't re-render the component        react-hooks/exhaustive-deps
-
-src/features/home/Home.js
-  Line 106:24:  'loading' is assigned a value but never used  no-unused-vars
-
-ERROR in [eslint] 
-src/components/VideoSlideshow.js
-  Line 46:9:    'numVideos' is not defined  no-undef
-  Line 48:35:   'numVideos' is not defined  no-undef
-  Line 51:16:   'numVideos' is not defined  no-undef
-  Line 67:16:   'videos' is not defined     no-undef
-  Line 71:46:   'numVideos' is not defined  no-undef
-  Line 85:17:   'videos' is not defined     no-undef
-  Line 92:8:    'videos' is not defined     no-undef
-  Line 92:18:   'numVideos' is not defined  no-undef
-  Line 121:14:  'videos' is not defined     no-undef
-  Line 121:59:  'videos' is not defined     no-undef
-  Line 144:18:  'videos' is not defined     no-undef
-  Line 145:18:  'videos' is not defined     no-undef
-  Line 146:21:  'videos' is not defined     no-undef
-  Line 157:25:  'videos' is not defined     no-undef
-  Line 158:56:  'numVideos' is not defined  no-undef
-  Line 162:12:  'videos' is not defined     no-undef
-  Line 180:16:  'videos' is not defined     no-undef
-  Line 202:10:  'videos' is not defined     no-undef
-
-Search for the keywords to learn more about each error.
-
-webpack compiled with 1 error and 1 warning
-Compiling...
-Failed to compile.
-
-[eslint] 
-src/components/VideoSlideshow.js
-  Line 71:46:   'numVideos' is not defined  no-undef
-  Line 85:17:   'videos' is not defined     no-undef
-  Line 92:8:    'videos' is not defined     no-undef
-  Line 92:18:   'numVideos' is not defined  no-undef
-  Line 121:14:  'videos' is not defined     no-undef
-  Line 121:59:  'videos' is not defined     no-undef
-  Line 144:18:  'videos' is not defined     no-undef
-  Line 145:18:  'videos' is not defined     no-undef
-  Line 146:21:  'videos' is not defined     no-undef
-  Line 157:25:  'videos' is not defined     no-undef
-  Line 158:56:  'numVideos' is not defined  no-undef
-  Line 162:12:  'videos' is not defined     no-undef
-  Line 180:16:  'videos' is not defined     no-undef
-  Line 202:10:  'videos' is not defined     no-undef
-
-Search for the keywords to learn more about each error.
-WARNING in [eslint] 
-src/components/VideoSlideshow.js
-  Line 54:37:  'paused' was used before it was defined  no-use-before-define
-
-src/features/home/Home.js
-  Line 106:24:  'loading' is assigned a value but never used  no-unused-vars
-
-ERROR in [eslint] 
-src/components/VideoSlideshow.js
-  Line 71:46:   'numVideos' is not defined  no-undef
-  Line 85:17:   'videos' is not defined     no-undef
-  Line 92:8:    'videos' is not defined     no-undef
-  Line 92:18:   'numVideos' is not defined  no-undef
-  Line 121:14:  'videos' is not defined     no-undef
-  Line 121:59:  'videos' is not defined     no-undef
-  Line 144:18:  'videos' is not defined     no-undef
-  Line 145:18:  'videos' is not defined     no-undef
-  Line 146:21:  'videos' is not defined     no-undef
-  Line 157:25:  'videos' is not defined     no-undef
-  Line 158:56:  'numVideos' is not defined  no-undef
-  Line 162:12:  'videos' is not defined     no-undef
-  Line 180:16:  'videos' is not defined     no-undef
-  Line 202:10:  'videos' is not defined     no-undef
-
-Search for the keywords to learn more about each error.
-
-webpack compiled with 1 error and 1 warning
-Compiling...
-Failed to compile.
-
-[eslint] 
-src/components/VideoSlideshow.js
-  Line 71:46:  'numVideos' is not defined  no-undef
-
-Search for the keywords to learn more about each error.
-WARNING in [eslint] 
-src/components/VideoSlideshow.js
-  Line 54:37:  'paused' was used before it was defined  no-use-before-define
-
-src/features/home/Home.js
-  Line 106:24:  'loading' is assigned a value but never used  no-unused-vars
-
-ERROR in [eslint] 
-src/components/VideoSlideshow.js
-  Line 71:46:  'numVideos' is not defined  no-undef
-
-Search for the keywords to learn more about each error.
-
-webpack compiled with 1 error and 1 warning
-Compiling...
-Compiled with warnings.
-
-[eslint] 
-src/features/home/Home.js
-  Line 106:24:  'loading' is assigned a value but never used  no-unused-vars
-
-Search for the keywords to learn more about each warning.
-To ignore, add // eslint-disable-next-line to the line before.
-
-WARNING in [eslint] 
-src/features/home/Home.js
-  Line 106:24:  'loading' is assigned a value but never used  no-unused-vars
-
-webpack compiled with 1 warning
-Compiling...
-Compiled with warnings.
-
-[eslint] 
-src/features/home/Home.js
-  Line 106:24:  'loading' is assigned a value but never used  no-unused-vars
-
-Search for the keywords to learn more about each warning.
-To ignore, add // eslint-disable-next-line to the line before.
-
-WARNING in [eslint] 
-src/features/home/Home.js
-  Line 106:24:  'loading' is assigned a value but never used  no-unused-vars
+  Line 182:11:  The element button has an implicit role of button. Defining this explicitly is redundant and should be avoided  jsx-a11y/no-redundant-roles
 
 webpack compiled with 1 warning
