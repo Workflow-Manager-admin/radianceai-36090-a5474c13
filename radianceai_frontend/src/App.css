@@ -57,6 +57,17 @@ body {
   display: flex;
   flex-direction: column;
   background: none;
+  pointer-events: auto !important;
+}
+
+main {
+  pointer-events: auto !important;
+}
+
+.animated-fade,
+.AppleFadeTransition,
+.motion-wrapper {
+  pointer-events: auto !important;
 }
 
 /* --- NAVIGATION BARS --- */
