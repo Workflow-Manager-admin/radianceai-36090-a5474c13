@@ -114,6 +114,14 @@ export function useProducts(options = {}) {
       "Plum",
       "Wow"
     ];
+    // Brand image map for official branding at mapping time
+    const brandImageMap = {
+      "DermaCo": "https://cdn.shopify.com/s/files/1/0283/0165/2747/products/the-dermaco-face-serum-niacinamide-10-percent-30-ml-44516721406142.jpg",
+      "Kiehl's": "https://www.kiehls.com.sg/dw/image/v2/BDTJ_PRD/on/demandware.static/-/Sites-masterCatalog_Kiehls/default/dwc9f5beec/2020/Products/Face/Serums/Ultra_Pure_Hyaluronic_Acid_Serum_30ml_ProductPageZoom.jpg",
+      "Minimalist": "https://beminimalist.co/cdn/shop/files/Salicylic_Acid_2_percent_Face_Serum-minimalist-skincare-1_600x.jpg",
+      "Plum": "https://cdn.plumgoodness.com/products/Green-Tea-Face-Wash-1_800x.jpg",
+      "Wow": "https://cdn01.wowsts.com/pub/media/catalog/product/w/o/wow_skin_science_vitamin_c_face_wash_with_built_in_brush_100ml_front.jpg"
+    };
     results = results.filter(p =>
       allowedBrands.includes(
         ("" + p.brand).trim()
@@ -123,7 +131,19 @@ export function useProducts(options = {}) {
           .replace(/^mamaearth$/i, "")
           .replace(/^himalaya$/i, "")
       )
-    );
+    )
+    // Always patch in correct image mapping for these brands
+    .map(p => {
+      let patchBrand = ("" + p.brand).trim();
+      if (/^the derma\s*co$/i.test(patchBrand)) patchBrand = "DermaCo";
+      if (/^wow skin science$/i.test(patchBrand)) patchBrand = "Wow";
+      if (/^kiehl'?s/i.test(patchBrand)) patchBrand = "Kiehl's";
+      if (/^minimalist/i.test(patchBrand)) patchBrand = "Minimalist";
+      if (/^plum/i.test(patchBrand)) patchBrand = "Plum";
+      let patchThumb = p.thumbnail;
+      if (brandImageMap[patchBrand]) patchThumb = brandImageMap[patchBrand];
+      return { ...p, brand: patchBrand, thumbnail: patchThumb };
+    });
 
     // Filter by categories
     if (categories && categories.length > 0) {

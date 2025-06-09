@@ -40,12 +40,19 @@ export const fetchRecommendedProducts = async (params = {}) => {
 
   if (!requestedBrands.length) requestedBrands = allowedBrands.slice();
 
+  // Static official image URLs for brand priority
+  const brandImageMap = {
+    "DermaCo": "https://cdn.shopify.com/s/files/1/0283/0165/2747/products/the-dermaco-face-serum-niacinamide-10-percent-30-ml-44516721406142.jpg",
+    "Kiehl's": "https://www.kiehls.com.sg/dw/image/v2/BDTJ_PRD/on/demandware.static/-/Sites-masterCatalog_Kiehls/default/dwc9f5beec/2020/Products/Face/Serums/Ultra_Pure_Hyaluronic_Acid_Serum_30ml_ProductPageZoom.jpg",
+    "Minimalist": "https://beminimalist.co/cdn/shop/files/Salicylic_Acid_2_percent_Face_Serum-minimalist-skincare-1_600x.jpg",
+    "Plum": "https://cdn.plumgoodness.com/products/Green-Tea-Face-Wash-1_800x.jpg",
+    "Wow": "https://cdn01.wowsts.com/pub/media/catalog/product/w/o/wow_skin_science_vitamin_c_face_wash_with_built_in_brush_100ml_front.jpg"
+  };
+
   // Simulate parallel fetches for each brand (replace with real APIs in prod)
   async function fetchBrandProducts(brand) {
-    // For demo: always return only things with one of the allowed brand names
     const minRating = typeof params.minRating === "number" ? params.minRating : 0;
     const limit = typeof params.limit === "number" ? params.limit : 7;
-    // Use DummyJSON as backend for fallback. No real 3rd party API at present.
     const DUMMYJSON_URL = "https://dummyjson.com/products";
     let url = `${DUMMYJSON_URL}?limit=${limit}`;
     if (params.category) url += `&category=${encodeURIComponent(params.category)}`;
@@ -60,22 +67,26 @@ export const fetchRecommendedProducts = async (params = {}) => {
       // Force the mapping to allowed brands only
       if (!allowedBrands.includes(brand)) return [];
       return products
-        .map((p, idx) => ({
-          ...p,
-          id: `${brand}-${p.id || idx}`,
-          price: Math.round((p.price || 10) * 80 + 59),
-          currency: "INR",
-          brand: brand,
-          title: `[${brand}] ${(p.title?.replace(/[\s]*-.*$/, "") || "")} (IN)`,
-          description: p.description,
-          link: p.link || p.url || "",
-          rating: p.rating,
-          stock: p.stock,
-          thumbnail: p.thumbnail,
-          keywords: p.keywords || [],
-          category: p.category || params.category || "skincare",
-          isLocalIN: true
-        }))
+        .map((p, idx) => {
+          // Always associate official brand image if available
+          const thumbnail = brandImageMap[brand] || p.thumbnail;
+          return {
+            ...p,
+            id: `${brand}-${p.id || idx}`,
+            price: Math.round((p.price || 10) * 80 + 59),
+            currency: "INR",
+            brand: brand,
+            title: `[${brand}] ${(p.title?.replace(/[\s]*-.*$/, "") || "")} (IN)`,
+            description: p.description,
+            link: p.link || p.url || "",
+            rating: p.rating,
+            stock: p.stock,
+            thumbnail: thumbnail,
+            keywords: p.keywords || [],
+            category: p.category || params.category || "skincare",
+            isLocalIN: true
+          };
+        })
         .filter((prod) => allowedBrands.includes(prod.brand));
     } catch (err) {
       return [];
