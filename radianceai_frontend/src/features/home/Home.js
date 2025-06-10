@@ -100,10 +100,10 @@ const DEMO_VIDEO_URLS = [
 
 const Home = () => {
   const navigate = useNavigate();
-  // Fetch 3 bestsellers—if product doesn't include video, fallback to demo.
+  // Fetch 5 bestsellers—if product doesn't include video, fallback to demo.
   const { recommended, loading } = useProducts({
     sortBy: "rating",
-    limit: 3,
+    limit: 5,
     minRating: 4,
     deduplicate: true
   });
