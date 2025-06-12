@@ -251,7 +251,7 @@ const Home = () => {
               style={{
                 fontWeight: 900,
                 fontSize: "2.54em",
-                color: "#FFF8EB",
+                color: "#FFF8EB", // creamy white for headline (already matches the requested color)
                 letterSpacing: ".01em",
                 margin: "0 0 10px 0",
                 padding: 0,
