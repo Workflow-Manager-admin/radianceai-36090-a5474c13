@@ -1,8 +1,10 @@
 # Lightweight React Template for KAVIA
 
-## EmailJS Setup (REQUIRED: NO PLACEHOLDERS ALLOWED)
+## EmailJS Setup — **No Placeholders Allowed (REQUIRED)**
 
-RadianceAI's email features (reminders, summaries, admin notifications) require **real** EmailJS credentials set as environment variables in `radianceai_frontend/.env` or your deployment config:
+RadianceAI’s email features (reminders, summaries, admin notifications) require **real** EmailJS credentials set as environment variables in `radianceai_frontend/.env` or your deployment config. **Only environment variables are accepted**—hardcoded/demo/placeholder keys are strictly rejected.
+
+Set up the following in your `.env` or deployment configuration:
 
 ```
 REACT_APP_EMAILJS_SERVICE_ID=your_real_service_id_here
@@ -11,10 +13,23 @@ REACT_APP_EMAILJS_REMINDER_TEMPLATE_ID=your_real_reminder_template_id_here
 REACT_APP_EMAILJS_SUMMARY_TEMPLATE_ID=your_real_summary_template_id_here
 ```
 
-**Do NOT use any placeholders or demo/example keys. Only real credentials from your EmailJS dashboard are accepted. If any of these are missing or not real, all email sends are BLOCKED and admins/users will see a clear UI message explaining how to update your `.env` or deployment secrets.**
+**Do NOT use any placeholders, demo, or example keys. If any required variable is not set or left with a placeholder value, all email features are** `BLOCKED` **by the app. Users and admins will see a clear message in the Email UI with links and setup instructions.**
 
-Get credentials from https://dashboard.emailjs.com/  
-See [EmailJS React docs](https://www.emailjs.com/docs/examples/reactjs/) for integration details.
+> 💡 **Where to get these values:**  
+> 1. Log in to the [EmailJS Dashboard](https://dashboard.emailjs.com/)  
+> 2. Go to your Email Services — copy the Service ID  
+> 3. Go to your Templates — copy the Template IDs for reminders and summaries  
+> 4. Go to API Keys — copy your real (public) User ID  
+> 
+> Set these in your `.env` file locally or as environment secrets in your deployment host (Vercel/Netlify/Render/etc).
+
+> 📢 **Troubleshooting EmailJS integration:**<br>
+>  - The UI will block all email attempts and display a diagnostic message until all four variables are set and non-placeholder.
+>  - For production, never expose secrets client-side — use the environment for all keys.
+>  - If you see an error about EmailJS config in the app, check your `.env`/server setup and restart the app.
+
+See [EmailJS React docs](https://www.emailjs.com/docs/examples/reactjs/) for in-depth integration.
+
 
 ---
 

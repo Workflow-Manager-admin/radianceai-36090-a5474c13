@@ -4,28 +4,18 @@ import useLocalStorage from "../../hooks/useLocalStorage";
 import { MotionWrapper, AppleFadeTransition } from "../../utils/animation";
 
 /*
- * Default config: Draw ONLY from environment variables (no placeholders ever).
- * If these values are missing or left as placeholders, email sending will be BLOCKED and UI/admin error will instruct to set up REAL config.
- * User/admin must set these via .env or secure config. No fallback to demo/placeholder allowed.
+ * EmailJS config: Draws ONLY from environment variables (REACT_APP_EMAILJS_*)
+ * If not present or left as placeholders, ALL email features are BLOCKED. UI shows clear instructions for admin setup.
+ * No UI/LS/admin config allowed anymore. Remove all fallback/local config logic.
  */
-const DEFAULT_EMAILJS_CONFIG = {
-  serviceId: (
-    process.env.REACT_APP_EMAILJS_SERVICE_ID ||
-    ""
-  ),
-  userId: (
-    process.env.REACT_APP_EMAILJS_USER_ID ||
-    ""
-  ),
-  reminderTemplateId: (
-    process.env.REACT_APP_EMAILJS_REMINDER_TEMPLATE_ID ||
-    ""
-  ),
-  summaryTemplateId: (
-    process.env.REACT_APP_EMAILJS_SUMMARY_TEMPLATE_ID ||
-    ""
-  ),
-};
+function getEmailJsConfigFromEnv() {
+  return {
+    serviceId: process.env.REACT_APP_EMAILJS_SERVICE_ID || "",
+    userId: process.env.REACT_APP_EMAILJS_USER_ID || "",
+    reminderTemplateId: process.env.REACT_APP_EMAILJS_REMINDER_TEMPLATE_ID || "",
+    summaryTemplateId: process.env.REACT_APP_EMAILJS_SUMMARY_TEMPLATE_ID || "",
+  };
+}
 
 function validateEmail(email) {
   // Simple email validation
@@ -35,26 +25,22 @@ function validateEmail(email) {
 // PUBLIC_INTERFACE
 /**
  * EmailFeatures – Send routine reminders & summary via EmailJS.
- * Users can opt-in, with config controls, and see clean feedback.
+ * Users can opt-in, see config status and admin instructions if not ready.
  */
 const EmailFeatures = () => {
-  // Persist email + consent opt-in
+  // Persist user fields only (email/name/consent)
   const [email, setEmail] = useLocalStorage("userEmail", "");
   const [name, setName] = useLocalStorage("userName", "");
   const [optedIn, setOptedIn] = useLocalStorage("emailOptIn", false);
 
-  // Separate config state if admin/advanced toggle needed later (for demo)
-  const [emailjsConfig, setEmailjsConfig] = useLocalStorage("emailjsConfig", DEFAULT_EMAILJS_CONFIG);
-
+  // Always read EmailJS config from environment
+  const emailjsConfig = getEmailJsConfigFromEnv();
   const [pending, setPending] = useState(false);
   const [result, setResult] = useState(""); // success/fail message
-
-  // For demonstration: user can choose type + if they're testing config
   const [sendType, setSendType] = useState("reminder"); // 'reminder' or 'summary'
 
-  // Helper: test if config is filled with real values
+  // Block usage if missing env vars
   function configHasPlaceholdersOrMissing(cfg) {
-    // Accept values from env variables or config object
     if (
       !cfg ||
       !cfg.serviceId ||
@@ -62,7 +48,7 @@ const EmailFeatures = () => {
       !cfg.reminderTemplateId ||
       !cfg.summaryTemplateId
     ) return true;
-    // Check for obviously incomplete or placeholder values
+    // Check for placeholder values
     if (
       /YOUR_SERVICE_ID/i.test(cfg.serviceId) ||
       /YOUR_EMAILJS_USER_ID|YOUR_PUBLIC_KEY/i.test(cfg.userId) ||
@@ -71,8 +57,6 @@ const EmailFeatures = () => {
     ) return true;
     return false;
   }
-
-  // configIncomplete will be true if any value is missing or a placeholder (whether from env or UI config)
   const configIncomplete = configHasPlaceholdersOrMissing(emailjsConfig);
 
   // Handlers
@@ -86,26 +70,24 @@ const EmailFeatures = () => {
     setOptedIn(true);
     setResult("Opt-in successful! You will receive reminders and summaries.");
   };
-
   const handleOptOut = () => {
     setOptedIn(false);
     setResult("Unsubscribed from email notifications.");
   };
-
   const handleSend = async (e) => {
     e.preventDefault();
     if (!validateEmail(email)) {
       setResult("Invalid email.");
       return;
     }
-    // Block send if config not set
+    // Block send if not configured
     if (configIncomplete) {
-      setResult("Email feature is not configured. Please ask an admin to set valid EmailJS credentials (Service ID, User/Public Key, Template IDs). See documentation.");
+      setResult("Email feature is not configured. Please ask an admin to set valid EmailJS credentials (Service ID, Public Key, and Template IDs) in environment. See below.");
       return;
     }
     setPending(true);
     setResult("");
-    // Build real payload, pass current config
+    // Build payload, only .env config allowed
     const payload = {
       toEmail: email,
       toName: name || "GlowSkin User",
@@ -127,24 +109,20 @@ const EmailFeatures = () => {
     else setResult("Email failed to send. Check configuration and try again.");
   };
 
-  // For admin/demo: configurable emailjs keys (hidden in production)
-  const [showConfig, setShowConfig] = useState(false);
-  const updateConfig = (field, value) => setEmailjsConfig(prev => ({ ...prev, [field]: value }));
-
-  // For message guidance
+  // Diagnostic/admin message logic
   let configDiagnosticMsg = "";
   if (configIncomplete) {
     configDiagnosticMsg =
-      "⚠️ EmailJS is not configured! Emails will NOT send until real credentials are set.\n" +
-      "To enable this feature, you must set the following in your environment (.env, deployment config, or secure admin setup):\n" +
+      "⚠️ EmailJS is not configured! Emails are BLOCKED until real credentials are set as environment variables. \n" +
+      "To enable this feature, set all the following in your .env or deployment config (never commit values in code or UI!):\n" +
       "• REACT_APP_EMAILJS_SERVICE_ID\n" +
       "• REACT_APP_EMAILJS_USER_ID   (public key)\n" +
       "• REACT_APP_EMAILJS_REMINDER_TEMPLATE_ID\n" +
       "• REACT_APP_EMAILJS_SUMMARY_TEMPLATE_ID\n" +
-      "Update .env for local development or use host configuration for production. " +
-      "Get these values in your EmailJS dashboard: https://dashboard.emailjs.com/.\n" +
+      "Edit .env in radianceai_frontend/ for local dev. For deployment, use secure environment variables. \n" +
+      "Values must match your real EmailJS dashboard: https://dashboard.emailjs.com/\n" +
       "See docs: https://www.emailjs.com/docs/examples/reactjs/ \n" +
-      "Emails are BLOCKED until this is complete.";
+      "Emails are BLOCKED until everything is correct.";
   }
 
   return (
@@ -175,20 +153,6 @@ const EmailFeatures = () => {
               {configDiagnosticMsg.split('\n').map((txt, idx) => (
                 <div key={idx}>{txt}</div>
               ))}
-              <button
-                style={{
-                  marginTop: 10,
-                  background: "linear-gradient(90deg,#fadadd 60%,#e7b3ff 100%)",
-                  color: "#23155f",
-                  border: "none",
-                  borderRadius: 7,
-                  fontWeight: 700,
-                  padding: "7px 14px",
-                  cursor: "pointer"
-                }}
-                onClick={() => setShowConfig(true)}>
-                {showConfig ? "Hide config" : "Show config setup"}
-              </button>
             </div>
           </MotionWrapper>
         )}
@@ -363,66 +327,19 @@ const EmailFeatures = () => {
           </MotionWrapper>
         )}
 
-        {/* Admin/config: allow switching config (hide or require password in prod) */}
+        {/* Admin: config is not editable via browser at all. Show instructions only */}
         <div style={{
           margin: "24px 0 0 0",
           textAlign: "center",
           fontSize: 13.5,
           color: "#fadadd",
-          opacity: 0.79,
-          cursor: "pointer"
+          opacity: 0.82
         }}>
-          <span onClick={() => setShowConfig(s => !s)} style={{ textDecoration: "underline", cursor: "pointer" }}>
-            {showConfig ? "Hide" : "Show"} EmailJS config
-          </span>
+          <b>Note for Admins:</b> EmailJS configuration is now <u>read strictly from environment variables</u>.<br />
+          To update credentials, <b>edit <code>.env</code> in <code>radianceai_frontend/</code></b> (or set environment secrets in your deployment host) and <b>restart</b> the app.<br />
+          <br />
+          Get valid values from <a href="https://dashboard.emailjs.com/" target="_blank" rel="noopener noreferrer" style={{ color: "#f339db" }}>EmailJS Dashboard →</a>
         </div>
-        {showConfig && (
-          <MotionWrapper>
-            <div style={{
-              background: "#fadadd1d",
-              borderRadius: 13,
-              margin: "13px 0 0 0",
-              padding: "12px 12px 10px 12px",
-              color: "#23155f"
-            }}>
-              <div style={{ marginBottom: 7 }}>
-                <label>
-                  Service ID:
-                  <input value={emailjsConfig.serviceId} onChange={e => updateConfig("serviceId", e.target.value)}
-                    style={{ marginLeft: 5, borderRadius: 7, padding: "2.5px 6px" }} />
-                </label>
-              </div>
-              <div style={{ marginBottom: 7 }}>
-                <label>
-                  User ID (Public Key):
-                  <input value={emailjsConfig.userId} onChange={e => updateConfig("userId", e.target.value)}
-                    style={{ marginLeft: 5, borderRadius: 7, padding: "2.5px 6px" }} />
-                </label>
-              </div>
-              <div>
-                <label>
-                  Reminder Template ID:
-                  <input value={emailjsConfig.reminderTemplateId} onChange={e => updateConfig("reminderTemplateId", e.target.value)}
-                    style={{ marginLeft: 5, borderRadius: 7, padding: "2.5px 6px" }} />
-                </label>
-              </div>
-              <div style={{ marginTop: 5 }}>
-                <label>
-                  Summary Template ID:
-                  <input value={emailjsConfig.summaryTemplateId} onChange={e => updateConfig("summaryTemplateId", e.target.value)}
-                    style={{ marginLeft: 5, borderRadius: 7, padding: "2.5px 6px" }} />
-                </label>
-              </div>
-              <div style={{
-                color: "#f339db", marginTop: 11, fontSize: 13.2
-              }}>
-                In production, <b>DO NOT</b> expose keys clientside; place them in <b>.env</b> and restart.<br/>
-                Always use EmailJS dashboard values:&nbsp;
-                <a href="https://dashboard.emailjs.com/" style={{color: "#f339db"}} target="_blank" rel="noopener noreferrer">EmailJS Dashboard →</a>
-              </div>
-            </div>
-          </MotionWrapper>
-        )}
 
         {result && (
           <MotionWrapper>
