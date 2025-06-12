@@ -1,5 +1,17 @@
 # Lightweight React Template for KAVIA
 
+## EmailJS Setup
+
+RadianceAI's email features (reminders, summaries, admin notifications) require the following **real** EmailJS credentials set as environment variables in `radianceai_frontend/.env` or your deployment config:
+
+```
+REACT_APP_EMAILJS_SERVICE_ID=your_real_service_id
+REACT_APP_EMAILJS_USER_ID=your_real_public_key
+REACT_APP_EMAILJS_REMINDER_TEMPLATE_ID=your_real_template_id
+REACT_APP_EMAILJS_SUMMARY_TEMPLATE_ID=your_real_template_id
+```
+If these are missing or left as placeholders, all email sends will be blocked and an admin/user message will instruct how to update them in the UI. Get real values from https://dashboard.emailjs.com/ and see [EmailJS React docs](https://www.emailjs.com/docs/examples/reactjs/).
+
 This project provides a minimal React template with a clean, modern UI and minimal dependencies.
 
 ## Features
