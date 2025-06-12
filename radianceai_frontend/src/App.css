@@ -1,33 +1,37 @@
 :root {
-  /* RadianceAI Modern DARK THEME PALETTE */
-  --primary: #212329; /* dark grey background */
+  /* RadianceAI Modern DARK THEME: Coherent Pastel-Free Palette */
+  --primary: #212329; /* base dark bg */
   --secondary: #232430;
   --dark-grey: #1B1C22;
-  --accent: #FFD447;       /* yellow for accents */
-  --accent-contrast: #E6B800; /* slightly darker yellow for hover/active */
-  --navbar-bg: #272832;    /* nav bg slightly lighter for contrast */
-  --navbar-gradient: linear-gradient(100deg, #1B1C22 70%, #232430 100%);
+  --accent: #FFD447;             /* yellow for main accents */
+  --accent-contrast: #E6B800;    /* bold yellow for active */
+  --accent-lavender: #F4E6FF;    /* lavender card bg or accent */
+  --accent-blue: #D7EAFE;        /* light blue for info/ai */
+  --accent-lightyellow: #FFF9E2; /* ultra-light yellow contextual bg */
+  --gradient-gray-bg: linear-gradient(120deg, #212329 62%, #242443 98%, #F4E6FF08 100%);
+  --navbar-bg: #272832;
+  --navbar-gradient: linear-gradient(100deg, #232430 68%, #31344a 100%);
   --tile-bg: #232430;
-  --tile-accent: linear-gradient(93deg, #232430 68%, #FFD44722 100%);
+  --tile-accent: linear-gradient(92deg, #232430 70%, #FFD4471a 100%);
   --cta-gradient: linear-gradient(90deg, #FFD447 60%, #E6B800 100%);
   --danger: #EA5151;
   --success: #40e09b;
 
-  /* Gradients (no more pastels) */
-  --gradient-pastel: linear-gradient(98deg, #232430 0%, #22232e 100%);
-  --gradient-subtle: linear-gradient(100deg, #212329 0%, #232430 100%);
+  /* Remove pastel gradients and pinks */
+  --gradient-subtle: linear-gradient(102deg, #22232a 0%, #232430 100%);
   --gradient-glow: linear-gradient(95deg, #FFD44711 0%, #232430 70%);
 
-  /* Text */
-  --text-color: #7461ac;        /* lavender/lilac main text on dark */
+  /* Modern readable text tones */
+  --text-color: #7461ac;        /* lavender/lilac text on dark */
   --text-light: #ece6ff;        /* lighter lavender for highlights */
   --text-secondary: #B7BCD6;    /* muted blue for secondary text */
-  --text-quiz-heading: #e7e0fa; /* pale lilac for quiz title */
-  --text-quiz-secondary: #ccb2ff; /* soft lavender for description etc. */
+  --text-quiz-heading: #e7e0fa;
+  --text-quiz-secondary: #ccb2ff;
 
-  /* Accent background for highlights */
+  /* Accent backgrounds for highlights */
   --highlight-yellow: #FFD447;
   --highlight-lilac: #f4e6ff;
+  --highlight-blue: #d7eafe;
 
   /* Borders & Shadow */
   --border-color: #2f344299;
@@ -46,8 +50,8 @@
 }
 
 body {
-  background: var(--primary); /* dark */
-  color: var(--text-color);   /* navy blue */
+  background: var(--gradient-gray-bg); /* unified gradient gray */
+  color: var(--text-color);
   font-family: 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
   margin: 0;
   min-height: 100vh;
@@ -58,7 +62,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: var(--primary);
+  background: var(--gradient-gray-bg); /* ensure gradient for layout as well */
   pointer-events: auto !important;
 }
 
@@ -224,26 +228,26 @@ main {
 
 .topbar-nav-btn:hover,
 .topbar-nav-btn:focus-visible {
-  background: linear-gradient(99deg, #f339db22 54%, #fadadd3d 100%);
-  color: #d2195b !important;
+  background: linear-gradient(97deg, var(--highlight-yellow) 67%, var(--accent-lavender) 125%);
+  color: var(--primary) !important;
   outline: none;
   opacity: 1;
-  box-shadow: 0 2.5px 17px #fadadd1b;
+  box-shadow: 0 2.5px 17px #ffd4471b;
   transform: scale(1.04);
   z-index: 2;
 }
 .topbar-nav-btn:active {
-  background: #fadaddcc;
-  color: #b343a5 !important;
+  background: var(--highlight-yellow);
+  color: var(--primary) !important;
 }
 
 .topbar-nav-btn.nav-action-btn--active,
 .topbar-nav-btn[aria-current="page"] {
-  background: linear-gradient(98deg,#fadaddbb 60%, #f339db33 110%);
-  color: #d2195b !important;
+  background: linear-gradient(95deg, var(--highlight-yellow) 82%, var(--accent-contrast) 130%);
+  color: var(--primary) !important;
   font-weight: 800 !important;
-  box-shadow: 0 1.5px 14px #fadadd29, 0 0.5px 6px #f339db1a;
-  outline: 2.5px solid #f339db38;
+  box-shadow: 0 1.5px 14px #ffd44729, 0 0.5px 6px #e6b80016;
+  outline: 2.5px solid var(--highlight-yellow);
   z-index: 2;
   opacity: 1;
 }
@@ -326,9 +330,9 @@ main {
   flex-direction: column;
   align-items: center;
   gap: 32px;
-  background: var(--gradient-glow);
+  background: var(--accent-lavender, var(--gradient-glow));
   border-radius: var(--radius-xl);
-  box-shadow: 0 4px 34px #e7b3ff33;
+  box-shadow: 0 4px 34px #FFD44733;
   margin-bottom: 32px;
   animation: heroFadeIn 1s cubic-bezier(.17,.77,.31,1.01);
 }
@@ -474,15 +478,15 @@ main {
 
 /* Quiz modal content: dark background, lilac/lavender text, rounded */
 .quiz-modal-content {
-  background: var(--primary) !important;
+  background: var(--accent-lavender, var(--primary)) !important;
   color: var(--text-light) !important;
   border-radius: var(--radius-xl);
   padding: 36px 36px 33px 36px;
   max-width: 450px;
   min-width: 330px;
   margin: 0 auto;
-  box-shadow: 0 9px 44px #fadadd13, 0 1.5px 21px #1B1C2222;
-  border: 2px solid var(--accent);
+  box-shadow: 0 9px 44px #FFD44719, 0 1.5px 21px #23244725;
+  border: 2px solid var(--highlight-yellow);
   position: relative;
   pointer-events: auto !important;
   font-family: inherit;
@@ -665,11 +669,11 @@ main {
 
 /* PRODUCT CARD */
 .product-card {
-  background: var(--secondary);
+  background: var(--accent-lightyellow, var(--secondary));
   border-radius: var(--radius-l);
   margin: 0 14px 0 0;
   padding: 18px 15px 22px 15px;
-  box-shadow: 0 1.5px 16px 0 #0B0C0F44;
+  box-shadow: 0 1.5px 16px 0 #FFD44729;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -689,7 +693,7 @@ main {
   height: 122px;
   border-radius: var(--radius);
   margin-bottom: 10px;
-  box-shadow: 0 2px 16px #e7b3ff38;
+  box-shadow: 0 2px 16px var(--highlight-yellow, #FFD44718);
   background: #fff;
   border: 1px solid #fff5;
 }
@@ -720,9 +724,9 @@ main {
   min-height: 195px;
   max-height: 358px;
   border-radius: 0 0 var(--radius-xl) var(--radius-xl);
-  box-shadow: 0 6px 44px 2px #fadadd32;
+  box-shadow: 0 6px 44px 2px #FFD44733;
   z-index: 5;
-  background: var(--gradient-glow, #fadadd44);
+  background: var(--gradient-glow, var(--accent-blue));
   margin-bottom: 18px;
   transition: box-shadow 0.34s cubic-bezier(.29,1.19,.48,1.12);
 }
@@ -732,8 +736,8 @@ main {
   height: 100%;
   object-fit: cover;
   border-radius: 0 0 var(--radius-xl) var(--radius-xl);
-  background: #fffafd;
-  box-shadow: 0 4px 24px #fadadd38;
+  background: #fffefd;
+  box-shadow: 0 4px 24px #FFD44725;
 }
 .video-title {
   position: absolute;
@@ -741,7 +745,7 @@ main {
   bottom: 26px;
   width: 100%;
   color: #fff;
-  text-shadow: 0 4px 20px #2d1354cc;
+  text-shadow: 0 4px 20px #232447cc;
   font-weight: 900;
   font-size: min(2.55vw, 1.3em);
   padding: 0 42px;
@@ -767,9 +771,9 @@ main {
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: #fffafdcc;
+  background: var(--accent-lightyellow, #FFF9E2bb);
   opacity: 0.51;
-  border: 1.5px solid #fadadd;
+  border: 1.5px solid var(--accent-lavender);
   margin: 0;
   padding: 0;
   cursor: pointer;
@@ -779,10 +783,10 @@ main {
 .video-dots button[aria-current="true"],
 .video-dots button:focus-visible,
 .video-dots button.active {
-  background: linear-gradient(92deg, #fadadd 64%, #f339db 100%);
+  background: linear-gradient(91deg, var(--highlight-yellow) 72%, var(--accent-blue) 110%);
   opacity: 1;
-  border: 2.5px solid #d149b3;
-  outline: 2.2px solid #f339db44;
+  border: 2.5px solid var(--accent-contrast);
+  outline: 2.2px solid var(--highlight-yellow);
 }
 
 @media (max-width: 700px) {
