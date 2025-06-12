@@ -1,16 +1,22 @@
 # Lightweight React Template for KAVIA
 
-## EmailJS Setup
+## EmailJS Setup (REQUIRED: NO PLACEHOLDERS ALLOWED)
 
-RadianceAI's email features (reminders, summaries, admin notifications) require the following **real** EmailJS credentials set as environment variables in `radianceai_frontend/.env` or your deployment config:
+RadianceAI's email features (reminders, summaries, admin notifications) require **real** EmailJS credentials set as environment variables in `radianceai_frontend/.env` or your deployment config:
 
 ```
-REACT_APP_EMAILJS_SERVICE_ID=your_real_service_id
-REACT_APP_EMAILJS_USER_ID=your_real_public_key
-REACT_APP_EMAILJS_REMINDER_TEMPLATE_ID=your_real_template_id
-REACT_APP_EMAILJS_SUMMARY_TEMPLATE_ID=your_real_template_id
+REACT_APP_EMAILJS_SERVICE_ID=your_real_service_id_here
+REACT_APP_EMAILJS_USER_ID=your_real_public_key_here
+REACT_APP_EMAILJS_REMINDER_TEMPLATE_ID=your_real_reminder_template_id_here
+REACT_APP_EMAILJS_SUMMARY_TEMPLATE_ID=your_real_summary_template_id_here
 ```
-If these are missing or left as placeholders, all email sends will be blocked and an admin/user message will instruct how to update them in the UI. Get real values from https://dashboard.emailjs.com/ and see [EmailJS React docs](https://www.emailjs.com/docs/examples/reactjs/).
+
+**Do NOT use any placeholders or demo/example keys. Only real credentials from your EmailJS dashboard are accepted. If any of these are missing or not real, all email sends are BLOCKED and admins/users will see a clear UI message explaining how to update your `.env` or deployment secrets.**
+
+Get credentials from https://dashboard.emailjs.com/  
+See [EmailJS React docs](https://www.emailjs.com/docs/examples/reactjs/) for integration details.
+
+---
 
 This project provides a minimal React template with a clean, modern UI and minimal dependencies.
 
@@ -37,7 +43,7 @@ In the project directory, you can run:
 
 ### `npm start`
 
-Runs the app in development mode.\
+Runs the app in development mode.  
 Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
 ### `npm test`
@@ -46,7 +52,7 @@ Launches the test runner in interactive watch mode.
 
 ### `npm run build`
 
-Builds the app for production to the `build` folder.\
+Builds the app for production to the `build` folder.  
 It correctly bundles React in production mode and optimizes the build for the best performance.
 
 ## Escalation: Upstream Issues (react-router[-dom] / react-scripts)

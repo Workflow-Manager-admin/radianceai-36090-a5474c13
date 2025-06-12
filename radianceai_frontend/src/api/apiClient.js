@@ -264,52 +264,43 @@ export const sendEmail = async (payload) => {
       }
     }
 
-    // Get config from payload OR env
+    // Only fetch config from payload or ENV (client .env injected at build)
     const fromEnv = typeof process !== "undefined" && process.env ? process.env : {};
-    // Try to get config from payload, window, or injected env variables
-    const serviceId = (
+    const serviceId =
       payload.serviceId ||
-      window.EMAILJS_SERVICE_ID ||
-      (fromEnv.REACT_APP_EMAILJS_SERVICE_ID || fromEnv.EMAILJS_SERVICE_ID) ||
-      ""
-    );
-    const userId = (
+      (fromEnv.REACT_APP_EMAILJS_SERVICE_ID || "") ||
+      "";
+    const userId =
       payload.userId ||
-      window.EMAILJS_USER_ID ||
-      (fromEnv.REACT_APP_EMAILJS_USER_ID || fromEnv.EMAILJS_USER_ID) ||
-      ""
-    );
+      (fromEnv.REACT_APP_EMAILJS_USER_ID || "") ||
+      "";
     // Map type to template
     const { toEmail, toName, type, data } = payload;
     let templateId = "";
     if (type === "reminder")
       templateId =
         payload.reminderTemplateId ||
-        window.EMAILJS_REMINDER_TEMPLATE_ID ||
-        (fromEnv.REACT_APP_EMAILJS_REMINDER_TEMPLATE_ID || fromEnv.EMAILJS_REMINDER_TEMPLATE_ID) ||
+        (fromEnv.REACT_APP_EMAILJS_REMINDER_TEMPLATE_ID || "") ||
         "";
     else if (type === "summary")
       templateId =
         payload.summaryTemplateId ||
-        window.EMAILJS_SUMMARY_TEMPLATE_ID ||
-        (fromEnv.REACT_APP_EMAILJS_SUMMARY_TEMPLATE_ID || fromEnv.EMAILJS_SUMMARY_TEMPLATE_ID) ||
+        (fromEnv.REACT_APP_EMAILJS_SUMMARY_TEMPLATE_ID || "") ||
         "";
     else
       templateId =
         payload.templateId ||
-        window.EMAILJS_TEMPLATE_ID ||
-        (fromEnv.REACT_APP_EMAILJS_TEMPLATE_ID || fromEnv.EMAILJS_TEMPLATE_ID) ||
+        (fromEnv.REACT_APP_EMAILJS_TEMPLATE_ID || "") ||
         "";
 
-    // Validate for placeholders/missing
+    // Validate for missing or placeholder keys -- no fallback to window/legacy/demo allowed
     const MISSING_KEYS = [];
     if (!serviceId || /YOUR_SERVICE_ID/i.test(serviceId)) MISSING_KEYS.push("Service ID");
     if (!userId || /YOUR_EMAILJS_USER_ID|YOUR_PUBLIC_KEY/i.test(userId)) MISSING_KEYS.push("User/Public Key");
     if (!templateId || /routine_(reminder|summary)_template|YOUR_TEMPLATE_ID/i.test(templateId)) MISSING_KEYS.push("Template ID");
-    // Do NOT allow emails if any credential is missing or is a known placeholder
     if (MISSING_KEYS.length > 0) {
       throw new Error(
-        "EmailJS is not fully configured. The following keys must be set with your real values in the app's environment/config (not placeholders): " +
+        "EmailJS is not fully configured. The following keys must be set with your real values in the app's environment (.env or deployment config) and NOT left as placeholders: " +
         MISSING_KEYS.join(", ") +
         ".\nSee documentation: https://www.emailjs.com/docs/examples/reactjs/"
       );
@@ -347,7 +338,7 @@ export const sendEmail = async (payload) => {
     let msg =
       "Email send failed: " +
       (e && e.message ? e.message : String(e)) +
-      "\nTo enable email sending, set up EmailJS credentials in your environment. See https://dashboard.emailjs.com/admin and https://www.emailjs.com/docs/examples/reactjs/";
+      "\nTo enable email sending, set up EmailJS credentials in your environment (.env) and restart your app. See: https://dashboard.emailjs.com/admin and https://www.emailjs.com/docs/examples/reactjs/";
     if (typeof window !== "undefined" && window.console && window.console.error)
       window.console.error(msg);
     return { error: msg };

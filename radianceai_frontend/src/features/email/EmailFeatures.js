@@ -4,29 +4,25 @@ import useLocalStorage from "../../hooks/useLocalStorage";
 import { MotionWrapper, AppleFadeTransition } from "../../utils/animation";
 
 /*
- * Default config: will prompt for setup if values are unchanged or missing.
- * User/admin should set these via .env, secure admin config, or runtime env injection.
- * The below draws from environment first, then falls back to prior persisted config.
+ * Default config: Draw ONLY from environment variables (no placeholders ever).
+ * If these values are missing or left as placeholders, email sending will be BLOCKED and UI/admin error will instruct to set up REAL config.
+ * User/admin must set these via .env or secure config. No fallback to demo/placeholder allowed.
  */
 const DEFAULT_EMAILJS_CONFIG = {
   serviceId: (
-    process.env.REACT_APP_EMAILJS_SERVICE_ID || 
-    process.env.EMAILJS_SERVICE_ID || 
+    process.env.REACT_APP_EMAILJS_SERVICE_ID ||
     ""
   ),
   userId: (
     process.env.REACT_APP_EMAILJS_USER_ID ||
-    process.env.EMAILJS_USER_ID ||
     ""
   ),
   reminderTemplateId: (
     process.env.REACT_APP_EMAILJS_REMINDER_TEMPLATE_ID ||
-    process.env.EMAILJS_REMINDER_TEMPLATE_ID ||
     ""
   ),
   summaryTemplateId: (
     process.env.REACT_APP_EMAILJS_SUMMARY_TEMPLATE_ID ||
-    process.env.EMAILJS_SUMMARY_TEMPLATE_ID ||
     ""
   ),
 };
