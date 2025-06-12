@@ -1,7 +1,7 @@
 // PUBLIC_INTERFACE
-// Theme color palette for RadianceAI
+// Theme color palette for RadianceAI (DARK palette)
 export const COLORS = {
-  primary: '#FADADD',
-  secondary: '#e7b3ff',
-  accent: '#f339db',
+  primary: '#212329', // dark grey
+  secondary: '#FFD447', // deep yellow accent
+  accent: '#182C47', // navy blue primary text
 };
