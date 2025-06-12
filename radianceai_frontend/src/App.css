@@ -8,7 +8,8 @@
   --accent-lavender: #F4E6FF;    /* lavender card bg or accent */
   --accent-blue: #D7EAFE;        /* light blue for info/ai */
   --accent-lightyellow: #FFF9E2; /* ultra-light yellow contextual bg */
-  --gradient-gray-bg: linear-gradient(120deg, #212329 62%, #242443 98%, #F4E6FF08 100%);
+  /* Modern, accessible gray gradient background for the entire app */
+  --gradient-gray-bg: linear-gradient(120deg, #292B33 55%, #313247 84%, #F4E6FF09 100%);
   --navbar-bg: #272832;
   --navbar-gradient: linear-gradient(100deg, #232430 68%, #31344a 100%);
   --tile-bg: #232430;
@@ -50,7 +51,8 @@
 }
 
 body {
-  background: var(--gradient-gray-bg); /* unified gradient gray */
+  /* Universal modern gray gradient background, enforced */
+  background: var(--gradient-gray-bg) !important;
   color: var(--text-color);
   font-family: 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
   margin: 0;
@@ -62,7 +64,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: var(--gradient-gray-bg); /* ensure gradient for layout as well */
+  background: var(--gradient-gray-bg) !important; /* ensure gradient for app-level container */
   pointer-events: auto !important;
 }
 

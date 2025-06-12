@@ -137,8 +137,9 @@ function App() {
           style={{
             paddingTop: 70,
             minHeight: "calc(100vh - 70px)",
-            background: "none",
-            transition: "padding-bottom 0.25s cubic-bezier(.27,1.36,.48,1)",
+            /* Inherit the gray gradient – ensures no solid/white bg on main region */
+            background: "var(--gradient-gray-bg)",
+            transition: "padding-bottom 0.25s cubic-bezier(.27,1.36,.48,1), background 0.7s cubic-bezier(.45,1.45,.48,1)",
             willChange: "padding-bottom, background",
           }}
         >
