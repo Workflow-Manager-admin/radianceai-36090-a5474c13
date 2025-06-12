@@ -4,6 +4,32 @@ import { AppleFadeTransition, MotionWrapper } from "../../utils/animation";
 
 // PUBLIC_INTERFACE
 /**
+ * Helper to check for CORS or API/network failures and produce a detailed diagnostic message.
+ * @param {any} weatherResult
+ * @param {string} locErrorStr
+ * @returns {string} final error string to display
+ */
+function analyzeWeatherError(weatherResult, locErrorStr) {
+  if (locErrorStr) return locErrorStr;
+  if (!weatherResult || typeof weatherResult !== "object") return "Unknown error occurred. Please try again.";
+  if (weatherResult.error === "Missing coordinates") {
+    return "Could not determine your precise location. Please allow location access and retry.";
+  }
+  if (weatherResult.error && typeof weatherResult.raw === "object" && typeof weatherResult.raw.message === "string") {
+    return "Weather API: " + weatherResult.raw.message;
+  }
+  if (weatherResult.error) {
+    return weatherResult.error + (weatherResult.message ? ` (${weatherResult.message})` : "");
+  }
+  // CORS error detection: fetchWeather returns a generic error if fetch fails (may be CORS or network)
+  if (!("temp" in weatherResult)) {
+    return "Failed to get weather data: Unexpected API/network response. Check your connection and CORS permissions.";
+  }
+  return "";
+}
+
+// PUBLIC_INTERFACE
+/**
  * Weather-based suggestions that personalize skincare routine & products.
  * - Gets user geolocation (browser ask)
  * - Calls OpenWeatherMap for weather
@@ -102,11 +128,12 @@ const WeatherSuggestions = () => {
   const [loading, setLoading] = useState(true);
   const [locError, setLocError] = useState("");
   const [weatherError, setWeatherError] = useState("");
+  const [diagnostic, setDiagnostic] = useState(""); // SYSTEM: for future diagnostics
 
   // On mount: request geolocation if available
   useEffect(() => {
     if (!("geolocation" in navigator)) {
-      setLocError("Geolocation unsupported in your browser.");
+      setLocError("Geolocation unsupported in your browser. Precise/daily weather tips may be unavailable.");
       setLoading(false);
       return;
     }
@@ -114,8 +141,13 @@ const WeatherSuggestions = () => {
       (pos) => {
         setCoords({ lat: pos.coords.latitude, lon: pos.coords.longitude });
       },
-      () => {
-        setLocError("Location permission denied. Showing NYC example.");
+      (geoErr) => {
+        // geoErr: may contain details in .message and .code
+        setLocError(
+          geoErr && geoErr.code === 1
+            ? "Location permission denied. Showing NYC example."
+            : "Could not get precise location. Using default example (NYC)."
+        );
         // Manhattan default: 40.7831, -73.9712
         setCoords({ lat: 40.7831, lon: -73.9712 });
       },
@@ -133,16 +165,27 @@ const WeatherSuggestions = () => {
       .then((w) => {
         setWeather(w);
         setLoading(false);
-        setWeatherError(w?.error || "");
+        // Improved error parsing/path for further diagnostics
+        const diagn = (w && typeof w === "object" && w.error)
+          ? (w.message ? `[Weather] ${w.error}: ${w.message}` : `[Weather] ${w.error}`)
+          : "";
+        setWeatherError(analyzeWeatherError(w, ""));
+        setDiagnostic(diagn); // SYSTEM: store for future bug reports if needed
       })
-      .catch(() => {
+      .catch((e) => {
         setLoading(false);
-        setWeatherError("Could not fetch weather data.");
+        setWeatherError("Could not fetch weather data (network or CORS error).");
+        setDiagnostic(e && e.toString ? e.toString() : String(e));
       });
   }, [coords]);
 
   // Choose tips & routine
   const suggestion = getSuggestion(weather);
+
+  // Improved handling for subtle/diagnostic errors
+  const finalError =
+    loading ? "" :
+    weatherError || analyzeWeatherError(weather, locError);
 
   // UI section
   return (
@@ -158,11 +201,13 @@ const WeatherSuggestions = () => {
           Weather-Aware Skincare Suggestions
         </h2>
         <div style={{ color: "#e7b3ff", fontSize: 15.9, textAlign: "center", marginBottom: 24 }}>
-          {locError && <span style={{ color: "#f339db" }}>{locError}</span>}
-          {!locError &&
-            <span>
-              Using your current location, we've tailored skincare tips and product focus for today's weather.
-            </span>
+          {finalError
+            ? <span style={{ color: "#f339db" }}>{finalError}</span>
+            : (
+              <span>
+                Using your current location, we've tailored skincare tips and product focus for today's weather.
+              </span>
+            )
           }
         </div>
         {loading ? (
@@ -177,9 +222,34 @@ const WeatherSuggestions = () => {
               Loading weather…
             </div>
           </MotionWrapper>
-        ) : weatherError ? (
+        ) : finalError ? (
+          // Add a collapsible diagnostics section for easier debugging of persistent weather errors
           <div style={{ color: "#f339db", textAlign: "center", fontSize: 16, margin: "30px 0" }}>
-            {weatherError}
+            {finalError}
+            {diagnostic && (
+              <details style={{
+                background: "#f339db16",
+                color: "#fadadd",
+                fontSize: 12.7,
+                borderRadius: 8,
+                margin: "17px auto 0 auto",
+                padding: "7px 9px",
+                maxWidth: 420,
+                textAlign: "left"
+              }}>
+                <summary style={{ cursor: "pointer", color: "#fadadd", fontWeight: 600, fontSize: "1em" }}>
+                  Diagnostic details
+                </summary>
+                <div>
+                  {typeof diagnostic === "string"
+                    ? diagnostic.slice(0, 700)
+                    : JSON.stringify(diagnostic)}
+                </div>
+                <div>
+                  <em>To help resolve, check browser console for CORS errors, verify API key validity, and check network connection.</em>
+                </div>
+              </details>
+            )}
           </div>
         ) : (
           <MotionWrapper>

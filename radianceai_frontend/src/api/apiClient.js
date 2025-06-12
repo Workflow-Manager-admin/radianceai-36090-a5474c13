@@ -133,10 +133,18 @@ export const fetchWeather = async (lat, lon) => {
 
   try {
     const resp = await fetch(url);
-    if (!resp.ok) {
-      throw new Error("Failed to fetch weather");
+    let data;
+    try { data = await resp.json(); } catch { data = undefined; }
+    if (!resp.ok || !data || data.cod === 401 || data.cod === 429 || data.cod === "401" || data.cod === "429") {
+      // Capture some error details for diagnostics
+      const msg = data && typeof data === "object" && data.message ? data.message : null;
+      return {
+        error: "Weather fetch failed",
+        code: data && data.cod,
+        message: msg,
+        raw: data
+      };
     }
-    const data = await resp.json();
     // Extract key properties
     return {
       temp: data.main?.temp,
@@ -150,7 +158,10 @@ export const fetchWeather = async (lat, lon) => {
       raw: data,
     };
   } catch (e) {
-    return { error: "Weather fetch failed" };
+    return {
+      error: "Weather fetch failed",
+      message: (e && e.message) ? e.message : String(e)
+    };
   }
 };
 
