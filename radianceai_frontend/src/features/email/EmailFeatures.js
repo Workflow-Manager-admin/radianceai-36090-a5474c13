@@ -5,8 +5,8 @@ import { MotionWrapper, AppleFadeTransition } from "../../utils/animation";
 
 /*
  * EmailJS config: Draws ONLY from environment variables (REACT_APP_EMAILJS_*)
- * If not present or left as placeholders, ALL email features are BLOCKED. UI shows clear instructions for admin setup.
- * No UI/LS/admin config allowed anymore. Remove all fallback/local config logic.
+ * If not present or left as placeholders, ALL email features are BLOCKED.
+ * UI shows clear instructions for admin setup only if admin/dev, never to regular users.
  */
 function getEmailJsConfigFromEnv() {
   return {
@@ -24,8 +24,9 @@ function validateEmail(email) {
 
 // PUBLIC_INTERFACE
 /**
- * EmailFeatures – Send routine reminders & summary via EmailJS.
- * Users can opt-in, see config status and admin instructions if not ready.
+ * EmailFeatures – Sends routine reminders/summary via EmailJS.
+ * Shows minimal "not available" message to normal users if misconfigured.
+ * Admin/dev get full diagnostic + setup instructions. 
  */
 const EmailFeatures = () => {
   // Persist user fields only (email/name/consent)
@@ -39,7 +40,7 @@ const EmailFeatures = () => {
   const [result, setResult] = useState(""); // success/fail message
   const [sendType, setSendType] = useState("reminder"); // 'reminder' or 'summary'
 
-  // Block usage if missing env vars
+  // Helper: check if config is incomplete or uses placeholder values
   function configHasPlaceholdersOrMissing(cfg) {
     if (
       !cfg ||
@@ -48,7 +49,6 @@ const EmailFeatures = () => {
       !cfg.reminderTemplateId ||
       !cfg.summaryTemplateId
     ) return true;
-    // Check for placeholder values
     if (
       /YOUR_SERVICE_ID/i.test(cfg.serviceId) ||
       /YOUR_EMAILJS_USER_ID|YOUR_PUBLIC_KEY/i.test(cfg.userId) ||
@@ -58,6 +58,14 @@ const EmailFeatures = () => {
     return false;
   }
   const configIncomplete = configHasPlaceholdersOrMissing(emailjsConfig);
+
+  // User/admin mode detection (public, quick logic; for real admin use auth/session/role)
+  // In dev: localhost, 127.*; or window.ADMIN_MODE = true (mock for admin testing)
+  const isDevHost =
+    (typeof window !== "undefined" && window.location && (window.location.hostname === "localhost" || window.location.hostname.startsWith("127.")));
+  const isAdmin =
+    (typeof window !== "undefined" && window.ADMIN_MODE === true) ||
+    isDevHost;
 
   // Handlers
   const handleOptIn = async (e) => {
@@ -82,7 +90,7 @@ const EmailFeatures = () => {
     }
     // Block send if not configured
     if (configIncomplete) {
-      setResult("Email feature is not configured. Please ask an admin to set valid EmailJS credentials (Service ID, Public Key, and Template IDs) in environment. See below.");
+      setResult("Email feature is not configured. Please ask an admin to set valid EmailJS credentials in environment.");
       return;
     }
     setPending(true);
@@ -101,7 +109,6 @@ const EmailFeatures = () => {
         summary: "Your routine summary will be included here.",
       },
     };
-    // Attempt send
     const ok = await sendEmail(payload);
     setPending(false);
     if (ok === true) setResult("Email sent successfully!");
@@ -109,12 +116,12 @@ const EmailFeatures = () => {
     else setResult("Email failed to send. Check configuration and try again.");
   };
 
-  // Diagnostic/admin message logic
+  // Diagnostic/admin message logic (admin-only)
   let configDiagnosticMsg = "";
-  if (configIncomplete) {
+  if (configIncomplete && isAdmin) {
     configDiagnosticMsg =
       "⚠️ EmailJS is not configured! Emails are BLOCKED until real credentials are set as environment variables. \n" +
-      "To enable this feature, set all the following in your .env or deployment config (never commit values in code or UI!):\n" +
+      "To enable this feature, set all the following in your .env or deployment config (never commit values in code or UI!)\n" +
       "• REACT_APP_EMAILJS_SERVICE_ID\n" +
       "• REACT_APP_EMAILJS_USER_ID   (public key)\n" +
       "• REACT_APP_EMAILJS_REMINDER_TEMPLATE_ID\n" +
@@ -124,6 +131,28 @@ const EmailFeatures = () => {
       "See docs: https://www.emailjs.com/docs/examples/reactjs/ \n" +
       "Emails are BLOCKED until everything is correct.";
   }
+
+  // User-facing email unavailable message
+  const emailUnavailableMessage = (
+    <div
+      style={{
+        color: "#77a6ed",
+        background: "rgba(32,80,170,0.06)",
+        fontSize: 16,
+        padding: "14px 14px 13px 14px",
+        borderRadius: 12,
+        textAlign: "center",
+        fontWeight: 600,
+        marginBottom: 17,
+        marginTop: 6,
+        boxShadow: "0 1.5px 8px #2050aa10",
+        letterSpacing: ".01em",
+        lineHeight: 1.32,
+      }}
+    >
+      Email reminders are not available at the moment. This feature will be enabled soon.
+    </div>
+  );
 
   return (
     <section className="container" style={{ maxWidth: 440, margin: "0 auto", paddingTop: 25 }}>
@@ -137,157 +166,137 @@ const EmailFeatures = () => {
         }}>
           Email Reminders & Summaries
         </h2>
-        {configIncomplete && (
+        {/* Show user-friendly unavailable message to users if blocked; show setup guidance only to admin/dev */}
+        {configIncomplete && !isAdmin && emailUnavailableMessage}
+        {configIncomplete && isAdmin && (
           <MotionWrapper>
             <div style={{
-              background: "#f339db1c",
-              color: "#f339db",
+              background: "#1c3b65",
+              color: "#93c7ff",
               borderRadius: 11,
               fontWeight: 600,
               fontSize: 15,
               textAlign: "center",
-              padding: "12px",
-              marginBottom: 15,
-              boxShadow: "0 1.5px 8px #fadadd20"
+              padding: "14px",
+              marginBottom: 18,
+              marginTop: 7,
+              boxShadow: "0 1.5px 10px #266fd630"
             }}>
               {configDiagnosticMsg.split('\n').map((txt, idx) => (
-                <div key={idx}>{txt}</div>
+                <div key={idx} style={idx === 0 ? { color: "#3aa1ff", fontWeight: 700, fontSize: 16 } : undefined}>{txt}</div>
               ))}
+              <div style={{marginTop:10, whiteSpace:"pre-line", color: "#bfd7ef", fontWeight: 500, fontSize: 14.5 }}>
+                To configure, set .env in <b>radianceai_frontend/</b> (see EmailJS docs).<br />
+                <a href="https://dashboard.emailjs.com/" target="_blank" rel="noopener noreferrer" style={{ color: "#358fff", fontWeight: 700, textDecoration: "underline", marginTop: 8, display: "inline-block" }}>EmailJS Dashboard →</a>
+              </div>
             </div>
           </MotionWrapper>
         )}
         <div style={{ color: "#e7b3ff", textAlign: "center", fontSize: 16, marginBottom: 17 }}>
           Opt in to receive skincare reminders and your routine summary. No spam. Cancel anytime.
         </div>
-        {configIncomplete && (
-          <div style={{
-            color: "#f339db",
-            fontSize: 14,
-            background: "#fadadd18",
-            borderRadius: 11,
-            padding: "12px",
-            textAlign: "center",
-            marginBottom: 13,
-            boxShadow: "0 1.5px 8px #fadadd23"
-          }}>
-            <div>
-              <b>Email feature is blocked:</b> Real EmailJS credentials not set.
-            </div>
-            <div style={{marginTop:7, whiteSpace:"pre-line"}}>
-              To configure, ask an admin to update the .env file in <b>radianceai_frontend/.env</b> (sample below), then restart the app:
-              <br /> <br />
-              <code>
-                REACT_APP_EMAILJS_SERVICE_ID=your_real_service_id_here<br/>
-                REACT_APP_EMAILJS_USER_ID=your_real_user_key_here<br/>
-                REACT_APP_EMAILJS_REMINDER_TEMPLATE_ID=your_real_template_id_here<br/>
-                REACT_APP_EMAILJS_SUMMARY_TEMPLATE_ID=your_real_template_id_here
-              </code>
-              <br />
-              <a href="https://dashboard.emailjs.com/" target="_blank" rel="noopener noreferrer">Get values from EmailJS Dashboard →</a>
-            </div>
-          </div>
+        {/* Show opt-in/out/send forms ONLY if config is valid or is admin (so admin/dev can test even if not configured) */}
+        {(!configIncomplete || isAdmin) && (
+          <MotionWrapper>
+            {!optedIn ? (
+              <form style={{
+                background: "rgba(250,218,221,0.09)",
+                borderRadius: 16,
+                padding: "23px 19px 17px 19px",
+                boxShadow: "0 2px 13px #fadadd22",
+                marginBottom: 14
+              }} onSubmit={handleOptIn} autoComplete="on">
+                <div style={{marginBottom:18}}>
+                  <label style={{ color: "#fadadd", fontWeight: 700 }}>
+                    Name:
+                    <input
+                      style={{
+                        display: "block",
+                        marginTop: 2,
+                        marginBottom: 11,
+                        fontWeight: 500,
+                        borderRadius: 7,
+                        border: "none",
+                        padding: "7px 12px",
+                        width: "100%",
+                        background: "#e7b3ff18",
+                        color: "#fff"
+                      }}
+                      type="text"
+                      value={name}
+                      onChange={e => setName(e.target.value)}
+                      placeholder="Your name (optional)"
+                      autoComplete="name"
+                    />
+                  </label>
+                  <label style={{ color: "#fadadd", fontWeight: 700 }}>
+                    Email:
+                    <input
+                      style={{
+                        display: "block",
+                        marginTop: 2,
+                        marginBottom: 9,
+                        fontWeight: 500,
+                        borderRadius: 7,
+                        border: "none",
+                        padding: "7px 12px",
+                        width: "100%",
+                        background: "#e7b3ff18",
+                        color: "#fff"
+                      }}
+                      type="email"
+                      value={email}
+                      onChange={e => setEmail(e.target.value)}
+                      autoComplete="email"
+                      required
+                      placeholder="e.g. you@email.com"
+                    />
+                  </label>
+                </div>
+                <button className="btn btn-large" style={{
+                  width: "100%",
+                  fontWeight: 700,
+                  fontSize: "1.09rem",
+                  background: "linear-gradient(90deg, #fadadd 60%, #e7b3ff 100%)",
+                  color: "#23155f",
+                  borderRadius: 13,
+                  marginTop: 2
+                }} type="submit">
+                  Opt in for Email Reminders
+                </button>
+              </form>
+            ) : (
+              <div style={{
+                background: "rgba(250,218,221,0.08)",
+                borderRadius: 15,
+                padding: "20px",
+                marginBottom: 14
+              }}>
+                <div style={{ color: "#fadadd", fontWeight: 600, marginBottom: 12 }}>
+                  <span>
+                    {name && <span>{name}, </span>}
+                    you're opted in for:
+                  </span>
+                  <ul style={{ color: "#e7b3ff", fontWeight: 400, marginTop: 8, fontSize: "1.06em" }}>
+                    <li>• Routine reminders</li>
+                    <li>• Routine summary</li>
+                  </ul>
+                </div>
+                <button className="btn"
+                  style={{
+                    background: "rgba(234, 179, 255, 0.17)",
+                    color: "#fadadd",
+                    fontWeight: 500,
+                    borderRadius: 9,
+                    marginBottom: 4
+                  }}
+                  onClick={handleOptOut}>Opt out</button>
+              </div>
+            )}
+          </MotionWrapper>
         )}
-        <MotionWrapper>
-          {!optedIn ? (
-            <form style={{
-              background: "rgba(250,218,221,0.09)",
-              borderRadius: 16,
-              padding: "23px 19px 17px 19px",
-              boxShadow: "0 2px 13px #fadadd22",
-              marginBottom: 14
-            }} onSubmit={handleOptIn} autoComplete="on">
-              <div style={{marginBottom:18}}>
-                <label style={{ color: "#fadadd", fontWeight: 700 }}>
-                  Name:
-                  <input
-                    style={{
-                      display: "block",
-                      marginTop: 2,
-                      marginBottom: 11,
-                      fontWeight: 500,
-                      borderRadius: 7,
-                      border: "none",
-                      padding: "7px 12px",
-                      width: "100%",
-                      background: "#e7b3ff18",
-                      color: "#fff"
-                    }}
-                    type="text"
-                    value={name}
-                    onChange={e => setName(e.target.value)}
-                    placeholder="Your name (optional)"
-                    autoComplete="name"
-                  />
-                </label>
-                <label style={{ color: "#fadadd", fontWeight: 700 }}>
-                  Email:
-                  <input
-                    style={{
-                      display: "block",
-                      marginTop: 2,
-                      marginBottom: 9,
-                      fontWeight: 500,
-                      borderRadius: 7,
-                      border: "none",
-                      padding: "7px 12px",
-                      width: "100%",
-                      background: "#e7b3ff18",
-                      color: "#fff"
-                    }}
-                    type="email"
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    autoComplete="email"
-                    required
-                    placeholder="e.g. you@email.com"
-                  />
-                </label>
-              </div>
-              <button className="btn btn-large" style={{
-                width: "100%",
-                fontWeight: 700,
-                fontSize: "1.09rem",
-                background: "linear-gradient(90deg, #fadadd 60%, #e7b3ff 100%)",
-                color: "#23155f",
-                borderRadius: 13,
-                marginTop: 2
-              }} type="submit">
-                Opt in for Email Reminders
-              </button>
-            </form>
-          ) : (
-            <div style={{
-              background: "rgba(250,218,221,0.08)",
-              borderRadius: 15,
-              padding: "20px",
-              marginBottom: 14
-            }}>
-              <div style={{ color: "#fadadd", fontWeight: 600, marginBottom: 12 }}>
-                <span>
-                  {/* Show user's email */}
-                  {name && <span>{name}, </span>}
-                  you're opted in for:
-                </span>
-                <ul style={{ color: "#e7b3ff", fontWeight: 400, marginTop: 8, fontSize: "1.06em" }}>
-                  <li>• Routine reminders</li>
-                  <li>• Routine summary</li>
-                </ul>
-              </div>
-              <button className="btn"
-                style={{
-                  background: "rgba(234, 179, 255, 0.17)",
-                  color: "#fadadd",
-                  fontWeight: 500,
-                  borderRadius: 9,
-                  marginBottom: 4
-                }}
-                onClick={handleOptOut}>Opt out</button>
-            </div>
-          )}
-        </MotionWrapper>
-
-        {/* Demo/test send section if opted in only */}
-        {optedIn && (
+        {/* Test send section if opted in AND config is valid/admin */}
+        {optedIn && (!configIncomplete || isAdmin) && (
           <MotionWrapper>
             <form onSubmit={handleSend} style={{ marginTop: 7 }}>
               <label style={{ color: "#e7b3ff", fontWeight: 500 }}>Test type:
@@ -327,18 +336,14 @@ const EmailFeatures = () => {
           </MotionWrapper>
         )}
 
-        {/* Admin: config is not editable via browser at all. Show instructions only */}
         <div style={{
-          margin: "24px 0 0 0",
-          textAlign: "center",
-          fontSize: 13.5,
-          color: "#fadadd",
-          opacity: 0.82
+          color: "#e7b3ff",
+          opacity: 0.82,
+          fontSize: 13.7,
+          margin: "25px 0 0 0",
+          textAlign: "center"
         }}>
-          <b>Note for Admins:</b> EmailJS configuration is now <u>read strictly from environment variables</u>.<br />
-          To update credentials, <b>edit <code>.env</code> in <code>radianceai_frontend/</code></b> (or set environment secrets in your deployment host) and <b>restart</b> the app.<br />
-          <br />
-          Get valid values from <a href="https://dashboard.emailjs.com/" target="_blank" rel="noopener noreferrer" style={{ color: "#f339db" }}>EmailJS Dashboard →</a>
+          All notifications are optional and you may unsubscribe at any time.
         </div>
 
         {result && (
@@ -356,16 +361,6 @@ const EmailFeatures = () => {
             </div>
           </MotionWrapper>
         )}
-
-        <div style={{
-          color: "#e7b3ff",
-          opacity: 0.82,
-          fontSize: 13.7,
-          margin: "25px 0 0 0",
-          textAlign: "center"
-        }}>
-          All notifications are optional and you may unsubscribe at any time.
-        </div>
       </AppleFadeTransition>
     </section>
   );
