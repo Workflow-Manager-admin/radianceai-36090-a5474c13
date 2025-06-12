@@ -5,13 +5,30 @@ import { MotionWrapper, AppleFadeTransition } from "../../utils/animation";
 
 /*
  * Default config: will prompt for setup if values are unchanged or missing.
- * User/admin should set these via .env or a secure admin config screen.
+ * User/admin should set these via .env, secure admin config, or runtime env injection.
+ * The below draws from environment first, then falls back to prior persisted config.
  */
 const DEFAULT_EMAILJS_CONFIG = {
-  serviceId: "",
-  userId: "",
-  reminderTemplateId: "",
-  summaryTemplateId: "",
+  serviceId: (
+    process.env.REACT_APP_EMAILJS_SERVICE_ID || 
+    process.env.EMAILJS_SERVICE_ID || 
+    ""
+  ),
+  userId: (
+    process.env.REACT_APP_EMAILJS_USER_ID ||
+    process.env.EMAILJS_USER_ID ||
+    ""
+  ),
+  reminderTemplateId: (
+    process.env.REACT_APP_EMAILJS_REMINDER_TEMPLATE_ID ||
+    process.env.EMAILJS_REMINDER_TEMPLATE_ID ||
+    ""
+  ),
+  summaryTemplateId: (
+    process.env.REACT_APP_EMAILJS_SUMMARY_TEMPLATE_ID ||
+    process.env.EMAILJS_SUMMARY_TEMPLATE_ID ||
+    ""
+  ),
 };
 
 function validateEmail(email) {
@@ -41,6 +58,7 @@ const EmailFeatures = () => {
 
   // Helper: test if config is filled with real values
   function configHasPlaceholdersOrMissing(cfg) {
+    // Accept values from env variables or config object
     if (
       !cfg ||
       !cfg.serviceId ||
@@ -48,16 +66,17 @@ const EmailFeatures = () => {
       !cfg.reminderTemplateId ||
       !cfg.summaryTemplateId
     ) return true;
-    // Check if values match known placeholder patterns
+    // Check for obviously incomplete or placeholder values
     if (
       /YOUR_SERVICE_ID/i.test(cfg.serviceId) ||
       /YOUR_EMAILJS_USER_ID|YOUR_PUBLIC_KEY/i.test(cfg.userId) ||
-      /routine_reminder_template/i.test(cfg.reminderTemplateId) ||
-      /routine_summary_template/i.test(cfg.summaryTemplateId)
+      /routine_reminder_template|YOUR_TEMPLATE_ID/i.test(cfg.reminderTemplateId) ||
+      /routine_summary_template|YOUR_TEMPLATE_ID/i.test(cfg.summaryTemplateId)
     ) return true;
     return false;
   }
 
+  // configIncomplete will be true if any value is missing or a placeholder (whether from env or UI config)
   const configIncomplete = configHasPlaceholdersOrMissing(emailjsConfig);
 
   // Handlers
@@ -120,10 +139,16 @@ const EmailFeatures = () => {
   let configDiagnosticMsg = "";
   if (configIncomplete) {
     configDiagnosticMsg =
-      "⚠️ EmailJS config is incomplete or using placeholder values. " +
-      "This feature requires real EmailJS credentials (Service ID, User/Public Key, Reminder and Summary Template IDs). " +
-      "Emails will not send until these are set – stored via secure admin panel, .env, or localStorage.\n" +
-      "Ask your app admin to generate the necessary values from https://dashboard.emailjs.com/ and update app config securely.";
+      "⚠️ EmailJS is not configured! Emails will NOT send until real credentials are set.\n" +
+      "To enable this feature, you must set the following in your environment (.env, deployment config, or secure admin setup):\n" +
+      "• REACT_APP_EMAILJS_SERVICE_ID\n" +
+      "• REACT_APP_EMAILJS_USER_ID   (public key)\n" +
+      "• REACT_APP_EMAILJS_REMINDER_TEMPLATE_ID\n" +
+      "• REACT_APP_EMAILJS_SUMMARY_TEMPLATE_ID\n" +
+      "Update .env for local development or use host configuration for production. " +
+      "Get these values in your EmailJS dashboard: https://dashboard.emailjs.com/.\n" +
+      "See docs: https://www.emailjs.com/docs/examples/reactjs/ \n" +
+      "Emails are BLOCKED until this is complete.";
   }
 
   return (
@@ -174,6 +199,34 @@ const EmailFeatures = () => {
         <div style={{ color: "#e7b3ff", textAlign: "center", fontSize: 16, marginBottom: 17 }}>
           Opt in to receive skincare reminders and your routine summary. No spam. Cancel anytime.
         </div>
+        {configIncomplete && (
+          <div style={{
+            color: "#f339db",
+            fontSize: 14,
+            background: "#fadadd18",
+            borderRadius: 11,
+            padding: "12px",
+            textAlign: "center",
+            marginBottom: 13,
+            boxShadow: "0 1.5px 8px #fadadd23"
+          }}>
+            <div>
+              <b>Email feature is blocked:</b> Real EmailJS credentials not set.
+            </div>
+            <div style={{marginTop:7, whiteSpace:"pre-line"}}>
+              To configure, ask an admin to update the .env file in <b>radianceai_frontend/.env</b> (sample below), then restart the app:
+              <br /> <br />
+              <code>
+                REACT_APP_EMAILJS_SERVICE_ID=your_real_service_id_here<br/>
+                REACT_APP_EMAILJS_USER_ID=your_real_user_key_here<br/>
+                REACT_APP_EMAILJS_REMINDER_TEMPLATE_ID=your_real_template_id_here<br/>
+                REACT_APP_EMAILJS_SUMMARY_TEMPLATE_ID=your_real_template_id_here
+              </code>
+              <br />
+              <a href="https://dashboard.emailjs.com/" target="_blank" rel="noopener noreferrer">Get values from EmailJS Dashboard →</a>
+            </div>
+          </div>
+        )}
         <MotionWrapper>
           {!optedIn ? (
             <form style={{
@@ -367,7 +420,9 @@ const EmailFeatures = () => {
               <div style={{
                 color: "#f339db", marginTop: 11, fontSize: 13.2
               }}>
-                Remember to use your EmailJS dashboard to match these config keys!
+                In production, <b>DO NOT</b> expose keys clientside; place them in <b>.env</b> and restart.<br/>
+                Always use EmailJS dashboard values:&nbsp;
+                <a href="https://dashboard.emailjs.com/" style={{color: "#f339db"}} target="_blank" rel="noopener noreferrer">EmailJS Dashboard →</a>
               </div>
             </div>
           </MotionWrapper>
