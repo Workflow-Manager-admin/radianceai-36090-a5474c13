@@ -4,6 +4,23 @@ import './index.css';
 import App from './App';
 import { GlobalStateProvider } from './context/GlobalStateContext';
 
+// DEBUG: Log potential critical errors at startup
+(function () {
+  window.onerror = function (message, source, lineno, colno, error) {
+    document.body.innerHTML = "<pre style='color:#D2195B;padding:2em;background:#fff8fa;border-radius:12px;font-size:1.2em'>RUNTIME ERROR on startup:\n" +
+      (message || '') + "\n" +
+      (error && error.stack ? "\n" + error.stack : "") +
+      "\nSource: " + (source || '') + " (" + lineno + ":" + colno + ")" +
+      "</pre>";
+    return false;
+  };
+  window.addEventListener('unhandledrejection', function(e) {
+    document.body.innerHTML = "<pre style='color:#D2195B;padding:2em;background:#fff8fa;border-radius:12px;font-size:1.13em'>UNHANDLED PROMISE ERROR:\n" +
+      (e.reason && e.reason.message ? e.reason.message : (e.reason || "")) +
+      (e.reason && e.reason.stack ? ("\n" + e.reason.stack) : "") +
+      "</pre>";
+  });
+})();
 // PUBLIC_INTERFACE
 // Basic error boundary component for runtime React errors
 class ErrorBoundary extends React.Component {
