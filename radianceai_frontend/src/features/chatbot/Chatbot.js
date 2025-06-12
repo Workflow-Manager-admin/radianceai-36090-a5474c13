@@ -6,6 +6,21 @@ import { AppleFadeTransition, MotionWrapper } from "../../utils/animation";
  * PUBLIC_INTERFACE
  * Chatbot: Apple-like animated AI chat with contextual rule-based (stub) logic for skin/routine/product help.
  */
+
+// Palette
+const palette = {
+  blueDark: "#2050aa",
+  blueLight: "#77a6ed",
+  white: "#fff",
+  blueBG: "linear-gradient(120deg,#2050aa 40%,#77a6ed 100%)",
+  blueBGUser: "linear-gradient(120deg, #dde9ff 60%, #e9f6fb 100%)",
+  gradientLight: "linear-gradient(115deg,#19155e 50%,#dde9ff24 120%)",
+  msgBotBG: "linear-gradient(110deg,#dde9ff0c 60%,#e9f6fb27 120%)",
+  msgUserBG: "linear-gradient(97deg, #dde9ff 65%, #e9f6fb 120%)",
+  botColor: "#2050aa",
+  badge: "#77a6ed"
+};
+
 const SUGGESTIONS = [
   "How do I start a skincare routine?",
   "Best products for dry skin?",
@@ -20,7 +35,7 @@ const BOT_AVATAR =
   <span style={{
     display: "inline-block",
     width: 35, height: 35,
-    borderRadius: "50%", background: "linear-gradient(120deg,#2050aa 40%,#77a6ed 100%)",
+    borderRadius: "50%", background: palette.blueBG,
     boxShadow: "0 1.5px 7px #2050aa15",
     display_: "flex", alignItems_: "center", justifyContent_: "center", fontSize: 27, textAlign: "center"
   }} aria-label="bot">💬</span>;
@@ -62,8 +77,8 @@ const USER_AVATAR =
   <span style={{
     display: "inline-block",
     width: 35, height: 35,
-    borderRadius: "50%", background: "linear-gradient(120deg,#e7b3ff 60%,#fadadd 100%)",
-    boxShadow: "0 1.5px 7px #e7b3ff28",
+    borderRadius: "50%", background: palette.blueBGUser,
+    boxShadow: "0 1.5px 7px #dde9ff18",
     display_: "flex", alignItems_: "center", justifyContent_: "center", fontSize: 25, textAlign: "center"
   }} aria-label="user">🧑‍💻</span>;
 
@@ -124,13 +139,13 @@ const Chatbot = () => {
       <AppleFadeTransition>
         <h2 style={{
           fontWeight: 700, fontSize: "1.48rem",
-          color: "#fadadd", textAlign: "center", letterSpacing: ".01em",
+          color: palette.blueDark, textAlign: "center", letterSpacing: ".01em",
           margin: "10px 0 7px 0"
         }}>
           RadianceAI Chatbot
         </h2>
         <div style={{
-          color: "#e7b3ff",
+          color: palette.blueLight,
           textAlign: "center",
           fontSize: 16,
           marginBottom: 15,
@@ -140,14 +155,14 @@ const Chatbot = () => {
         <MotionWrapper>
           <motion.div
             className="ai-chatbot-frame"
-            initial={{ boxShadow: "0 2px 20px #fadadd17", scale: 0.97 }}
-            animate={{ boxShadow: "0 4px 38px #fadadd26", scale: 1 }}
+            initial={{ boxShadow: "0 2px 20px #dde9ff17", scale: 0.97 }}
+            animate={{ boxShadow: "0 4px 38px #dde9ff26", scale: 1 }}
             transition={{ duration: 0.6, type: "spring", bounce: 0.29 }}
             style={{
-              background: "linear-gradient(115deg,#19155e 50%,#fadadd24 120%)",
+              background: palette.gradientLight,
               borderRadius: 24,
               padding: "26px 10px 12px 10px",
-              boxShadow: "0 1.5px 9px #fadadd12",
+              boxShadow: "0 1.5px 9px #dde9ff12",
               minHeight: 440,
               margin: "0 auto 12px auto",
               position: "relative",
@@ -165,9 +180,9 @@ const Chatbot = () => {
                 height: 340,
                 overflowY: "auto",
                 overscrollBehavior: "contain",
-                background: "rgba(234,179,255,0.055)",
+                background: "rgba(221,233,255,0.055)",
                 borderRadius: 16,
-                boxShadow: "0 1px 11px #e7b3ff19",
+                boxShadow: "0 1px 11px #dde9ff19",
                 padding: "6px 8px 8px 8px",
                 marginBottom: 9,
                 position: "relative",
@@ -192,9 +207,9 @@ const Chatbot = () => {
                   <div
                     style={{
                       background: msg.sender === "bot"
-                        ? "linear-gradient(110deg,#E7B3FF0c 60%,#FADADD27 120%)"
-                        : "linear-gradient(97deg, #fadadd 65%, #e7b3ff 120%)",
-                      color: msg.sender === "bot" ? "#fadadd" : "#23155f",
+                        ? palette.msgBotBG
+                        : palette.msgUserBG,
+                      color: msg.sender === "bot" ? palette.blueDark : "#233869",
                       padding: "12px 15px",
                       borderRadius: msg.sender === "bot" ? "13px 13px 13px 2.5em" : "13px 13px 2.5em 13px",
                       fontSize: 15.9,
@@ -203,8 +218,8 @@ const Chatbot = () => {
                       maxWidth: 320,
                       fontWeight: 500,
                       boxShadow: msg.sender === "bot"
-                        ? "0 2px 14px #fadadd15"
-                        : "0 2px 19px #fadadd43",
+                        ? "0 2px 14px #dde9ff15"
+                        : "0 2px 19px #dde9ff43",
                       marginBottom: 5,
                       marginLeft: msg.sender === "user" ? 0 : 5,
                       marginRight: msg.sender === "user" ? 5 : 0,
@@ -234,8 +249,8 @@ const Chatbot = () => {
                     <div>{BOT_AVATAR}</div>
                     <div style={{
                       display: "inline-block", padding: "12px 20px",
-                      borderRadius: "14px 14px 18px 14px", background: "#fadadd29",
-                      color: "#fadadd"
+                      borderRadius: "14px 14px 18px 14px", background: "#dde9ff29",
+                      color: palette.blueDark
                     }}>
                       <BlinkingDots />
                     </div>
@@ -258,11 +273,11 @@ const Chatbot = () => {
                       padding: "7px 15px",
                       borderRadius: 12,
                       border: "none",
-                      background: "linear-gradient(90deg,#fadadd 60%,#e7b3ff 100%)",
-                      color: "#27174e",
+                      background: "linear-gradient(90deg,#dde9ff 60%,#e9f6fb 100%)",
+                      color: "#2050aa",
                       fontWeight: 600,
                       fontSize: 14,
-                      boxShadow: "0 1px 6px #e7b3ff1d",
+                      boxShadow: "0 1px 6px #dde9ff1d",
                       marginBottom: 2,
                       cursor: "pointer",
                     }}>
@@ -291,11 +306,11 @@ const Chatbot = () => {
                   border: "none",
                   fontSize: 16,
                   padding: "12px 14px",
-                  background: "#e7b3ff19",
-                  color: "#fff",
+                  background: "#dde9ff19",
+                  color: palette.blueDark,
                   outline: "none",
                   marginRight: 2,
-                  boxShadow: "0 1px 4px #fadadd15"
+                  boxShadow: "0 1px 4px #dde9ff15"
                 }}
                 onFocus={() => setShowSuggest(false)}
               />
@@ -308,28 +323,28 @@ const Chatbot = () => {
                   border: "none",
                   fontWeight: 700,
                   fontSize: 16.2,
-                  background: "linear-gradient(90deg,#fadadd 60%,#e7b3ff 100%)",
-                  color: "#27174e",
+                  background: "linear-gradient(90deg,#dde9ff 60%,#e9f6fb 100%)",
+                  color: "#2050aa",
                   padding: "11px 24px",
                   minWidth: 65,
                   cursor: typing || !input.trim() ? "not-allowed" : "pointer",
                   opacity: typing || !input.trim() ? 0.69 : 1,
-                  boxShadow: "0 1px 4px #fadadd13"
+                  boxShadow: "0 1px 4px #dde9ff13"
                 }}
                 aria-label="Send"
               >Send</motion.button>
             </form>
             <div style={{
-              color: "#fadadd",
+              color: palette.blueLight,
               fontSize: 13.2,
               opacity: 0.56,
               margin: "8px 0 0 0",
               textAlign: "center"
             }}>
               Chatbot is learning. For product recommendations, try the <a href="/quiz" style={{
-                color: "#f339db", textDecoration: "underline"
+                color: palette.blueDark, textDecoration: "underline"
               }}>quiz</a> or <a href="/products" style={{
-                color: "#e7b3ff", textDecoration: "underline"
+                color: palette.blueLight, textDecoration: "underline"
               }}>browse products</a>.
             </div>
           </motion.div>
