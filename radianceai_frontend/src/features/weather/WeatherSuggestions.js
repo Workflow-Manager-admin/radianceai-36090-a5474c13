@@ -2,24 +2,65 @@ import React, { useEffect, useState } from "react";
 import { fetchWeather } from "../../api/apiClient";
 import { AppleFadeTransition, MotionWrapper } from "../../utils/animation";
 
-// PUBLIC_INTERFACE
+// Diagnostic logger helper to funnel logs to console
+const diagLog = (...args) => { try { window && window.console && window.console.log && window.console.log("[WeatherDiag]", ...args); } catch {} };
+
 /**
  * Helper to check for CORS or API/network failures and produce a detailed diagnostic message.
  * @param {any} weatherResult
  * @param {string} locErrorStr
+ * @param {object} diag diagnostic details from each stage
  * @returns {string} final error string to display
  */
-function analyzeWeatherError(weatherResult, locErrorStr) {
+function analyzeWeatherError(weatherResult, locErrorStr, diag = {}) {
   if (locErrorStr) return locErrorStr;
   if (!weatherResult || typeof weatherResult !== "object") return "Unknown error occurred. Please try again.";
   if (weatherResult.error === "Missing coordinates") {
     return "Could not determine your precise location. Please allow location access and retry.";
   }
-  if (weatherResult.error && typeof weatherResult.raw === "object" && typeof weatherResult.raw.message === "string") {
-    return "Weather API: " + weatherResult.raw.message;
+  if (
+    weatherResult.error &&
+    typeof weatherResult.response === "object" &&
+    weatherResult.code === 401
+  ) {
+    return "Weather fetch failed: Invalid API key. Please check/renew your OpenWeatherMap API key.";
+  }
+  if (
+    weatherResult.error &&
+    typeof weatherResult.response === "object" &&
+    weatherResult.code === 429
+  ) {
+    return "Weather fetch failed: Too many requests (API rate limit exceeded). Please try again later.";
+  }
+  if (
+    weatherResult.error &&
+    typeof weatherResult.response === "object" &&
+    typeof weatherResult.response.message === "string"
+  ) {
+    return `Weather API error: ${weatherResult.response.message}`;
+  }
+  if (
+    weatherResult.error &&
+    weatherResult.reason === "Invalid API key or unauthorized."
+  ) {
+    return "Weather fetch failed: Invalid API key (unauthorized). Check your OpenWeatherMap API key.";
+  }
+  if (
+    weatherResult.error &&
+    weatherResult.reason === "API rate limit exceeded (Too Many Requests)."
+  ) {
+    return "Weather fetch failed: Too many requests (rate limit). Try again in a moment.";
   }
   if (weatherResult.error) {
-    return weatherResult.error + (weatherResult.message ? ` (${weatherResult.message})` : "");
+    return (
+      weatherResult.error +
+      (weatherResult.message
+        ? ` (${weatherResult.message})`
+        : weatherResult.reason
+        ? ` (${weatherResult.reason})`
+        : ""
+      )
+    );
   }
   // CORS error detection: fetchWeather returns a generic error if fetch fails (may be CORS or network)
   if (!("temp" in weatherResult)) {
@@ -123,69 +164,118 @@ function getSuggestion(weather) {
 }
 
 const WeatherSuggestions = () => {
-  const [coords, setCoords] = useState(null); // {lat, lon}
+  const [coords, setCoords] = useState(null);
   const [weather, setWeather] = useState(null);
   const [loading, setLoading] = useState(true);
   const [locError, setLocError] = useState("");
+  const [coordDiag, setCoordDiag] = useState("");
   const [weatherError, setWeatherError] = useState("");
-  const [diagnostic, setDiagnostic] = useState(""); // SYSTEM: for future diagnostics
+  const [diagnostic, setDiagnostic] = useState(null); // SYSTEM: richer diagnostics structure
 
-  // On mount: request geolocation if available
+  // Instrumented status trackers
+  const [stepLog, setStepLog] = useState([]);
+
   useEffect(() => {
+    let logs = [];
+    setStepLog((cur) => []);
+    // Geolocation step
     if (!("geolocation" in navigator)) {
+      diagLog("Step [geo]: Browser geolocation API not supported.");
+      logs.push("Geolocation API: NOT supported in browser.");
+      setStepLog(logs);
       setLocError("Geolocation unsupported in your browser. Precise/daily weather tips may be unavailable.");
       setLoading(false);
+      setCoordDiag("Browser does not implement geolocation (navigator.geolocation missing)");
       return;
     }
+    // Geolocation fetch
+    diagLog("Step [geo]: Requesting browser geolocation…");
+    logs.push("Geolocation API: Requested browser geolocation.");
+
     navigator.geolocation.getCurrentPosition(
       (pos) => {
+        diagLog(
+          "Step [geo]: User location detected.",
+          { latitude: pos.coords.latitude, longitude: pos.coords.longitude }
+        );
+        logs.push("Geolocation API: Success. User accepted geolocation prompt.");
+        setStepLog(logs);
         setCoords({ lat: pos.coords.latitude, lon: pos.coords.longitude });
       },
       (geoErr) => {
-        // geoErr: may contain details in .message and .code
-        setLocError(
-          geoErr && geoErr.code === 1
-            ? "Location permission denied. Showing NYC example."
-            : "Could not get precise location. Using default example (NYC)."
-        );
-        // Manhattan default: 40.7831, -73.9712
-        setCoords({ lat: 40.7831, lon: -73.9712 });
+        let msg = "Could not get precise location. Using default example (NYC).";
+        let diag = `Geo error code:${geoErr && geoErr.code}; message:${geoErr && geoErr.message}`;
+        if (geoErr && geoErr.code === 1) {
+          msg = "Location permission denied. Showing NYC example.";
+          diag += " (User denied browser geolocation permission)";
+        }
+        diagLog("Step [geo]: Geolocation failed/fallback.", geoErr, diag);
+        logs.push(`Geolocation API: Failure. ${msg} [${diag}]`);
+        setStepLog(logs);
+        setLocError(msg);
+        setCoordDiag(diag || String(geoErr));
+        setCoords({ lat: 40.7831, lon: -73.9712 }); // NYC fallback
       },
       {
         timeout: 8000
       }
     );
+    // eslint-disable-next-line
   }, []);
 
   // Fetch actual weather when coordinates ready
   useEffect(() => {
     if (!coords) return;
+    let logs = [...stepLog];
+    logs.push(`Proceed to fetch weather for lat=${coords.lat}, lon=${coords.lon}`);
     setLoading(true);
+    setStepLog(logs);
+
     fetchWeather(coords.lat, coords.lon)
       .then((w) => {
+        diagLog("Step [weather]: Weather fetch response:", w);
+        logs.push(w && !w.error ? "Weather API: Success." : `Weather API: Failure. Error: ${w && w.error}`);
+        setStepLog(logs);
         setWeather(w);
         setLoading(false);
+        // Build comprehensive diagnostic tree
+        let diagDetail = {
+          location: coords,
+          locError,
+          coordsDiag: coordDiag,
+          weatherResult: w,
+          logs
+        };
         // Improved error parsing/path for further diagnostics
-        const diagn = (w && typeof w === "object" && w.error)
-          ? (w.message ? `[Weather] ${w.error}: ${w.message}` : `[Weather] ${w.error}`)
-          : "";
-        setWeatherError(analyzeWeatherError(w, ""));
-        setDiagnostic(diagn); // SYSTEM: store for future bug reports if needed
+        setWeatherError(analyzeWeatherError(w, locError, diagDetail));
+        setDiagnostic(diagDetail);
       })
       .catch((e) => {
+        diagLog("Step [weather]: Weather fetch failed (network/CORS)", e);
+        logs.push(`Weather API: Network or CORS error: ${(e && e.message) ? e.message : String(e)}`);
+        setStepLog(logs);
         setLoading(false);
         setWeatherError("Could not fetch weather data (network or CORS error).");
-        setDiagnostic(e && e.toString ? e.toString() : String(e));
+        setDiagnostic({
+          error: e,
+          location: coords,
+          locError,
+          coordsDiag: coordDiag,
+          logs
+        });
       });
+    // eslint-disable-next-line
   }, [coords]);
 
   // Choose tips & routine
   const suggestion = getSuggestion(weather);
 
-  // Improved handling for subtle/diagnostic errors
+  // Improved handling for subtle/diagnostic errors (always user-friendly, but system details available)
   const finalError =
-    loading ? "" :
-    weatherError || analyzeWeatherError(weather, locError);
+    loading
+      ? ""
+      : weatherError ||
+        analyzeWeatherError(weather, locError, diagnostic);
 
   // UI section
   return (
@@ -202,7 +292,17 @@ const WeatherSuggestions = () => {
         </h2>
         <div style={{ color: "#e7b3ff", fontSize: 15.9, textAlign: "center", marginBottom: 24 }}>
           {finalError
-            ? <span style={{ color: "#f339db" }}>{finalError}</span>
+            ? (
+              <span style={{ color: "#f339db" }}>
+                {/* Show user-facing failure and a more precise location */}
+                {finalError}
+                {coordDiag &&
+                  <span style={{ display: "block", fontSize: 12.5, opacity: 0.7, color: "#f339db", marginTop: 4 }}>
+                    {coordDiag}
+                  </span>
+                }
+              </span>
+            )
             : (
               <span>
                 Using your current location, we've tailored skincare tips and product focus for today's weather.
@@ -241,12 +341,22 @@ const WeatherSuggestions = () => {
                   Diagnostic details
                 </summary>
                 <div>
-                  {typeof diagnostic === "string"
-                    ? diagnostic.slice(0, 700)
-                    : JSON.stringify(diagnostic)}
-                </div>
-                <div>
-                  <em>To help resolve, check browser console for CORS errors, verify API key validity, and check network connection.</em>
+                  <b>Debug log:</b>
+                  <ul style={{ marginBottom: 7, paddingLeft: 16 }}>
+                    {diagnostic.logs && diagnostic.logs.map((line, idx) => (
+                      <li key={idx} style={{ marginBottom: 0 }}>{line}</li>
+                    ))}
+                  </ul>
+                  <b>Error detail:</b>
+                  <pre style={{ background: "rgba(255,255,255,0.04)", padding: 6, borderRadius: 6 }}>
+                    {JSON.stringify(diagnostic, null, 2).slice(0, 900)}
+                  </pre>
+                  <div>
+                    <em>
+                      Tip: Check your browser console for more logs,<br />
+                      verify location & API key permissions, and check network connection.
+                    </em>
+                  </div>
                 </div>
               </details>
             )}

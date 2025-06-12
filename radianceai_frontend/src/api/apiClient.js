@@ -122,30 +122,80 @@ export const fetchRecommendedProducts = async (params = {}) => {
   * PUBLIC_INTERFACE
   * Fetch weather data using OpenWeatherMap for provided latitude and longitude.
   * Returns object: { temp, humidity, weatherMain, weatherDesc, icon, ... }
+  * Enhanced: Adds explicit diagnostics, logs, and more granular error reporting for weather feature.
   */
 export const fetchWeather = async (lat, lon) => {
   // Note: In production, move the API key to env file. For demo, hardcoding OK.
   const apiKey = "9a2339e93797b5eadbb4356bf9cc1b70"; // public demo key (replace with real for prod)
+  // Diagnostic log helper
+  const log = (...args) => { try { window && window.console && window.console.log && window.console.log("[WeatherAPI]", ...args); } catch {} };
+
+  // Validate coordinates before API call
   if (typeof lat !== "number" || typeof lon !== "number") {
-    return { error: "Missing coordinates" };
+    log("Weather fetch failed: Missing coordinates. Input lat/lon:", lat, lon);
+    return { error: "Missing coordinates", diagnostic: { lat, lon } };
   }
+
+  // Validate (dummy public) API key (check length, should be 32 characters for OpenWeatherMap, but demo key is 32)
+  if (!apiKey || typeof apiKey !== "string" || apiKey.trim().length < 24) {
+    log("Weather fetch failed: API key missing/invalid.", { apiKey });
+    return { error: "OpenWeatherMap API key missing or invalid", diagnostic: { apiKey } };
+  }
+
   const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
+
+  log("Weather API request", { url, lat, lon, apiKey: apiKey.slice(0,8)+"...(hidden)" });
 
   try {
     const resp = await fetch(url);
+    log("Weather API response - status:", resp.status);
+
     let data;
-    try { data = await resp.json(); } catch { data = undefined; }
-    if (!resp.ok || !data || data.cod === 401 || data.cod === 429 || data.cod === "401" || data.cod === "429") {
-      // Capture some error details for diagnostics
-      const msg = data && typeof data === "object" && data.message ? data.message : null;
+    try { data = await resp.json(); } catch (err) {
+      log("Weather API response JSON parse error", err, resp);
       return {
-        error: "Weather fetch failed",
-        code: data && data.cod,
-        message: msg,
-        raw: data
+        error: "Invalid weather API response (could not parse JSON).",
+        code: resp.status,
+        diagnostic: { url, status: resp.status, err: (err && err.message) || String(err) }
       };
     }
-    // Extract key properties
+
+    log("Weather API response data", data);
+
+    // Detect standard OpenWeatherMap error codes
+    if (
+      !resp.ok ||
+      !data ||
+      data.cod === 401 ||
+      data.cod === 429 ||
+      data.cod === "401" ||
+      data.cod === "429"
+    ) {
+      // Detailed error for diagnostics
+      const msg = data && typeof data === "object" && data.message ? data.message : null;
+      log("Weather fetch failed: API error response", { url, status: resp.status, data });
+      // List common reasons for 401/429
+      let reason = undefined;
+      if (data.cod === 401 || data.cod === "401") reason = "Invalid API key or unauthorized.";
+      if (data.cod === 429 || data.cod === "429") reason = "API rate limit exceeded (Too Many Requests).";
+      return {
+        error: "Weather fetch failed: API error",
+        code: data && data.cod,
+        reason,
+        message: msg,
+        request: url,
+        response: data
+      };
+    }
+    // Extract key properties; still validate
+    if (!data.main || typeof data.main.temp !== "number") {
+      log("Weather fetch incomplete data", { url, data });
+      return {
+        error: "Weather fetch failed: incomplete API data",
+        code: data && data.cod,
+        response: data
+      };
+    }
     return {
       temp: data.main?.temp,
       humidity: data.main?.humidity,
@@ -156,10 +206,12 @@ export const fetchWeather = async (lat, lon) => {
       city: data.name,
       country: data.sys?.country,
       raw: data,
+      _diagnostic: { url, status: resp.status }
     };
   } catch (e) {
+    log("Weather fetch failed: Network or fetch error", e);
     return {
-      error: "Weather fetch failed",
+      error: "Weather fetch failed: network or CORS error",
       message: (e && e.message) ? e.message : String(e)
     };
   }

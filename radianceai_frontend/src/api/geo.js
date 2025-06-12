@@ -9,16 +9,29 @@
 const GEO_API_URL = "https://ipapi.co/json/";
 
 
-// PUBLIC_INTERFACE
 /**
  * Fetch geolocation data for current user based on their IP address.
  * Returns: { ip, city, region, country, country_code, latitude, longitude, ... }
+ * Adds logs/status diagnostics for failure and fetch state.
  */
 export async function fetchGeolocation() {
+  const log = (...args) => { try { window && window.console && window.console.log && window.console.log("[GeoAPI]", ...args); } catch {} };
   try {
+    log("Requesting geolocation from", GEO_API_URL);
     const resp = await fetch(GEO_API_URL);
-    if (!resp.ok) throw new Error("Failed to fetch geolocation");
+    if (!resp.ok) {
+      log("Geolocation fetch failed - HTTP Status:", resp.status);
+      return { error: "Geolocation fetch failed (bad response)", diagnostic: { status: resp.status, url: GEO_API_URL } };
+    }
     const data = await resp.json();
+    log("Geolocation API response", data);
+
+    // Validate must-have fields
+    if (!data || typeof data.latitude !== "number" || typeof data.longitude !== "number") {
+      log("Geolocation fetch: response missing coordinates", data);
+      return { error: "Geolocation data incomplete", raw: data };
+    }
+
     return {
       ip: data.ip,
       city: data.city,
@@ -30,7 +43,11 @@ export async function fetchGeolocation() {
       raw: data
     };
   } catch (e) {
-    return { error: "Geolocation lookup failed" };
+    log("Geolocation fetch error", e);
+    return {
+      error: "Geolocation lookup failed",
+      message: (e && e.message) ? e.message : String(e)
+    };
   }
 }
 
