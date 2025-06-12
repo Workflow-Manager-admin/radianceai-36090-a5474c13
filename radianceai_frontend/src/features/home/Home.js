@@ -1,118 +1,104 @@
-import React, { useMemo } from "react";
-import { useNavigate } from "react-router-dom";
-import { MotionWrapper } from "../../utils/animation";
+import React, { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import useProducts from "../../hooks/useProducts";
+import { MotionWrapper } from "../../utils/animation";
 
 /**
  * PUBLIC_INTERFACE
- * Home (landing) page redesigned based on radianceaihome1 and home2 screenshots.
- * - Soft hero with brand, tagline, main CTA
- * - Prominent best-sellers carousel (horizontal scroll) under hero
- * - Secondary CTA: "Take Quiz"
- * - Category tiles scroll horizontally (subtler, not visually dominant)
- * - Overall: light, elegant, premium, soft shadows and rounded corners
+ * Home (landing) page: Dynamic product cards filtered by concern, with pill-shaped selectors.
  */
 
-const CATEGORIES = [
-  {
-    key: "brightening",
-    label: "Skin Brightening",
-    icon: "✨",
-    color: "linear-gradient(100deg, #fadadd 80%, #e7b3ff 100%)",
-    to: "/recommendations?cat=brightening",
-    description: "Even tone, radiance"
-  },
-  {
-    key: "acne",
-    label: "Acne Removal",
-    icon: "🛡️",
-    color: "linear-gradient(100deg, #f339db 65%, #e7b3ff 100%)",
-    to: "/recommendations?cat=acne",
-    description: "Fight blemishes"
-  },
-  {
-    key: "hydration",
-    label: "Hydration",
-    icon: "💧",
-    color: "linear-gradient(100deg, #e7b3ff 60%, #fadadd 100%)",
-    to: "/recommendations?cat=hydration",
-    description: "Glowing hydration"
-  },
-  {
-    key: "antiaging",
-    label: "Anti-Aging",
-    icon: "🕰️",
-    color: "linear-gradient(94deg, #fadadd 50%, #e7b3ff 90%)",
-    to: "/recommendations?cat=antiaging",
-    description: "Youthful skin"
-  },
-  {
-    key: "sensitivity",
-    label: "Sensitivity",
-    icon: "🍃",
-    color: "linear-gradient(91deg, #fadadd 45%, #e7b3ff 97%)",
-    to: "/recommendations?cat=sensitivity",
-    description: "Calming care"
-  }
+const CONCERNS = [
+  { key: "brightening", label: "Brightening", icon: "✨" },
+  { key: "acne", label: "Acne", icon: "🛡️" },
+  { key: "hydration", label: "Hydration", icon: "💧" },
+  { key: "antiaging", label: "Anti-Aging", icon: "🕰️" },
+  { key: "sensitivity", label: "Sensitivity", icon: "🍃" },
 ];
 
-// Animation for CTAs and sections
 const sectionFade = {
   initial: { opacity: 0, y: 24, scale: 0.98 },
   animate: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.68, type: "spring", bounce: 0.24 }},
 };
 
-const tileVariants = {
-  initial: { opacity: 0, x: 40, scale: 0.96 },
-  animate: (i) => ({
-    opacity: 1,
-    x: 0,
-    scale: 1,
-    transition: {
-      delay: 0.03 + i * 0.12,
-      type: "spring",
-      bounce: 0.18,
-      duration: 0.56,
-      stiffness: 162
-    }
-  }),
-  whileHover: { scale: 1.04, boxShadow: "0 4px 32px #fadadd55" },
-  whileTap: { scale: 0.98 }
+const pillStyle = (active) => ({
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 8,
+  border: "none",
+  padding: "9px 22px",
+  borderRadius: 30,
+  fontWeight: 700,
+  fontSize: 16,
+  cursor: "pointer",
+  background: active
+    ? "linear-gradient(92deg, #23215b 90%, #5496fd 130%)"
+    : "linear-gradient(92deg,#e7eafc 10%,#dbecfd 120%)",
+  color: active ? "#fff" : "#23215b",
+  boxShadow: active
+    ? "0 2.5px 13px #63a3ff23"
+    : "0 1.5px 7px #d8e7f844",
+  marginRight: 13,
+  marginBottom: 10,
+  transition: "all .15s cubic-bezier(.27,1.36,.48,1)"
+});
+
+const productCardStyle = {
+  minWidth: 236,
+  flex: "0 0 236px",
+  background: "linear-gradient(104deg,#ebf4ff 60%,#dde4ff 100%)",
+  borderRadius: 20,
+  boxShadow: "0 2px 18px #badbf369",
+  padding: "19px 13px 18px 13px",
+  marginBottom: 7,
+  position: "relative",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  scrollSnapAlign: "start",
 };
 
 const Home = () => {
-  const navigate = useNavigate();
+  // State for selected concern
+  const [selected, setSelected] = useState(CONCERNS[0].key);
 
-  // Get the top 5 recommended products for the horizontal best-seller carousel (not videos)
+  // Fetch all products, and allow client-side filtering for demo (since API returns limited mapping)
   const { recommended, loading } = useProducts({
     sortBy: "rating",
-    limit: 5,
-    minRating: 4,
-    deduplicate: true
+    limit: 12,
+    minRating: 3.5,
+    deduplicate: true,
   });
 
-  // Horizontally scrollable best-seller carousel (products, not videos for homepage per brief)
-  const bestSellers = useMemo(() => {
-    if (Array.isArray(recommended) && recommended.length > 0) {
-      return recommended;
-    }
-    return [];
-  }, [recommended]);
+  // Simulate concern-to-product mapping by keywords/category for filtering
+  const filteredProducts = useMemo(() => {
+    if (!Array.isArray(recommended)) return [];
+    if (!selected) return recommended.slice(0, 8);
+    // Map concern to match title, category or keywords string match
+    return recommended.filter((prod) =>
+      [
+        prod.title?.toLowerCase(),
+        prod.category?.toLowerCase(),
+        ...(prod.keywords || [])
+      ]
+        .join(" ")
+        .includes(selected)
+    );
+  }, [recommended, selected]);
 
   return (
-    <div className="container" style={{maxWidth: 1050, margin: "0 auto", padding: 0}}>
+    <div className="container" style={{maxWidth: 1060, margin: "0 auto", padding: 0}}>
       <MotionWrapper>
         {/* HERO SECTION */}
         <motion.section
           style={{
-            background: "linear-gradient(98deg, #1a1a1a 70%, #fadadd10 100%)",
+            background: "linear-gradient(98deg, #1a1a1a 75%, #d2e2f410 100%)",
             borderRadius: 32,
-            boxShadow: "0 4px 44px #fadadd23",
+            boxShadow: "0 4px 44px #88bbe123",
             padding: "48px 14px 42px 14px",
             margin: "28px 0 0 0",
             position: "relative",
-            minHeight: 235
+            minHeight: 210,
           }}
           variants={sectionFade}
           initial="initial"
@@ -126,7 +112,7 @@ const Home = () => {
             <div style={{
               fontWeight: 600,
               fontSize: "1.36em",
-              color: "#fadadd",
+              color: "#479eff",
               letterSpacing: ".04em",
               marginBottom: 4
             }}>
@@ -136,7 +122,7 @@ const Home = () => {
               style={{
                 fontWeight: 900,
                 fontSize: "2.54em",
-                background: "linear-gradient(92deg, #fadadd 50%, #e7b3ff 100%)",
+                background: "linear-gradient(92deg,#479eff 50%,#2a378b 100%)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
                 letterSpacing: ".01em",
@@ -148,30 +134,29 @@ const Home = () => {
               AI-Powered Skincare Guidance & Routines
             </h1>
             <div style={{
-              fontSize: "1.15em",
-              color: "#e7b3ff",
+              fontSize: "1.13em",
+              color: "#8cbffd",
               margin: "0 0 27px 0",
-              opacity: 0.96
+              opacity: 0.99
             }}>
               Unlock your ideal skincare routine with science-backed, personalized recommendations and trend-driven best sellers.
             </div>
             <motion.button
-              onClick={() => navigate("/recommendations")}
+              onClick={() => window.location.href="/recommendations"}
               style={{
-                background: "linear-gradient(93deg,#fadadd 38%,#e7b3ff 100%)",
-                color: "#23155f",
+                background: "linear-gradient(91deg, #2889fd 45%, #8eb2fe 100%)",
+                color: "#fff",
                 fontWeight: 800,
-                fontSize: "1.07em",
-                padding: "14px 42px",
-                borderRadius: 15,
+                fontSize: "1.01em",
+                padding: "13px 36px",
+                borderRadius: 16,
                 border: "none",
-                boxShadow: "0 4px 16px #fadadd2a",
+                boxShadow: "0 4px 15px #417aec36",
                 margin: "6px 0 0 0",
                 cursor: "pointer",
-                transition: "all 0.16s",
                 letterSpacing: ".01em"
               }}
-              whileHover={{ scale: 1.075, boxShadow: "0 8px 28px #fadadd42" }}
+              whileHover={{ scale: 1.072, boxShadow: "0 8px 28px #9acca72f" }}
               whileTap={{ scale: 0.96 }}
               aria-label="See recommendations"
             >
@@ -181,262 +166,177 @@ const Home = () => {
               <button
                 className="btn btn-large"
                 style={{
-                  background: "rgba(234,179,255,0.16)",
-                  border: "2px solid #fadadd63",
-                  color: "#fadadd",
+                  background: "#e4efff",
+                  border: "2px solid #8ec8ff",
+                  color: "#3788be",
                   fontWeight: 700,
-                  fontSize: "1.1em",
+                  fontSize: "1.09em",
                   borderRadius: 13,
                   margin: "3px 4px 0 4px",
                   outline: "none",
-                  boxShadow: "none"
+                  boxShadow: "none",
+                  transition: "background .15s"
                 }}
-                onClick={() => navigate("/quiz")}
+                onClick={() => window.location.href="/quiz"}
               >
                 Take the Personalized Quiz
               </button>
             </div>
           </div>
         </motion.section>
-        {/* BEST SELLERS CAROUSEL */}
+        {/* PILL CONCERN FILTER */}
         <motion.section
-          style={{
-            margin: "34px 0 0 0",
-            padding: "0 0 14px 0"
-          }}
+          style={{ marginTop: 34, marginBottom: 18 }}
           variants={sectionFade}
           initial="initial"
           animate="animate"
         >
           <div style={{
-            color: "#fadadd",
+            color: "#1784e7",
             fontWeight: 700,
-            fontSize: "1.31em",
-            margin: "0 0 10px 10px",
-            letterSpacing: ".01em"
+            fontSize: "1.18em",
+            margin: "0 0 17px 2px"
           }}>
-            Best Sellers
+            Filter by Concern
           </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 0 }}>
+            {CONCERNS.map((c) => (
+              <button
+                key={c.key}
+                style={pillStyle(selected === c.key)}
+                onClick={() => setSelected(c.key)}
+                aria-label={`Show products for ${c.label}`}
+              >
+                <span style={{fontSize: 20}}>{c.icon}</span>
+                {c.label}
+              </button>
+            ))}
+          </div>
+        </motion.section>
+        {/* PRODUCT CARDS MODAL SECTION */}
+        <motion.section
+          style={{
+            margin: "18px 0 30px 0",
+            padding: "0 0 8px 0"
+          }}
+          variants={sectionFade}
+          initial="initial"
+          animate="animate"
+        >
           {loading ? (
-              <div style={{
-                color: "#fadadd",
-                fontWeight: 600,
-                textAlign: "center",
-                margin: "38px 0",
-                fontSize: 22,
-              }}>
-                Loading best sellers…
-              </div>
-            ) : (
+            <div style={{
+              color: "#1784e7",
+              fontWeight: 600,
+              textAlign: "center",
+              margin: "32px 0",
+              fontSize: 22,
+            }}>
+              Loading products…
+            </div>
+          ) : filteredProducts.length === 0 ? (
+            <div style={{
+              color: "#7daffe",
+              margin: "18px 0",
+              textAlign: "center",
+              fontSize: 18,
+            }}>
+              No products for this concern.
+            </div>
+          ) : (
             <div
               style={{
                 overflowX: "auto",
                 display: "flex",
-                gap: 28,
-                padding: "7px 9px 10px 9px",
+                gap: 23,
+                padding: "7px 9px 10px 7px",
                 scrollSnapType: "x mandatory",
-                margin: "0 -8px 0 0"
+                margin: "0 -7px 0 0"
               }}
             >
-              {bestSellers.length === 0 && (
-                <div style={{ color: "#fadadd", margin: "22px 0" }}>
-                  No product data available.
-                </div>
-              )}
-              {bestSellers.map((prod, idx) => (
+              {filteredProducts.map((prod, idx) => (
                 <motion.div
                   key={prod.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0, transition: { delay: 0.11 + idx*0.11, duration: 0.55, type: "spring", bounce: 0.27 } }}
-                  whileHover={{ scale: 1.05, boxShadow: "0 4px 17px #fadadd48" }}
-                  style={{
-                    minWidth: 238,
-                    flex: "0 0 238px",
-                    background: "linear-gradient(104deg, #faf0ffbb 70%, #e7b3ff22 100%)",
-                    borderRadius: 22,
-                    boxShadow: "0 2px 15px #fadadd23",
-                    padding: "14px 12px 19px 12px",
-                    marginBottom: 6,
-                    position: "relative",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    scrollSnapAlign: "start"
-                  }}
+                  initial={{ opacity: 0, y: 14 }}
+                  animate={{ opacity: 1, y: 0, transition: { delay: 0.10 + idx*0.06, duration: 0.44, type: "spring", bounce: 0.26 } }}
+                  whileHover={{ scale: 1.06, boxShadow: "0 4px 18px #69acf82a" }}
+                  style={productCardStyle}
+                  tabIndex={0}
+                  aria-label={`View details for ${prod.title}`}
+                  onClick={() => window.open(prod.link || "/products", "_blank")}
                 >
                   <img
                     src={prod.thumbnail}
                     alt={prod.title}
                     style={{
-                      width: 86,
-                      height: 86,
-                      borderRadius: 13,
+                      width: 88,
+                      height: 88,
+                      borderRadius: 15,
                       objectFit: "cover",
-                      boxShadow: "0 2.5px 19px #fadadd22",
-                      marginBottom: 12,
+                      boxShadow: "0 2.5px 13px #476eec29",
+                      marginBottom: 13,
                       background: "#fff"
                     }}
                     loading="lazy"
                   />
                   <div style={{
                     fontWeight: 700,
-                    color: "#27174e",
-                    fontSize: "1.09em",
-                    marginBottom: 3,
+                    color: "#285598",
+                    fontSize: "1.07em",
+                    marginBottom: 4,
                     textAlign: "center"
                   }}
                     title={prod.title}
-                  >{prod.title.length > 28 ? prod.title.slice(0, 27) + "…" : prod.title}</div>
+                  >{prod.title.length > 27 ? prod.title.slice(0, 26) + "…" : prod.title}</div>
                   <div style={{
-                    color: "#f339db",
+                    color: "#6eabe6",
                     fontWeight: 600,
                     fontSize: "1em",
                     marginBottom: 2
                   }}>
-                    Brand: <span style={{ color: "#e7b3ff" }}>{prod.brand}</span>
+                    Brand: <span style={{ color: "#398af6" }}>{prod.brand}</span>
                   </div>
                   <div style={{
                     fontWeight: 600,
-                    color: "#fadadd",
-                    fontSize: 15.6,
-                    marginBottom: 4
+                    color: "#1790ea",
+                    fontSize: 15.2,
+                    marginBottom: 3
                   }}>
                     {prod.currency === "INR" || prod.isLocalIN ? "₹" : "$"}
                     {prod.price}
-                    {prod.isLocalIN && (
-                      <span style={{ color: "#f339db", fontSize: 11, marginLeft: 4 }}>India</span>
-                    )}
                   </div>
                   <div style={{
-                    fontSize: 13.2,
-                    color: "#23155f",
-                    opacity: 0.73,
-                    minHeight: 21,
+                    fontSize: 13.1,
+                    color: "#285598",
+                    opacity: 0.75,
+                    minHeight: 18,
                     textAlign: "center",
                     marginBottom: 0
                   }}>
-                    {prod.description?.length > 35
-                      ? prod.description.slice(0, 35) + "…"
+                    {prod.description?.length > 34
+                      ? prod.description.slice(0, 33) + "…"
                       : prod.description}
                   </div>
                   <button
                     className="btn"
                     style={{
-                      background: "linear-gradient(91deg, #fadadd 47%, #e7b3ff 100%)",
-                      color: "#23155f",
-                      borderRadius: 8,
+                      background: "linear-gradient(89deg, #1d7ae1 38%, #48bcfb 100%)",
+                      color: "#fff",
+                      borderRadius: 9,
                       fontWeight: 700,
-                      fontSize: 14.1,
-                      marginTop: 12,
-                      minWidth: 130,
+                      fontSize: 13.4,
+                      marginTop: 11,
+                      minWidth: 102,
                       border: "none",
-                      boxShadow: "0 1px 8px #fadadd22",
+                      boxShadow: "0 1px 8px #b8e1ff22",
                       cursor: "pointer"
                     }}
-                    onClick={() => navigate("/products")}
                   >
-                    Browse More
+                    See Details
                   </button>
                 </motion.div>
               ))}
             </div>
           )}
-        </motion.section>
-        {/* CATEGORY CAROUSEL: Horizontally scrolling */}
-        <motion.section
-          style={{
-            margin: "32px 0 10px 0"
-          }}
-          variants={sectionFade}
-          initial="initial"
-          animate="animate"
-        >
-          <div style={{
-            color: "#fadadd",
-            fontWeight: 700,
-            fontSize: "1.16em",
-            margin: "0 0 8px 10px"
-          }}>
-            Shop by Concern
-          </div>
-          <div
-            style={{
-              display: "flex",
-              overflowX: "auto",
-              gap: 22,
-              padding: "7px 8px",
-              scrollbarWidth: "thin",
-              msOverflowStyle: "none"
-            }}>
-            {CATEGORIES.map((cat, idx) => (
-              <motion.button
-                key={cat.key}
-                custom={idx}
-                initial="initial"
-                animate="animate"
-                whileHover="whileHover"
-                whileTap="whileTap"
-                variants={tileVariants}
-                onClick={() => navigate(cat.to)}
-                className="category-tile-btn"
-                style={{
-                  minWidth: 143,
-                  minHeight: 113,
-                  maxWidth: 170,
-                  flex: "0 0 143px",
-                  background: cat.color,
-                  color: "#23155f",
-                  border: "none",
-                  borderRadius: 20,
-                  boxShadow: "0 2.5px 13px #fadadd23",
-                  fontWeight: 700,
-                  fontSize: "1.11em",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  cursor: "pointer",
-                  position: "relative",
-                  margin: "0",
-                  padding: "13px 10px 13px 10px",
-                  overflow: "hidden"
-                }}
-                aria-label={`See products for ${cat.label}`}
-              >
-                <motion.div
-                  style={{
-                    fontSize: 32,
-                    marginBottom: 2,
-                    textShadow: "0 2px 8px #fadadd29"
-                  }}
-                  initial={{ scale: 0.89 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", stiffness: 160, delay: 0.05 + idx * 0.09 }}
-                >
-                  {cat.icon}
-                </motion.div>
-                <div style={{
-                  fontWeight: 800,
-                  fontSize: "1.03em",
-                  color: "#f339db",
-                  letterSpacing: ".01em"
-                }}>
-                  {cat.label}
-                </div>
-                <div style={{
-                  color: "#23155f",
-                  fontWeight: 400,
-                  fontSize: "0.91em",
-                  lineHeight: 1.15,
-                  opacity: 0.69,
-                  marginTop: 1,
-                  textAlign: "center"
-                }}>
-                  {cat.description}
-                </div>
-              </motion.button>
-            ))}
-          </div>
         </motion.section>
       </MotionWrapper>
     </div>
