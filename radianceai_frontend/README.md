@@ -13,6 +13,16 @@ This project provides a minimal React template with a clean, modern UI and minim
 
 In the project directory, you can run:
 
+### Suppress Webpack Overlay Warnings
+
+To show errors only (not warnings) in the Webpack dev overlay, this project uses a `craco.config.js` (or `config-overrides.js`) for overrides if needed. If you see overlay warnings blocking the UI, review your Webpack/CRA/CRACO configuration:
+
+- For Create React App v5/react-scripts, warnings never block the UI but show in the console.
+- To suppress overlay warnings in the dev server, ensure your `devServer.overlay` (if available) is set to `{ errors: true, warnings: false }` in your config overrides.
+- If your UI is still blocked by warnings, check for custom overlays, strict mode, or upstream package issues (see escalation notes below).
+
+In the project directory, you can run:
+
 ### `npm start`
 
 Runs the app in development mode.\
@@ -26,6 +36,22 @@ Launches the test runner in interactive watch mode.
 
 Builds the app for production to the `build` folder.\
 It correctly bundles React in production mode and optimizes the build for the best performance.
+
+## Escalation: Upstream Issues (react-router[-dom] / react-scripts)
+
+If warnings (such as "react-router-dom unresolved exports" or overlay crashes) persist after config updates:
+
+1. Check indirect dependencies: 
+   - Run `npm ls react-router` and `npm ls react-router-dom` to verify that only one version of each exists in the tree.
+   - Ensure no unused legacy Next.js or custom plugin is bringing in an old react-router version.
+
+2. Examine `node_modules/react-router-dom/dist/index.js` for re-export errors.
+
+3. If overlays still block the UI, a deep incompatibility may exist between react-scripts and react-router[-dom]. 
+   - File an issue with reproducible steps at https://github.com/remix-run/react-router/issues or the relevant CRA/react-scripts repo.
+   - Include your `package.json`, the error message, Node/npm versions, and your react-router-dom version.
+
+4. As a last resort, consider patch-package or forking react-scripts until upstream is fixed.
 
 ## Customization
 
