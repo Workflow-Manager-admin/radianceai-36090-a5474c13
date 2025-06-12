@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom'; // All used symbols are current as of v6
 import { AnimatePresence } from "framer-motion";
 import './App.css';
 import TopNavBar from './components/TopNavBar';
