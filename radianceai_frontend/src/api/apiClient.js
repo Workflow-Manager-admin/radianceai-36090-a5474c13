@@ -237,46 +237,101 @@ export const fetchWeather = async (lat, lon) => {
 export const sendEmail = async (payload) => {
   // Import emailjs if present, otherwise fallback
   try {
-    if (!window.emailjs) {
-      // Optionally: Load EmailJS from CDN dynamically.
-      // NOTE: For production, install and import EmailJS:
-      // import emailjs from '@emailjs/browser'
-      // But here we load from CDN for demo.
-      await new Promise((resolve, reject) => {
-        const script = document.createElement("script");
-        script.src = "https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js";
-        script.async = true;
-        script.onload = resolve;
-        script.onerror = reject;
-        document.body.appendChild(script);
-      });
+    // Use ES module import if present, otherwise fallback to CDN (for demo/dev environments)
+    // NOTE: To avoid global window conflicts in strict environments, always prefer the npm import.
+    let emailjs;
+    if (typeof window !== "undefined" && window.emailjs) {
+      emailjs = window.emailjs;
+    } else {
+      // Dynamically import for dev/test; production should use npm package!
+      try {
+        // For environments supporting import()
+        emailjs = (await import("emailjs-com")).default;
+      } catch (err) {
+        // Fallback to serially load via CDN if in browser
+        await new Promise((resolve, reject) => {
+          const script = document.createElement("script");
+          script.src = "https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js";
+          script.async = true;
+          script.onload = resolve;
+          script.onerror = reject;
+          document.body.appendChild(script);
+        });
+        emailjs = window.emailjs;
+      }
     }
-    // Init if not already
-    if (!window.emailjs.___init) {
-      window.emailjs.init("YOUR_EMAILJS_USER_ID"); // <-- Set in EmailFeatures config
-      window.emailjs.___init = true;
-    }
+
+    // Accept config from payload OR global config (backward compat); warn if missing
+    const serviceId = payload.serviceId || window.EMAILJS_SERVICE_ID || "YOUR_SERVICE_ID";
+    const userId = payload.userId || window.EMAILJS_USER_ID || "YOUR_EMAILJS_USER_ID";
 
     // Map type to template
     const { toEmail, toName, type, data } = payload;
-    // Map EmailJS template (you should define these in your account)
+    let templateId = "routine_summary_template"; // fallback
+    if (type === "reminder") templateId = payload.reminderTemplateId || "routine_reminder_template";
+    if (type === "summary") templateId = payload.summaryTemplateId || "routine_summary_template";
+
+    // Init (one-time for browser/EmailJS global or for emailjs-com)
+    if (!emailjs.___init) {
+      emailjs.init(userId);
+      emailjs.___init = true;
+    }
+
+    // Construct params for template
     let templateParams = {
       to_email: toEmail,
       to_name: toName,
       ...data,
     };
-    let templateId = "routine_summary_template"; // fallback
-    if (type === "reminder") templateId = "routine_reminder_template";
-    if (type === "summary") templateId = "routine_summary_template";
 
-    // Must be configured at https://dashboard.emailjs.com/
-    // service_id and template_id must match those defined in the dashboard
-    const serviceId = payload.serviceId || "YOUR_SERVICE_ID"; // e.g., 'service_xxxx'
-    const res = await window.emailjs.send(serviceId, templateId, templateParams);
+    // Validate that all required config is present
+    if (
+      !serviceId ||
+      !userId ||
+      !templateId ||
+      serviceId.startsWith("YOUR") ||
+      userId.startsWith("YOUR") ||
+      templateId.startsWith("YOUR")
+    ) {
+      throw new Error(
+        "EmailJS configuration incomplete. Please provide userId, serviceId, and templateId."
+      );
+    }
 
-    return res?.status === 200 ? true : false;
+    // Send via EmailJS
+    let result;
+    try {
+      result = await emailjs.send(serviceId, templateId, templateParams, userId);
+    } catch (err) {
+      // Add details for error diagnosis
+      let detailMsg = err?.message || String(err);
+      if (err?.status === 404) {
+        detailMsg +=
+          " (EmailJS: Service, template, or user ID incorrect, or not found. Double-check all IDs in your EmailJS dashboard at https://dashboard.emailjs.com/)";
+      }
+      if (err?.status === 401) {
+        detailMsg +=
+          " (EmailJS: API key (user ID/public key) is missing, malformed, or invalid.)";
+      }
+      if (err?.status === 400) {
+        detailMsg +=
+          " (EmailJS: Bad request—possibly a required template param is missing, or malformed payload.)";
+      }
+      // Rethrow for catch below
+      throw new Error(detailMsg);
+    }
+
+    return result?.status === 200 ? true : false;
   } catch (e) {
-    // Optionally log or pass up error
-    return false;
+    // Optionally, return the error for UI diagnosis/debug
+    // Provide a string error to help users correct config in the UI
+    let msg =
+      "Email send failed: " +
+      (e && e.message ? e.message : String(e)) +
+      " | See https://dashboard.emailjs.com/admin for config.";
+    if (typeof window !== "undefined" && window.console && window.console.error)
+      window.console.error(msg);
+    // Return string error for UI display/diagnosis, or false for backward compatibility
+    return { error: msg };
   }
 };
