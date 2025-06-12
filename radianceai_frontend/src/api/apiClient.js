@@ -235,20 +235,23 @@ export const fetchWeather = async (lat, lon) => {
   * @param {Object} payload { toEmail, toName, type: "reminder"|"summary", data: {...} }
   */
 export const sendEmail = async (payload) => {
-  // Import emailjs if present, otherwise fallback
+  /*
+    Enforces REAL EmailJS config.
+    Attempts to load EmailJS credentials from:
+      - payload (preferred, passed in from UI/effective config)
+      - window.EMAILJS_* (for legacy/demo)
+      - process.env (for real deployments, if exposed via env/webpack)
+    Throws clear errors if placeholders or missing values are present.
+  */
   try {
-    // Use ES module import if present, otherwise fallback to CDN (for demo/dev environments)
-    // NOTE: To avoid global window conflicts in strict environments, always prefer the npm import.
+    // emailjs import logic (same as before)
     let emailjs;
     if (typeof window !== "undefined" && window.emailjs) {
       emailjs = window.emailjs;
     } else {
-      // Dynamically import for dev/test; production should use npm package!
       try {
-        // For environments supporting import()
         emailjs = (await import("emailjs-com")).default;
       } catch (err) {
-        // Fallback to serially load via CDN if in browser
         await new Promise((resolve, reject) => {
           const script = document.createElement("script");
           script.src = "https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js";
@@ -261,77 +264,92 @@ export const sendEmail = async (payload) => {
       }
     }
 
-    // Accept config from payload OR global config (backward compat); warn if missing
-    const serviceId = payload.serviceId || window.EMAILJS_SERVICE_ID || "YOUR_SERVICE_ID";
-    const userId = payload.userId || window.EMAILJS_USER_ID || "YOUR_EMAILJS_USER_ID";
-
+    // Get config from payload OR env
+    const fromEnv = typeof process !== "undefined" && process.env ? process.env : {};
+    // Try to get config from payload, window, or injected env variables
+    const serviceId = (
+      payload.serviceId ||
+      window.EMAILJS_SERVICE_ID ||
+      (fromEnv.REACT_APP_EMAILJS_SERVICE_ID || fromEnv.EMAILJS_SERVICE_ID) ||
+      ""
+    );
+    const userId = (
+      payload.userId ||
+      window.EMAILJS_USER_ID ||
+      (fromEnv.REACT_APP_EMAILJS_USER_ID || fromEnv.EMAILJS_USER_ID) ||
+      ""
+    );
     // Map type to template
     const { toEmail, toName, type, data } = payload;
-    let templateId = "routine_summary_template"; // fallback
-    if (type === "reminder") templateId = payload.reminderTemplateId || "routine_reminder_template";
-    if (type === "summary") templateId = payload.summaryTemplateId || "routine_summary_template";
+    let templateId = "";
+    if (type === "reminder")
+      templateId =
+        payload.reminderTemplateId ||
+        window.EMAILJS_REMINDER_TEMPLATE_ID ||
+        (fromEnv.REACT_APP_EMAILJS_REMINDER_TEMPLATE_ID || fromEnv.EMAILJS_REMINDER_TEMPLATE_ID) ||
+        "";
+    else if (type === "summary")
+      templateId =
+        payload.summaryTemplateId ||
+        window.EMAILJS_SUMMARY_TEMPLATE_ID ||
+        (fromEnv.REACT_APP_EMAILJS_SUMMARY_TEMPLATE_ID || fromEnv.EMAILJS_SUMMARY_TEMPLATE_ID) ||
+        "";
+    else
+      templateId =
+        payload.templateId ||
+        window.EMAILJS_TEMPLATE_ID ||
+        (fromEnv.REACT_APP_EMAILJS_TEMPLATE_ID || fromEnv.EMAILJS_TEMPLATE_ID) ||
+        "";
 
-    // Init (one-time for browser/EmailJS global or for emailjs-com)
+    // Validate for placeholders/missing
+    const MISSING_KEYS = [];
+    if (!serviceId || /YOUR_SERVICE_ID/i.test(serviceId)) MISSING_KEYS.push("Service ID");
+    if (!userId || /YOUR_EMAILJS_USER_ID|YOUR_PUBLIC_KEY/i.test(userId)) MISSING_KEYS.push("User/Public Key");
+    if (!templateId || /routine_(reminder|summary)_template|YOUR_TEMPLATE_ID/i.test(templateId)) MISSING_KEYS.push("Template ID");
+    // Do NOT allow emails if any credential is missing or is a known placeholder
+    if (MISSING_KEYS.length > 0) {
+      throw new Error(
+        "EmailJS is not fully configured. The following keys must be set with your real values in the app's environment/config (not placeholders): " +
+        MISSING_KEYS.join(", ") +
+        ".\nSee documentation: https://www.emailjs.com/docs/examples/reactjs/"
+      );
+    }
+
+    // Only initialize if necessary; ensure idempotent
     if (!emailjs.___init) {
       emailjs.init(userId);
       emailjs.___init = true;
     }
+    let templateParams = { to_email: toEmail, to_name: toName, ...data };
 
-    // Construct params for template
-    let templateParams = {
-      to_email: toEmail,
-      to_name: toName,
-      ...data,
-    };
-
-    // Validate that all required config is present
-    if (
-      !serviceId ||
-      !userId ||
-      !templateId ||
-      serviceId.startsWith("YOUR") ||
-      userId.startsWith("YOUR") ||
-      templateId.startsWith("YOUR")
-    ) {
-      throw new Error(
-        "EmailJS configuration incomplete. Please provide userId, serviceId, and templateId."
-      );
-    }
-
-    // Send via EmailJS
     let result;
     try {
       result = await emailjs.send(serviceId, templateId, templateParams, userId);
     } catch (err) {
-      // Add details for error diagnosis
       let detailMsg = err?.message || String(err);
       if (err?.status === 404) {
         detailMsg +=
-          " (EmailJS: Service, template, or user ID incorrect, or not found. Double-check all IDs in your EmailJS dashboard at https://dashboard.emailjs.com/)";
+          " (EmailJS: Service ID, Template ID, or User ID was not found. Double-check all IDs at https://dashboard.emailjs.com/)";
       }
       if (err?.status === 401) {
         detailMsg +=
-          " (EmailJS: API key (user ID/public key) is missing, malformed, or invalid.)";
+          " (EmailJS: User/Public Key is missing, malformed, or invalid.)";
       }
       if (err?.status === 400) {
         detailMsg +=
-          " (EmailJS: Bad request—possibly a required template param is missing, or malformed payload.)";
+          " (EmailJS: Bad request—check required template params and payload formatting.)";
       }
-      // Rethrow for catch below
       throw new Error(detailMsg);
     }
-
     return result?.status === 200 ? true : false;
   } catch (e) {
-    // Optionally, return the error for UI diagnosis/debug
-    // Provide a string error to help users correct config in the UI
+    // Guidance returned for UI
     let msg =
       "Email send failed: " +
       (e && e.message ? e.message : String(e)) +
-      " | See https://dashboard.emailjs.com/admin for config.";
+      "\nTo enable email sending, set up EmailJS credentials in your environment. See https://dashboard.emailjs.com/admin and https://www.emailjs.com/docs/examples/reactjs/";
     if (typeof window !== "undefined" && window.console && window.console.error)
       window.console.error(msg);
-    // Return string error for UI display/diagnosis, or false for backward compatibility
     return { error: msg };
   }
 };

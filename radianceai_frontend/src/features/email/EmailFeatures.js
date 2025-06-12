@@ -3,12 +3,15 @@ import { sendEmail } from "../../api/apiClient";
 import useLocalStorage from "../../hooks/useLocalStorage";
 import { MotionWrapper, AppleFadeTransition } from "../../utils/animation";
 
-// Default config: Replace with your EmailJS values or show UX prompt
+/*
+ * Default config: will prompt for setup if values are unchanged or missing.
+ * User/admin should set these via .env or a secure admin config screen.
+ */
 const DEFAULT_EMAILJS_CONFIG = {
-  serviceId: "YOUR_SERVICE_ID",
-  userId: "YOUR_EMAILJS_USER_ID",
-  reminderTemplateId: "routine_reminder_template",
-  summaryTemplateId: "routine_summary_template",
+  serviceId: "",
+  userId: "",
+  reminderTemplateId: "",
+  summaryTemplateId: "",
 };
 
 function validateEmail(email) {
@@ -36,6 +39,27 @@ const EmailFeatures = () => {
   // For demonstration: user can choose type + if they're testing config
   const [sendType, setSendType] = useState("reminder"); // 'reminder' or 'summary'
 
+  // Helper: test if config is filled with real values
+  function configHasPlaceholdersOrMissing(cfg) {
+    if (
+      !cfg ||
+      !cfg.serviceId ||
+      !cfg.userId ||
+      !cfg.reminderTemplateId ||
+      !cfg.summaryTemplateId
+    ) return true;
+    // Check if values match known placeholder patterns
+    if (
+      /YOUR_SERVICE_ID/i.test(cfg.serviceId) ||
+      /YOUR_EMAILJS_USER_ID|YOUR_PUBLIC_KEY/i.test(cfg.userId) ||
+      /routine_reminder_template/i.test(cfg.reminderTemplateId) ||
+      /routine_summary_template/i.test(cfg.summaryTemplateId)
+    ) return true;
+    return false;
+  }
+
+  const configIncomplete = configHasPlaceholdersOrMissing(emailjsConfig);
+
   // Handlers
   const handleOptIn = async (e) => {
     e.preventDefault();
@@ -44,7 +68,6 @@ const EmailFeatures = () => {
       setResult("Please enter a valid email address.");
       return;
     }
-    // Could trigger confirmation email here for double opt-in.
     setOptedIn(true);
     setResult("Opt-in successful! You will receive reminders and summaries.");
   };
@@ -60,28 +83,48 @@ const EmailFeatures = () => {
       setResult("Invalid email.");
       return;
     }
+    // Block send if config not set
+    if (configIncomplete) {
+      setResult("Email feature is not configured. Please ask an admin to set valid EmailJS credentials (Service ID, User/Public Key, Template IDs). See documentation.");
+      return;
+    }
     setPending(true);
     setResult("");
-    // Demo: fake payload
+    // Build real payload, pass current config
     const payload = {
       toEmail: email,
       toName: name || "GlowSkin User",
       serviceId: emailjsConfig.serviceId,
+      userId: emailjsConfig.userId,
       type: sendType,
+      reminderTemplateId: emailjsConfig.reminderTemplateId,
+      summaryTemplateId: emailjsConfig.summaryTemplateId,
       data: {
-        routine: "Example routine data goes here.", // Add details from routine builder/localStorage if needed.
+        routine: "Example routine data goes here.",
         summary: "Your routine summary will be included here.",
       },
     };
     // Attempt send
     const ok = await sendEmail(payload);
     setPending(false);
-    setResult(ok ? "Email sent successfully!" : "Email failed to send. Check config/try later.");
+    if (ok === true) setResult("Email sent successfully!");
+    else if (ok && ok.error) setResult(ok.error);
+    else setResult("Email failed to send. Check configuration and try again.");
   };
 
   // For admin/demo: configurable emailjs keys (hidden in production)
   const [showConfig, setShowConfig] = useState(false);
   const updateConfig = (field, value) => setEmailjsConfig(prev => ({ ...prev, [field]: value }));
+
+  // For message guidance
+  let configDiagnosticMsg = "";
+  if (configIncomplete) {
+    configDiagnosticMsg =
+      "⚠️ EmailJS config is incomplete or using placeholder values. " +
+      "This feature requires real EmailJS credentials (Service ID, User/Public Key, Reminder and Summary Template IDs). " +
+      "Emails will not send until these are set – stored via secure admin panel, .env, or localStorage.\n" +
+      "Ask your app admin to generate the necessary values from https://dashboard.emailjs.com/ and update app config securely.";
+  }
 
   return (
     <section className="container" style={{ maxWidth: 440, margin: "0 auto", paddingTop: 25 }}>
@@ -95,6 +138,39 @@ const EmailFeatures = () => {
         }}>
           Email Reminders & Summaries
         </h2>
+        {configIncomplete && (
+          <MotionWrapper>
+            <div style={{
+              background: "#f339db1c",
+              color: "#f339db",
+              borderRadius: 11,
+              fontWeight: 600,
+              fontSize: 15,
+              textAlign: "center",
+              padding: "12px",
+              marginBottom: 15,
+              boxShadow: "0 1.5px 8px #fadadd20"
+            }}>
+              {configDiagnosticMsg.split('\n').map((txt, idx) => (
+                <div key={idx}>{txt}</div>
+              ))}
+              <button
+                style={{
+                  marginTop: 10,
+                  background: "linear-gradient(90deg,#fadadd 60%,#e7b3ff 100%)",
+                  color: "#23155f",
+                  border: "none",
+                  borderRadius: 7,
+                  fontWeight: 700,
+                  padding: "7px 14px",
+                  cursor: "pointer"
+                }}
+                onClick={() => setShowConfig(true)}>
+                {showConfig ? "Hide config" : "Show config setup"}
+              </button>
+            </div>
+          </MotionWrapper>
+        )}
         <div style={{ color: "#e7b3ff", textAlign: "center", fontSize: 16, marginBottom: 17 }}>
           Opt in to receive skincare reminders and your routine summary. No spam. Cancel anytime.
         </div>
