@@ -18,18 +18,28 @@ export const fetchRecommendedProducts = async (params = {}) => {
     "Kiehl's",
     "Minimalist",
     "Plum",
-    "Wow"
+    "Wow",
+    "FoxTale"
   ];
 
-  // Normalize/correct user-supplied brand params
+  // Normalize/correct user-supplied brand params and common API misspellings
   const normalizeBrand = (b) => {
     if (!b) return "";
-    const str = ("" + b).trim().toLowerCase();
+    const str = ("" + b).trim().toLowerCase()
+      .replace(/[’‘`´]/g, "'"); // Normalize apostrophes
     if (str === "the derma co" || str === "dermaco") return "DermaCo";
     if (str === "minimalist") return "Minimalist";
     if (str === "plum") return "Plum";
     if (str === "wow skin science" || str === "wow") return "Wow";
-    if (str === "kiehl's" || str === "kiehls") return "Kiehl's";
+    // Normalize various spellings of Kiehl's
+    if (
+      str === "kiehl's" ||
+      str === "kiehls" ||
+      str === "kiehl’s" ||
+      str === "kiehls'" ||
+      str === "kiels" // plus a common misspelling
+    ) return "Kiehl's";
+    if (str === "foxtale" || str === "fox tale") return "FoxTale";
     return "";
   };
 
@@ -46,7 +56,8 @@ export const fetchRecommendedProducts = async (params = {}) => {
     "Kiehl's": "https://www.kiehls.com.sg/dw/image/v2/BDTJ_PRD/on/demandware.static/-/Sites-masterCatalog_Kiehls/default/dwc9f5beec/2020/Products/Face/Serums/Ultra_Pure_Hyaluronic_Acid_Serum_30ml_ProductPageZoom.jpg",
     "Minimalist": "https://beminimalist.co/cdn/shop/files/Salicylic_Acid_2_percent_Face_Serum-minimalist-skincare-1_600x.jpg",
     "Plum": "https://cdn.plumgoodness.com/products/Green-Tea-Face-Wash-1_800x.jpg",
-    "Wow": "https://cdn01.wowsts.com/pub/media/catalog/product/w/o/wow_skin_science_vitamin_c_face_wash_with_built_in_brush_100ml_front.jpg"
+    "Wow": "https://cdn01.wowsts.com/pub/media/catalog/product/w/o/wow_skin_science_vitamin_c_face_wash_with_built_in_brush_100ml_front.jpg",
+    "FoxTale": "https://cdn.shopify.com/s/files/1/0553/0937/1178/products/foxtale-vitamin-c-serum-30ml.jpg" // Example FoxTale product image
   };
 
   // Simulate parallel fetches for each brand (replace with real APIs in prod)

@@ -283,7 +283,8 @@ function ProductList() {
     "Kiehl's",
     "Minimalist",
     "Plum",
-    "Wow"
+    "Wow",
+    "FoxTale"
   ];
   const [selectedBrands, setSelectedBrands] = useState([...availableBrands]);
 

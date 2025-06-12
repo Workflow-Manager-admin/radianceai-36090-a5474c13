@@ -260,12 +260,33 @@ const Recommendations = () => {
       "Kiehl's",
       "Minimalist",
       "Plum",
-      "Wow"
+      "Wow",
+      "FoxTale"
     ];
+    // Normalize for variants like Kiehls, Kiehl’s (“ or other apostrophes)
+    function normalizeBrand(brand) {
+      if (!brand) return "";
+      const str = ("" + brand).trim().toLowerCase().replace(/[’‘`´]/g, "'");
+      if (
+        str === "kiehl's" ||
+        str === "kiehls" ||
+        str === "kiehl’s" ||
+        str === "kiehls'" ||
+        str === "kiels"
+      ) return "Kiehl's";
+      if (str === "foxtale" || str === "fox tale") return "FoxTale";
+      if (str === "the derma co" || str === "dermaco") return "DermaCo";
+      if (str === "minimalist") return "Minimalist";
+      if (str === "plum") return "Plum";
+      if (str === "wow skin science" || str === "wow") return "Wow";
+      return brand; // fallback
+    }
     if (recommended && Array.isArray(recommended)) {
-      setProducts(recommended.filter(p =>
-        allowedBrands.includes(p.brand)
-      ));
+      setProducts(
+        recommended.filter(p =>
+          allowedBrands.includes(normalizeBrand(p.brand))
+        )
+      );
       setLoading(false);
     }
   }, [recommended]);
