@@ -1,0 +1,58 @@
+{
+  "steps": [
+    {
+      "description": "Identify all pink color usages in the codebase.",
+      "details": "Perform a comprehensive search across the codebase (src/ directory) for usage of '#fadadd', '#f339db', similar hex/pink shades, and descriptive color variable names. This includes: CSS variables, inline styles, design constants in JS, and theme configs.",
+      "files_to_modify": [],
+      "expected_changes": "List of files and exact locations (variables, component-level, inline styles) where pink is present."
+    },
+    {
+      "description": "Update global theme variables and color constants to replace any pink with approved neutral/primary colors.",
+      "details": "In files like App.css and colors.js, change variables such as '--kavia-pink', '--primary', or anything mapped to a pink value. Where necessary, introduce blue or neutral replacements.",
+      "files_to_modify": [
+        "radianceai_frontend/src/App.css",
+        "radianceai_frontend/src/index.css",
+        "radianceai_frontend/src/utils/colors.js"
+      ],
+      "expected_changes": "Global theme variables and JS color constants use blue/neutral values instead of pink."
+    },
+    {
+      "description": "Refactor all inline/component-level pink usages in functional components and feature modules.",
+      "details": "In all .js files under features/ (quiz, chatbot, weather, products, etc.) and components/, replace pinks in inline styles, color props for animation, gradients, and any contextual coloring (text, backgrounds, buttons, etc). Replace them with blue/neutral as contextually suitable.",
+      "files_to_modify": [
+        "radianceai_frontend/src/features/chatbot/Chatbot.js",
+        "radianceai_frontend/src/features/email/EmailFeatures.js",
+        "radianceai_frontend/src/features/geolocation/Geolocation.js",
+        "radianceai_frontend/src/features/home/Home.js",
+        "radianceai_frontend/src/features/products/ProductList.js",
+        "radianceai_frontend/src/features/quiz/Quiz.js",
+        "radianceai_frontend/src/features/recommendations/Recommendations.js",
+        "radianceai_frontend/src/features/weather/WeatherSuggestions.js",
+        "radianceai_frontend/src/features/progress/ProgressTracker.js",
+        "radianceai_frontend/src/components/TopNavBar.js",
+        "radianceai_frontend/src/components/VideoSlideshow.js"
+      ],
+      "expected_changes": "No pink (#fadadd, #f339db, or similar) remains—neutral or theme blue/gray is used for all text, backgrounds, borders, gradients, highlights, and effects."
+    },
+    {
+      "description": "Update demo overlay styles in App.js and any diagnostic overlays.",
+      "details": "Remove or restyle any debug overlays that use pink borders/gradients/shadows.",
+      "files_to_modify": [
+        "radianceai_frontend/src/App.js"
+      ],
+      "expected_changes": "Overlay uses blue/neutral diagnostic color, not pink."
+    },
+    {
+      "description": "Review for overlooked usages and polish.",
+      "details": "Do a final automated and manual sweep to ensure no instances of pink hex codes or their RGBA equivalents, destructive color names, or residual class names remain. Confirm theme consistency and accessibility.",
+      "files_to_modify": [],
+      "expected_changes": "App is fully free of pink; all UI is aligned to the new palette."
+    }
+  ],
+  "assumptions": [
+    "Theme blue is now the primary accent and should be used for highlights, buttons, etc.",
+    "Where a pink was 'secondary', use a light blue or soft gray.",
+    "Gradient usages that used pink should blend with blue/gray instead.",
+    "No external style sheets reference pink, all colors are locally managed."
+  ]
+}
