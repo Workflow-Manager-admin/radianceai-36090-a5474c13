@@ -14,7 +14,8 @@ body {
   padding: 0;
   min-height: 100vh;
   font-family: 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
-  background: var(--primary);
+  /* Use the new gray gradient background consistent with the modern premium palette */
+  background: var(--gradient-gray-bg, linear-gradient(120deg, #212329 62%, #242443 98%, #F4E6FF08 100%));
   color: var(--text-color, #182C47);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
