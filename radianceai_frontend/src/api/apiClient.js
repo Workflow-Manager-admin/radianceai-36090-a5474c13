@@ -126,7 +126,7 @@ export const fetchRecommendedProducts = async (params = {}) => {
   */
 export const fetchWeather = async (lat, lon) => {
   // Note: In production, move the API key to env file. For demo, hardcoding OK.
-  const apiKey = "9a2339e93797b5eadbb4356bf9cc1b70"; // public demo key (replace with real for prod)
+  const apiKey = "06b55fc63b0c2836f40b43e784b68df0"; // Updated OpenWeatherMap API key (see task requirements)
   // Diagnostic log helper
   const log = (...args) => { try { window && window.console && window.console.log && window.console.log("[WeatherAPI]", ...args); } catch {} };
 
