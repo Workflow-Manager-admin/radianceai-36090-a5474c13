@@ -251,9 +251,7 @@ const Home = () => {
               style={{
                 fontWeight: 900,
                 fontSize: "2.54em",
-                background: "linear-gradient(92deg,#338af1 56%,#1a3770 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
+                color: "#FFF8EB",
                 letterSpacing: ".01em",
                 margin: "0 0 10px 0",
                 padding: 0,

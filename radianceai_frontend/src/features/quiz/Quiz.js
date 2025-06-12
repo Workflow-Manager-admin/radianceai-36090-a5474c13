@@ -69,13 +69,13 @@ function OptionButton({ label, selected, onClick, disabled, ariaLabel, style }) 
       aria-label={ariaLabel || label}
       style={{
         background: selected
-          ? "linear-gradient(92deg,#fadadd 45%,#f339db 100%)"
-          : "rgba(255,255,255,0.12)",
-        color: selected ? "#27174e" : "#190155",
+          ? "linear-gradient(92deg, #2050aa 70%, #77a6ed 130%)"
+          : "rgba(34, 92, 211, 0.10)",
+        color: selected ? "#fff" : "#2050aa",
         fontWeight: selected ? 700 : 500,
         border: selected
-          ? "2.2px solid #f339db"
-          : "2.2px solid #e7b3ff2e",
+          ? "2.2px solid #77a6ed"
+          : "2.2px solid #a6d7fd85",
         borderRadius: 15,
         padding: "17px 0px",
         margin: "0 0",
@@ -85,9 +85,9 @@ function OptionButton({ label, selected, onClick, disabled, ariaLabel, style }) 
         width: "100%",
         minHeight: 53,
         boxShadow: selected
-          ? "0 2px 16px 0 #fadadd61"
+          ? "0 2px 16px 0 #7bb7fe38"
           : "0 1px 8px 0 rgba(0,0,0,0.04)",
-        outline: selected ? "2.5px solid #f339db88" : "none",
+        outline: selected ? "2.5px solid #4889eeaa" : "none",
         letterSpacing: ".01em",
         transition: "box-shadow 0.16s, background 0.18s, color 0.18s, border 0.16s",
         ...style,

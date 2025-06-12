@@ -20,8 +20,8 @@ const BOT_AVATAR =
   <span style={{
     display: "inline-block",
     width: 35, height: 35,
-    borderRadius: "50%", background: "linear-gradient(120deg,#fadadd 40%,#e7b3ff 100%)",
-    boxShadow: "0 1.5px 7px #fadadd25",
+    borderRadius: "50%", background: "linear-gradient(120deg,#2050aa 40%,#77a6ed 100%)",
+    boxShadow: "0 1.5px 7px #2050aa15",
     display_: "flex", alignItems_: "center", justifyContent_: "center", fontSize: 27, textAlign: "center"
   }} aria-label="bot">💬</span>;
 
