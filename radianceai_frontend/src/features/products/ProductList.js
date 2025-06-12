@@ -15,10 +15,10 @@ function AnimatedProductCard({ product, expanded, onToggle }) {
   const cardVariants = {
     collapsed: {
       borderRadius: "18px",
-      boxShadow: "0 1.5px 7px 0 #fadadd29",
+      boxShadow: "0 1.5px 7px 0 #a8d4fc22", // blue shade
       scale: 1,
       background:
-        "linear-gradient(101deg, #201157 70%, #fadadd0c 100%)",
+        "linear-gradient(101deg, #2050aa 70%, #e1edfa0e 100%)",
       transition: {
         duration: 0.26,
         type: "spring",
@@ -28,10 +28,10 @@ function AnimatedProductCard({ product, expanded, onToggle }) {
     },
     expanded: {
       borderRadius: "26px",
-      boxShadow: "0 8px 22px #fadadd55",
+      boxShadow: "0 8px 22px #77a6ed66", // blue light
       scale: 1.013,
       background:
-        "linear-gradient(101deg,#e7b3ff14 55%,#fadadd18 110%)",
+        "linear-gradient(101deg,#dde9ff24 55%,#e9f6fb35 110%)", // blue/creamy-white tint
       transition: {
         duration: 0.31,
         type: "spring",
@@ -55,7 +55,7 @@ function AnimatedProductCard({ product, expanded, onToggle }) {
         marginBottom: 25,
         marginTop: 3,
         padding: expanded ? "24px 22px" : "14px 14px",
-        border: "2px solid #fadadd35",
+        border: "2px solid #dde9ff55",
         display: "flex",
         flexDirection: "column",
         alignItems: "stretch",
@@ -84,7 +84,7 @@ function AnimatedProductCard({ product, expanded, onToggle }) {
             borderRadius: "13px",
             objectFit: "cover",
             background: "#fff",
-            boxShadow: "0 1.5px 9px #fadadd23",
+            boxShadow: "0 1.5px 9px #77a6ed23",
             marginBottom: 3,
           }}
         />
@@ -92,7 +92,7 @@ function AnimatedProductCard({ product, expanded, onToggle }) {
           <div
             style={{
               fontWeight: 700,
-              color: "#fadadd",
+              color: "#2050aa",
               fontSize: "1.13rem",
               marginBottom: 2,
               letterSpacing: ".01em",
@@ -107,13 +107,13 @@ function AnimatedProductCard({ product, expanded, onToggle }) {
           </div>
           <div
             style={{
-              color: "#e7b3ff",
+              color: "#77a6ed",
               fontWeight: 500,
               fontSize: 14.3,
               marginBottom: 4,
             }}
           >
-            Brand: <span style={{ color: "#f339db" }}>{product.brand}</span>
+            Brand: <span style={{ color: "#2050aa" }}>{product.brand}</span>
           </div>
           <div
             style={{
@@ -124,17 +124,17 @@ function AnimatedProductCard({ product, expanded, onToggle }) {
               marginBottom: 2,
             }}
           >
-            <span style={{ color: "#fadadd", fontWeight: 600 }}>
+            <span style={{ color: "#2050aa", fontWeight: 600 }}>
               {product.currency === "INR" || product.isLocalIN ? "₹" : "$"}
               {product.price}
               {product.isLocalIN && (
-                <span style={{ color: "#f339db", fontSize: 11, marginLeft: 4 }}>India</span>
+                <span style={{ color: "#77a6ed", fontSize: 11, marginLeft: 4 }}>India</span>
               )}
             </span>
-            <span style={{ color: "#f339db" }}>★ {product.rating}</span>
+            <span style={{ color: "#2094ce" }}>★ {product.rating}</span>
             {product.stock < 15 && (
               <span style={{
-                color: "#ff6161",
+                color: "#e1af68", // beige/yellowish as alert for low stock (brand-compliant)
                 fontWeight: 500,
                 fontSize: 12.5,
                 marginLeft: 7,
@@ -143,7 +143,7 @@ function AnimatedProductCard({ product, expanded, onToggle }) {
           </div>
           <div
             style={{
-              color: "#23155f",
+              color: "#2050aa",
               fontSize: 13.1,
               opacity: 0.75,
               margin: "4px 0 0 0",
@@ -162,8 +162,8 @@ function AnimatedProductCard({ product, expanded, onToggle }) {
         <div
           style={{
             marginLeft: 6, marginTop: 8,
-            color: "#fadadd",
-            background: "rgba(234,179,255,.15)",
+            color: "#2050aa",
+            background: "rgba(119,166,237,0.15)",
             borderRadius: "8px",
             fontWeight: 600,
             fontSize: 13,
@@ -193,7 +193,7 @@ function AnimatedProductCard({ product, expanded, onToggle }) {
             <div>
               <div
                 style={{
-                  color: "#fff",
+                  color: "#2050aa",
                   fontWeight: 500,
                   fontSize: 14.3,
                   minHeight: 33,
@@ -203,20 +203,20 @@ function AnimatedProductCard({ product, expanded, onToggle }) {
               </div>
               {product.category && (
                 <div style={{
-                  color: "#fadadd",
+                  color: "#77a6ed",
                   fontSize: 13.2,
                   marginTop: 6,
                 }}>
-                  Category: <span style={{ color: "#f339db" }}>{product.category}</span>
+                  Category: <span style={{ color: "#2050aa" }}>{product.category}</span>
                 </div>
               )}
               <div style={{
                 marginTop: 7,
-                color: "#e7b3ff",
+                color: "#77a6ed",
                 fontSize: 13.2,
                 opacity: 0.9,
               }}>
-                <span style={{ color: "#fadadd", fontWeight: 600 }}>Details:</span>
+                <span style={{ color: "#2050aa", fontWeight: 600 }}>Details:</span>
                 <span style={{ marginLeft: 6 }}>
                   {/* Show key features if available, else fallback */}
                   {product.keywords
@@ -227,14 +227,14 @@ function AnimatedProductCard({ product, expanded, onToggle }) {
               {/* Usage tip: placeholder for future extension */}
               <div style={{
                 marginTop: 10,
-                color: "#fadadd",
+                color: "#77a6ed",
                 fontWeight: 600,
                 fontSize: 13,
                 letterSpacing: ".01em"
               }}>
                 Usage Tip:
                 <span style={{
-                  color: "#fff",
+                  color: "#2050aa",
                   fontWeight: 400,
                   marginLeft: 7,
                   fontSize: 13
@@ -251,7 +251,7 @@ function AnimatedProductCard({ product, expanded, onToggle }) {
                     display: "inline-block",
                     marginTop: 13,
                     color: "#fff",
-                    background: "linear-gradient(92deg, #f339db 60%, #e7b3ff 100%)",
+                    background: "linear-gradient(92deg, #2050aa 60%, #77a6ed 100%)",
                     borderRadius: 9,
                     fontSize: 14,
                     padding: "8px 18px",
@@ -327,7 +327,7 @@ function ProductList() {
       <AppleFadeTransition>
         <div style={{ margin: "15px 0 8px 0" }}>
           <h2 style={{
-            color: "#fadadd",
+            color: "#2050aa",
             fontWeight: 800,
             fontSize: "1.62rem",
             margin: "22px 0 4px",
@@ -347,8 +347,8 @@ function ProductList() {
           }}>
             <button onClick={handleSelectAll} disabled={selectedBrands.length === availableBrands.length}
               style={{
-                background: "#e7b3ff",
-                color: "#fff",
+                background: "#dde9ff",
+                color: "#2050aa",
                 fontWeight: 600,
                 fontSize: 13.5,
                 borderRadius: 8,
@@ -361,8 +361,8 @@ function ProductList() {
             >All Brands</button>
             <button onClick={handleClearAll} disabled={selectedBrands.length === 0}
               style={{
-                background: "#fadadd",
-                color: "#f339db",
+                background: "#e1edfa",
+                color: "#2050aa",
                 fontWeight: 600,
                 fontSize: 13.5,
                 borderRadius: 8,
@@ -381,13 +381,13 @@ function ProductList() {
                 marginLeft: 0,
                 fontSize: 14.3,
                 fontWeight: 600,
-                color: "#e7b3ff",
+                color: "#2050aa",
                 background: selectedBrands.includes(brand)
-                  ? "linear-gradient(92deg,#fadadd 60%,#e7b3ff 100%)"
-                  : "#fffafd",
+                  ? "linear-gradient(92deg,#2050aa 60%,#77a6ed 100%)"
+                  : "#fff",
                 border: selectedBrands.includes(brand)
-                  ? "2px solid #f339db"
-                  : "2px solid #fadadd55",
+                  ? "2px solid #77a6ed"
+                  : "2px solid #dde9ff",
                 borderRadius: 8,
                 padding: "4px 10px",
                 marginBottom: 4,
@@ -398,14 +398,14 @@ function ProductList() {
                   type="checkbox"
                   checked={selectedBrands.includes(brand)}
                   onChange={() => handleBrandToggle(brand)}
-                  style={{ marginRight: 7, accentColor: "#f339db", cursor: "pointer" }}
+                  style={{ marginRight: 7, accentColor: "#2050aa", cursor: "pointer" }}
                 />
                 {brand}
               </label>
             ))}
           </div>
           <div style={{
-            color: "#e7b3ff",
+            color: "#77a6ed",
             fontWeight: 500,
             textAlign: "center",
             margin: "0 0 18px 0",
@@ -421,7 +421,7 @@ function ProductList() {
         <MotionWrapper>
           {loading ? (
             <div style={{
-              color: "#fadadd",
+              color: "#2050aa",
               fontWeight: 600,
               textAlign: "center",
               margin: "40px 0",
@@ -431,7 +431,7 @@ function ProductList() {
             </div>
           ) : products.length === 0 ? (
             <div style={{
-              color: "#f339db",
+              color: "#77a6ed",
               margin: "34px 0",
               textAlign: "center",
               fontSize: 18,
