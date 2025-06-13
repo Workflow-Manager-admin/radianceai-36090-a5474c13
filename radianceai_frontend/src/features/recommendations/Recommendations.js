@@ -1,361 +1,224 @@
-import React, { useEffect, useState, useRef, useContext } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { AppleFadeTransition } from "../../utils/animation";
-import { useProducts } from "../../hooks/useProducts";
-import { GlobalStateContext } from "../../context/GlobalStateContext";
+import useProducts from "../../hooks/useProducts";
+import { MotionWrapper } from "../../utils/animation";
 
-// PUBLIC_INTERFACE
 /**
- * Recommendations feature: horizontally scrollable, animated carousel
- * Fetches best-selling products and displays them based on quiz result mapping.
+ * PUBLIC_INTERFACE
+ * Recommendations: Personalized product recommendations using blue palette (RadianceAI branding).
+ * All pink/purple color values replaced with blue shades: #e7b3ff (soft), #4682e7 (accent), #2050aa (dark), #77a6ed (light).
  */
 
-function ProductCard({ product }) {
-  // Card animation and layout
-  return (
-    <motion.div
-      className="product-card"
-      layout
-      whileHover={{ scale: 1.03, boxShadow: "0 4px 16px #fadadd33" }}
-      style={{
-        width: 210,
-        background: "linear-gradient(104deg,#faf0ffbb 60%,#e7b3ff25 100%)",
-        borderRadius: 18,
-        margin: "0 14px 0 0",
-        padding: "15px 14px 18px 14px",
-        boxShadow: "0 1px 12px 0 #fadadd1a",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        border: "1px solid #fadadd24",
-        minHeight: 285,
-      }}
-    >
-      <img
-        src={product.thumbnail}
-        alt={product.title}
-        loading="lazy"
-        style={{
-          objectFit: "cover",
-          width: 120,
-          height: 120,
-          borderRadius: 12,
-          marginBottom: 10,
-          boxShadow: "0 2px 10px #e7b3ff28",
-          background: "#fff"
-        }}
-      />
-      <div
-        style={{
-          fontWeight: 700,
-          fontSize: "1.08rem",
-          color: "#1a1a1a",
-          textAlign: "center",
-          marginBottom: 2,
-        }}
-        title={product.title}
-      >
-        {product.title.length > 30 ? product.title.slice(0, 29) + "…" : product.title}
-      </div>
-      <div
-        style={{
-          color: "#e7b3ff",
-          fontWeight: 500,
-          fontSize: 15.2,
-          marginBottom: 2,
-          textAlign: "center",
-          minHeight: 22,
-        }}
-      >
-        <span style={{ color: "#f339db" }}>Brand:</span> {product.brand}
-      </div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          gap: 7,
-          fontSize: 14.5,
-          marginBottom: 2,
-        }}
-      >
-        <span style={{ color: "#27275e", fontWeight: 700 }}>
-          {product.currency === "INR" || product.isLocalIN ? "₹" : "$"}
-          {product.price}
-        </span>
-        <span style={{ color: "#fadadd" }} title="Product rating">
-          ★ {product.rating}
-        </span>
-        {product.isLocalIN && (
-          <span style={{ color: "#f339db", fontSize: 11, marginLeft: 5 }}>
-            India
-          </span>
-        )}
-      </div>
-      <div style={{
-        fontSize: 13.3,
-        color: "#23155f",
-        minHeight: 45,
-        opacity: 0.76,
-        margin: "8px 0 0 0",
-        textAlign: "center"
-      }}>
-        {product.description.length > 55
-          ? product.description.slice(0, 55) + "…"
-          : product.description}
-      </div>
-      <a
-        href={product.link || "#"}
-        style={{
-          marginTop: 10,
-          display: "inline-block",
-          color: "#fff",
-          background: "linear-gradient(92deg, #f339db 60%, #e7b3ff 100%)",
-          borderRadius: 9,
-          fontSize: 14.3,
-          padding: "7px 17px",
-          fontWeight: 600,
-          textDecoration: "none"
-        }}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        View
-      </a>
-    </motion.div>
-  );
-}
-
-function ProductCarousel({ products, scrollRef }) {
-  return (
-    <motion.div
-      className="carousel"
-      style={{
-        width: "100%",
-        overflowX: "auto",
-        display: "flex",
-        flexDirection: "row",
-        scrollbarWidth: "none",
-        msOverflowStyle: "none",
-        margin: "24px 0",
-        WebkitOverflowScrolling: "touch",
-        paddingBottom: 10,
-      }}
-      ref={scrollRef}
-      whileTap={{ cursor: "grabbing" }}
-    >
-      {products.map((p) => (
-        <ProductCard key={p.id} product={p} />
-      ))}
-    </motion.div>
-  );
-}
-
-const Recommendations = () => {
-  // Access quiz answers from global context (provided by GlobalStateProvider and useQuiz)
-  const { quiz } = useContext(GlobalStateContext);
-  // quiz.quizAnswers format: { skinType, goals, budget }
-  // Defensive fallback: quiz may be undefined on first render
-  const quizAnswers = quiz?.quizAnswers || {};
-
-  // --- Parse query param for category ---
-  const location = useLocation();
-  const navigate = useNavigate();
-  const [categoryParam, setCategoryParam] = useState(null);
-
-  useEffect(() => {
-    // Parse query string to get ?cat= value
-    const params = new URLSearchParams(location.search);
-    const cat = params.get("cat");
-    setCategoryParam(cat);
-  }, [location.search]);
-
-  // Mapping quiz answers to product categories/concerns
-  function mapQuizToCategoriesAndConcerns(quizAnswers) {
-    // Map quiz goals to product categories
-    const goalToCategory = {
-      "Hydration":            ["moisturizer", "serum"],
-      "Reduce Acne/Blemishes":["acne", "cleanser", "serum"],
-      "Even Skin Tone":       ["serum", "toner", "brightening"],
-      "Anti-Aging":           ["serum", "moisturizer", "anti-aging"],
-      "Minimize Pores":       ["cleanser", "toner", "mask"],
-      "Brightening":          ["serum", "brightening", "mask"],
-      "Reduce Redness":       ["soothing", "cream", "serum"],
-      "Sun Protection":       ["sunscreen", "spf"],
-      "Soothe Sensitivity":   ["soothing", "moisturizer", "cream"],
-    };
-
-    // The quiz stores goals as an array, other fields as strings.
-    const goals = quizAnswers.goals || [];
-    const categories = [];
-    const concerns = [];
-
-    for (const goal of goals) {
-      if (goalToCategory[goal]) {
-        for (const cat of goalToCategory[goal]) {
-          // Separate 'concerns' like 'acne'/'brightening' and categories like 'serum'
-          if (
-            ["acne", "anti-aging", "brightening", "soothing"].includes(
-              cat.toLowerCase()
-            )
-          ) {
-            concerns.push(cat);
-          } else {
-            categories.push(cat);
-          }
-        }
-      }
-    }
-
-    // Fallback/default if user has not answered/wrong data
-    if (categories.length === 0 && categoryParam) {
-      categories.push(categoryParam);
-    }
-
-    return {
-      categories: [...new Set(categories)],
-      concerns: [...new Set(concerns)],
-    };
-  }
-
-  // Get tailored filters based on quiz answers
-  const { categories: quizCategories, concerns: quizConcerns } = React.useMemo(
-    () => mapQuizToCategoriesAndConcerns(quizAnswers),
-    // Rerun mapping if quiz answers or categoryParam changes
-    [quizAnswers, categoryParam]
-  );
-
-  // Pass mapped concerns/categories to product hook
-  const filterCategories = React.useMemo(() => {
-    // URL param beats quiz by user intent, fallback to mapped quiz categories, then []
-    if (categoryParam) return [categoryParam];
-    if (quizCategories) return quizCategories;
-    return [];
-  }, [categoryParam, quizCategories]);
-
-  const filterConcerns = React.useMemo(() => {
-    // Quiz concerns, or none
-    return quizConcerns || [];
-  }, [quizConcerns]);
-
-  const { recommended } = useProducts({
-    concerns: filterConcerns,
-    categories: filterCategories,
-    limit: 15,
-    minRating: 4,
-    deduplicate: true,
-  });
-
-  const [loading, setLoading] = useState(true);
-  const [products, setProducts] = useState([]);
-
-  const scrollRef = useRef();
-
-  useEffect(() => {
-    setLoading(true);
-    // recommended is reactive to quizState (concerns/categories) or the cat param if set
-    const allowedBrands = [
-      "DermaCo",
-      "Kiehl's",
-      "Minimalist",
-      "Plum",
-      "Wow",
-      "FoxTale"
-    ];
-    // Normalize for variants like Kiehls, Kiehl’s (“ or other apostrophes)
-    function normalizeBrand(brand) {
-      if (!brand) return "";
-      const str = ("" + brand).trim().toLowerCase().replace(/[’‘`´]/g, "'");
-      if (
-        str === "kiehl's" ||
-        str === "kiehls" ||
-        str === "kiehl’s" ||
-        str === "kiehls'" ||
-        str === "kiels"
-      ) return "Kiehl's";
-      if (str === "foxtale" || str === "fox tale") return "FoxTale";
-      if (str === "the derma co" || str === "dermaco") return "DermaCo";
-      if (str === "minimalist") return "Minimalist";
-      if (str === "plum") return "Plum";
-      if (str === "wow skin science" || str === "wow") return "Wow";
-      return brand; // fallback
-    }
-    if (recommended && Array.isArray(recommended)) {
-      setProducts(
-        recommended.filter(p =>
-          allowedBrands.includes(normalizeBrand(p.brand))
-        )
-      );
-      setLoading(false);
-    }
-  }, [recommended]);
-
-  const scrollBy = (dx) => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollBy({ left: dx, behavior: "smooth" });
-    }
-  };
-
-  return (
-    <section className="container" style={{ maxWidth: 1000, margin: "0 auto" }}>
-      <AppleFadeTransition>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
-          <h2 style={{
-            color: "#fadadd", fontWeight: 700, fontSize: "1.7rem", margin: "22px 0 6px 0"
-          }}>
-            {categoryParam
-              ? `Recommended for ${categoryParam.charAt(0).toUpperCase() + categoryParam.slice(1)}`
-              : "Recommended Products"}
-          </h2>
-          <div style={{
-            display: "flex", gap: 8
-          }}>
-            <button
-              aria-label="Scroll left"
-              onClick={() => scrollBy(-200)}
-              style={{
-                background: "none", border: "none", cursor: "pointer", padding: "4px 8px", borderRadius: 10, transition: "background .18s"
-              }}
-            >◀︎</button>
-            <button
-              aria-label="Scroll right"
-              onClick={() => scrollBy(200)}
-              style={{
-                background: "none", border: "none", cursor: "pointer", padding: "4px 8px", borderRadius: 10, transition: "background .18s"
-              }}
-            >▶︎</button>
-          </div>
-        </div>
-        {loading ? (
-          <div style={{
-            textAlign: "center",
-            color: "#e7b3ff",
-            marginTop: 30,
-            fontSize: 18
-          }}>Loading recommendations…</div>
-        ) : (
-          products.length > 0 ? (
-            <ProductCarousel products={products} scrollRef={scrollRef} />
-          ) : (
-            <div style={{
-              textAlign: "center",
-              marginTop: 25,
-              color: "#fadadd"
-            }}>No recommendations available.</div>
-          )
-        )}
-        <div style={{
-          fontSize: 14.2,
-          color: "#e7b3ff",
-          textAlign: "center",
-          margin: "22px 0"
-        }}>
-          Need a more tailored routine? <a href="/quiz" style={{color: "#f339db"}}>Take the quiz</a> for best matches!
-        </div>
-      </AppleFadeTransition>
-    </section>
-  );
+const PALETTE = {
+  blueSoft: "#e7b3ff",
+  blueAccent: "#4682e7",
+  blueDark: "#2050aa",
+  blueLight: "#77a6ed"
 };
+
+const titleStyles = {
+  fontWeight: 700,
+  fontSize: "2.0rem",
+  marginTop: 17,
+  marginBottom: 7,
+  textAlign: "center",
+  color: PALETTE.blueSoft,
+};
+
+const sectionTitle = {
+  color: PALETTE.blueAccent,
+  fontWeight: 600,
+  fontSize: "1.18em",
+  margin: "0 0 17px 2px"
+};
+
+const pillRecommendStyle = (active) => ({
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 8,
+  border: "none",
+  padding: "8px 21px",
+  borderRadius: 26,
+  fontWeight: 700,
+  fontSize: 15.2,
+  cursor: "pointer",
+  background: active
+    ? "linear-gradient(93deg, #4682e7 70%, #e7b3ff 120%)"
+    : "linear-gradient(93deg,#f0f8ff 13%,#e7b3ff 110%)",
+  color: active ? "#fff" : "#2050aa",
+  boxShadow: active
+    ? "0 2px 13px #4682e722"
+    : "0 1px 6px #e7b3ff55",
+  marginRight: 9,
+  marginBottom: 10,
+  transition: "all .14s cubic-bezier(.27,1.36,.48,1)",
+});
+
+const productCard = {
+  minWidth: 224,
+  flex: "0 0 224px",
+  background: "linear-gradient(108deg,#e7f2ff 50%,#e7b3ff 100%)",
+  borderRadius: 17,
+  boxShadow: "0 1px 7px #4682e729",
+  padding: "18px 13px 17px 13px",
+  marginBottom: 10,
+  position: "relative",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  scrollSnapAlign: "start",
+  cursor: "pointer"
+};
+
+const CONCERNS = [
+  { key: "hydration", label: "Hydration", icon: "💧" },
+  { key: "brightening", label: "Brightening", icon: "✨" },
+  { key: "acne", label: "Acne", icon: "🛡️" },
+  { key: "antiaging", label: "Anti-Aging", icon: "🕰️" },
+  { key: "sensitivity", label: "Sensitivity", icon: "🍃" }
+];
+
+// PUBLIC_INTERFACE
+function Recommendations() {
+  const [selectedConcern, setSelectedConcern] = useState("hydration");
+  const { recommended, loading } = useProducts({ sortBy: "rating", limit: 16 });
+
+  const filtered = useMemo(() => {
+    if (!Array.isArray(recommended)) return [];
+    if (!selectedConcern) return recommended.slice(0, 10);
+    return recommended.filter(prod =>
+      [prod.title, prod.category, ...(prod.keywords || [])]
+        .join(" ")
+        .toLowerCase()
+        .includes(selectedConcern)
+    );
+  }, [recommended, selectedConcern]);
+
+  return (
+    <div className="container" style={{ maxWidth: 900, margin: "0 auto" }}>
+      <MotionWrapper>
+        <motion.section>
+          <h2 style={titleStyles}>Personalized Recommendations</h2>
+          <div style={sectionTitle}>Choose a skin concern to explore top picks</div>
+          <div style={{ display: "flex", flexWrap: "wrap" }}>
+            {CONCERNS.map((c) => (
+              <button
+                key={c.key}
+                style={pillRecommendStyle(selectedConcern === c.key)}
+                onClick={() => setSelectedConcern(c.key)}
+                aria-label={`Show ${c.label} recommendations`}
+              >
+                <span style={{ fontSize: 19 }}>{c.icon}</span>
+                {c.label}
+              </button>
+            ))}
+          </div>
+        </motion.section>
+        <motion.section style={{ margin: "24px 0 0 0" }}>
+          {loading ? (
+            <div style={{ color: PALETTE.blueAccent, fontWeight: 600, textAlign: "center", fontSize: 22 }}>
+              Loading…
+            </div>
+          ) : filtered.length === 0 ? (
+            <div style={{ color: PALETTE.blueSoft, textAlign: "center", fontSize: 17 }}>No recommendations found.</div>
+          ) : (
+            <div
+              style={{
+                overflowX: "auto",
+                display: "flex",
+                gap: 21,
+                padding: "7px 9px 10px 7px",
+                scrollSnapType: "x mandatory",
+                margin: "0 -7px 0 0"
+              }}
+            >
+              {filtered.map((prod, idx) => (
+                <motion.div
+                  key={prod.id}
+                  style={productCard}
+                  whileHover={{ scale: 1.045, boxShadow: "0 4px 18px #4682e73a" }}
+                  tabIndex={0}
+                  aria-label={`See details for ${prod.title}`}
+                >
+                  <img
+                    src={prod.thumbnail}
+                    alt={prod.title}
+                    style={{
+                      width: 74,
+                      height: 74,
+                      borderRadius: 12,
+                      objectFit: "cover",
+                      marginBottom: 11,
+                      background: "#fff",
+                      boxShadow: "0 2.5px 11px #e7b3ff18"
+                    }}
+                    loading="lazy"
+                  />
+                  <div
+                    style={{
+                      fontWeight: 700,
+                      color: PALETTE.blueDark,
+                      fontSize: "1.01em",
+                      marginBottom: 3,
+                      textAlign: "center"
+                    }}
+                    title={prod.title}
+                  >{prod.title.length > 25 ? prod.title.slice(0, 24) + "…" : prod.title}</div>
+                  <div style={{
+                    color: PALETTE.blueAccent,
+                    fontWeight: 600,
+                    fontSize: "0.99em",
+                    marginBottom: 2
+                  }}>
+                    Brand: <span style={{ color: "#236ac2" }}>{prod.brand}</span>
+                  </div>
+                  <div style={{
+                    fontWeight: 600,
+                    color: PALETTE.blueDark,
+                    fontSize: 14.5,
+                    marginBottom: 2
+                  }}>
+                    {prod.currency === "INR" || prod.isLocalIN ? "₹" : "$"}
+                    {prod.price}
+                  </div>
+                  <div style={{
+                    fontSize: 13.1,
+                    color: "#4682e7",
+                    opacity: 0.76,
+                    minHeight: 18,
+                    textAlign: "center",
+                    marginBottom: 0
+                  }}>
+                    {prod.description?.length > 32
+                      ? prod.description.slice(0, 31) + "…"
+                      : prod.description}
+                  </div>
+                  <button
+                    className="btn"
+                    style={{
+                      background: "linear-gradient(91deg, #2050aa 38%, #e7b3ff 100%)",
+                      color: "#fff",
+                      borderRadius: 9,
+                      fontWeight: 700,
+                      fontSize: 13.3,
+                      marginTop: 10,
+                      minWidth: 94,
+                      border: "none",
+                      boxShadow: "0 1px 8px #4682e718",
+                      cursor: "pointer"
+                    }}
+                    tabIndex={-1}
+                  >
+                    See Details
+                  </button>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </motion.section>
+      </MotionWrapper>
+    </div>
+  );
+}
 
 export default Recommendations;
