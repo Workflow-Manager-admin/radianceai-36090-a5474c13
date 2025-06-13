@@ -463,11 +463,11 @@ const RoutineBuilder = () => {
     <section className="container" style={{ maxWidth: 800, margin: "0 auto" }}>
       <AppleFadeTransition>
         <h2 style={{
-          color: "#fadadd", fontWeight: 700, fontSize: "2.0rem", marginTop: 17, marginBottom: 7, textAlign: "center"
+          color: "#2050aa", fontWeight: 700, fontSize: "2.0rem", marginTop: 17, marginBottom: 7, textAlign: "center"
         }}>
           Your Personalized Routines
         </h2>
-        <div style={{ textAlign: "center", color: "#e7b3ff", margin: "0 0 16px 0", fontSize: 17 }}>
+        <div style={{ textAlign: "center", color: "#77a6ed", margin: "0 0 16px 0", fontSize: 17 }}>
           Morning and night routines crafted for your skin, goals, and preferences.
         </div>
         {/* Routine cards */}
@@ -481,13 +481,13 @@ const RoutineBuilder = () => {
           <MotionWrapper>
             <div>
               <div style={{
-                color: "#fadadd", fontWeight: 600, fontSize: "1.25rem", marginBottom: 15,
+                color: "#2050aa", fontWeight: 600, fontSize: "1.25rem", marginBottom: 15,
                 letterSpacing: ".01em", display: "flex", alignItems: "center"
               }}>
                 <span style={{
                   fontSize: 23,
                   marginRight: 5,
-                  filter: "drop-shadow(0 1px 3px #fadadd90)"
+                  filter: "drop-shadow(0 1px 3px #77a6ed80)"
                 }}>🌞</span>Morning Routine
               </div>
               <div>
@@ -510,13 +510,13 @@ const RoutineBuilder = () => {
           <MotionWrapper>
             <div>
               <div style={{
-                color: "#fadadd", fontWeight: 600, fontSize: "1.25rem", marginBottom: 15,
+                color: "#2050aa", fontWeight: 600, fontSize: "1.25rem", marginBottom: 15,
                 letterSpacing: ".01em", display: "flex", alignItems: "center"
               }}>
                 <span style={{
                   fontSize: 23,
                   marginRight: 5,
-                  filter: "drop-shadow(0 1px 3px #fadadd90)"
+                  filter: "drop-shadow(0 1px 3px #77a6ed80)"
                 }}>🌙</span>Night Routine
               </div>
               <div>
@@ -538,12 +538,12 @@ const RoutineBuilder = () => {
         </div>
         <div style={{
           marginTop: 24,
-          color: "#fadadd",
+          color: "#2050aa",
           textAlign: "center",
           fontSize: 15.2,
           opacity: 0.86
         }}>
-          Tap a step to expand. For a new routine, <a href="/quiz" style={{ color: "#f339db", fontWeight: 500 }}>retake the quiz</a>.
+          Tap a step to expand. For a new routine, <a href="/quiz" style={{ color: "#33aaff", fontWeight: 500 }}>retake the quiz</a>.
         </div>
       </AppleFadeTransition>
       <AnimatePresence>
@@ -560,12 +560,12 @@ const RoutineBuilder = () => {
               top: 0,
               right: 0,
               bottom: 0,
-              background: "rgba(23,9,87,0.87)",
+              background: "rgba(32,80,170,0.92)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               fontSize: 26,
-              color: "#fadadd",
+              color: "#fff",
               fontWeight: 600,
               pointerEvents: "all",
             }}
