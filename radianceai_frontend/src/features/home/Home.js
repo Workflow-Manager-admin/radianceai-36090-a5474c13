@@ -3,6 +3,10 @@ import Quiz from '../quiz/Quiz';
 import ProductList from '../products/ProductList';
 import { AppleFadeTransition, MotionWrapper } from '../../utils/animation';
 
+/**
+ * Renders the animated hero section at the top of the homepage.
+ * Includes a call-to-action and anchor to the quiz section.
+ */
 function HeroSection() {
   // Apple-like hero banner with CTA
   return (
@@ -64,6 +68,9 @@ function HeroSection() {
   );
 }
 
+/**
+ * An animated progress bar UI below the hero, reminiscent of Apple-style web progress.
+ */
 function AnimatedProgressBar() {
   // Simulated animated progress bar UI (Apple-like)
   return (
@@ -102,10 +109,13 @@ function AnimatedProgressBar() {
   );
 }
 
-// Main Home Page
 // PUBLIC_INTERFACE
+/**
+ * The Home page for RadianceAI – GlowSkin.
+ * Preserves all UX sections: hero, animated progress, Quiz below the fold, and ProductList in its correct showcase area only.
+ */
 export default function Home() {
-  // All homepage UX sections, preserving hero, quiz (below the fold), animated progress, and product area
+  // All homepage UX sections
   return (
     <MotionWrapper>
       <section>
@@ -120,7 +130,7 @@ export default function Home() {
         </AppleFadeTransition>
       </section>
 
-      {/* Product showcase area */}
+      {/* Product showcase area: ONLY for ProductList */}
       <section style={{
         margin: '60px auto 10px auto',
         maxWidth: 1240,
