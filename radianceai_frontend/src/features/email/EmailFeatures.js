@@ -158,7 +158,7 @@ const EmailFeatures = () => {
     <section className="container" style={{ maxWidth: 440, margin: "0 auto", paddingTop: 25 }}>
       <AppleFadeTransition>
         <h2 style={{
-          color: "#fadadd",
+          color: "#2050aa",
           textAlign: "center",
           fontWeight: 700,
           fontSize: "1.38rem",
@@ -171,8 +171,8 @@ const EmailFeatures = () => {
         {configIncomplete && isAdmin && (
           <MotionWrapper>
             <div style={{
-              background: "#1c3b65",
-              color: "#93c7ff",
+              background: "#e8f0fd",
+              color: "#2050aa",
               borderRadius: 11,
               fontWeight: 600,
               fontSize: 15,
@@ -180,19 +180,19 @@ const EmailFeatures = () => {
               padding: "14px",
               marginBottom: 18,
               marginTop: 7,
-              boxShadow: "0 1.5px 10px #266fd630"
+              boxShadow: "0 1.5px 10px #a2c5e830"
             }}>
               {configDiagnosticMsg.split('\n').map((txt, idx) => (
-                <div key={idx} style={idx === 0 ? { color: "#3aa1ff", fontWeight: 700, fontSize: 16 } : undefined}>{txt}</div>
+                <div key={idx} style={idx === 0 ? { color: "#2050aa", fontWeight: 700, fontSize: 16 } : undefined}>{txt}</div>
               ))}
-              <div style={{marginTop:10, whiteSpace:"pre-line", color: "#bfd7ef", fontWeight: 500, fontSize: 14.5 }}>
+              <div style={{marginTop:10, whiteSpace:"pre-line", color: "#497be6", fontWeight: 500, fontSize: 14.5 }}>
                 To configure, set .env in <b>radianceai_frontend/</b> (see EmailJS docs).<br />
-                <a href="https://dashboard.emailjs.com/" target="_blank" rel="noopener noreferrer" style={{ color: "#358fff", fontWeight: 700, textDecoration: "underline", marginTop: 8, display: "inline-block" }}>EmailJS Dashboard →</a>
+                <a href="https://dashboard.emailjs.com/" target="_blank" rel="noopener noreferrer" style={{ color: "#2a79e7", fontWeight: 700, textDecoration: "underline", marginTop: 8, display: "inline-block" }}>EmailJS Dashboard →</a>
               </div>
             </div>
           </MotionWrapper>
         )}
-        <div style={{ color: "#e7b3ff", textAlign: "center", fontSize: 16, marginBottom: 17 }}>
+        <div style={{ color: "#3878e6", textAlign: "center", fontSize: 16, marginBottom: 17 }}>
           Opt in to receive skincare reminders and your routine summary. No spam. Cancel anytime.
         </div>
         {/* Show opt-in/out/send forms ONLY if config is valid or is admin (so admin/dev can test even if not configured) */}
@@ -200,14 +200,14 @@ const EmailFeatures = () => {
           <MotionWrapper>
             {!optedIn ? (
               <form style={{
-                background: "rgba(250,218,221,0.09)",
+                background: "rgba(32,80,170,0.07)",
                 borderRadius: 16,
                 padding: "23px 19px 17px 19px",
-                boxShadow: "0 2px 13px #fadadd22",
+                boxShadow: "0 2px 13px #77a6ed22",
                 marginBottom: 14
               }} onSubmit={handleOptIn} autoComplete="on">
                 <div style={{marginBottom:18}}>
-                  <label style={{ color: "#fadadd", fontWeight: 700 }}>
+                  <label style={{ color: "#2050aa", fontWeight: 700 }}>
                     Name:
                     <input
                       style={{
@@ -219,8 +219,8 @@ const EmailFeatures = () => {
                         border: "none",
                         padding: "7px 12px",
                         width: "100%",
-                        background: "#e7b3ff18",
-                        color: "#fff"
+                        background: "#dde9ff18",
+                        color: "#2050aa"
                       }}
                       type="text"
                       value={name}
@@ -229,7 +229,7 @@ const EmailFeatures = () => {
                       autoComplete="name"
                     />
                   </label>
-                  <label style={{ color: "#fadadd", fontWeight: 700 }}>
+                  <label style={{ color: "#2050aa", fontWeight: 700 }}>
                     Email:
                     <input
                       style={{
@@ -241,8 +241,8 @@ const EmailFeatures = () => {
                         border: "none",
                         padding: "7px 12px",
                         width: "100%",
-                        background: "#e7b3ff18",
-                        color: "#fff"
+                        background: "#dde9ff18",
+                        color: "#2050aa"
                       }}
                       type="email"
                       value={email}
@@ -257,8 +257,8 @@ const EmailFeatures = () => {
                   width: "100%",
                   fontWeight: 700,
                   fontSize: "1.09rem",
-                  background: "linear-gradient(90deg, #fadadd 60%, #e7b3ff 100%)",
-                  color: "#23155f",
+                  background: "linear-gradient(90deg, #2050aa 60%, #77a6ed 100%)",
+                  color: "#fff",
                   borderRadius: 13,
                   marginTop: 2
                 }} type="submit">
@@ -267,25 +267,25 @@ const EmailFeatures = () => {
               </form>
             ) : (
               <div style={{
-                background: "rgba(250,218,221,0.08)",
+                background: "rgba(32,80,170,0.06)",
                 borderRadius: 15,
                 padding: "20px",
                 marginBottom: 14
               }}>
-                <div style={{ color: "#fadadd", fontWeight: 600, marginBottom: 12 }}>
+                <div style={{ color: "#2050aa", fontWeight: 600, marginBottom: 12 }}>
                   <span>
                     {name && <span>{name}, </span>}
                     you're opted in for:
                   </span>
-                  <ul style={{ color: "#e7b3ff", fontWeight: 400, marginTop: 8, fontSize: "1.06em" }}>
+                  <ul style={{ color: "#3878e6", fontWeight: 400, marginTop: 8, fontSize: "1.06em" }}>
                     <li>• Routine reminders</li>
                     <li>• Routine summary</li>
                   </ul>
                 </div>
                 <button className="btn"
                   style={{
-                    background: "rgba(234, 179, 255, 0.17)",
-                    color: "#fadadd",
+                    background: "rgba(119,166,237,0.16)",
+                    color: "#2050aa",
                     fontWeight: 500,
                     borderRadius: 9,
                     marginBottom: 4
@@ -299,7 +299,7 @@ const EmailFeatures = () => {
         {optedIn && (!configIncomplete || isAdmin) && (
           <MotionWrapper>
             <form onSubmit={handleSend} style={{ marginTop: 7 }}>
-              <label style={{ color: "#e7b3ff", fontWeight: 500 }}>Test type:
+              <label style={{ color: "#3878e6", fontWeight: 500 }}>Test type:
                 <select
                   value={sendType}
                   onChange={e => setSendType(e.target.value)}
@@ -309,8 +309,8 @@ const EmailFeatures = () => {
                     border: "none",
                     padding: "5px 10px",
                     fontWeight: 500,
-                    background: "#e7b3ff34",
-                    color: "#27174e"
+                    background: "#dde9ff34",
+                    color: "#2050aa"
                   }}
                 >
                   <option value="reminder">Routine Reminder</option>
@@ -321,8 +321,8 @@ const EmailFeatures = () => {
                 type="submit"
                 style={{
                   marginLeft: 14,
-                  background: "linear-gradient(90deg, #fadadd 60%, #e7b3ff 100%)",
-                  color: "#23155f",
+                  background: "linear-gradient(90deg, #2050aa 60%, #77a6ed 100%)",
+                  color: "#fff",
                   borderRadius: 13,
                   fontWeight: 700,
                   fontSize: "1.01rem",
@@ -337,7 +337,7 @@ const EmailFeatures = () => {
         )}
 
         <div style={{
-          color: "#e7b3ff",
+          color: "#3878e6",
           opacity: 0.82,
           fontSize: 13.7,
           margin: "25px 0 0 0",
@@ -351,8 +351,8 @@ const EmailFeatures = () => {
             <div style={{
               marginTop: 14,
               textAlign: "center",
-              color: result.startsWith("Email sent") || result.startsWith("Opt-in") ? "#fadadd" : "#f339db",
-              background: "rgba(234,179,255,0.16)",
+              color: result.startsWith("Email sent") || result.startsWith("Opt-in") ? "#33aaff" : "#f44336",
+              background: "rgba(119,166,237,0.13)",
               borderRadius: 9,
               padding: "7px 0",
               fontWeight: 600

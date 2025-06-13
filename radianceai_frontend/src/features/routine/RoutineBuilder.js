@@ -139,15 +139,15 @@ function AnimatedProductCard({ step, product, expanded, onToggle }) {
       style={{
         marginBottom: 18,
         background:
-          "linear-gradient(101deg,#1c1850bb 10%,#fadadd10 100%)",
+          "linear-gradient(101deg,#1c1850bb 10%,#77a6ed14 100%)",
         borderRadius: 19,
         padding: expanded ? "28px 24px" : "17px 18px",
         boxShadow: expanded
-          ? "0 4px 18px 0 #fadadd62"
-          : "0 1.5px 7px 0 #fadadd1b",
+          ? "0 4px 18px 0 #77a6ed33"
+          : "0 1.5px 7px 0 #2050aa13",
         border: step.isPrimary
-          ? "2.2px solid #fadadd"
-          : "1.5px solid #fadadd29",
+          ? "2.2px solid #2050aa"
+          : "1.5px solid #77a6ed55",
         display: "flex",
         flexDirection: "column",
         alignItems: "flex-start",
@@ -165,7 +165,7 @@ function AnimatedProductCard({ step, product, expanded, onToggle }) {
           style={{
             fontSize: 27,
             marginRight: 3,
-            filter: "drop-shadow(0 0 2px #fadadd7c)",
+            filter: "drop-shadow(0 0 2px #77a6ed99)",
           }}
         >
           {step.icon}
@@ -174,7 +174,7 @@ function AnimatedProductCard({ step, product, expanded, onToggle }) {
           <div
             style={{
               fontWeight: 700,
-              color: "#fadadd",
+              color: "#2050aa",
               fontSize: 19,
               marginBottom: 2,
             }}
@@ -183,8 +183,8 @@ function AnimatedProductCard({ step, product, expanded, onToggle }) {
             {step.isPrimary && (
               <span
                 style={{
-                  background: "#fadadd",
-                  color: "#27174e",
+                  background: "#77a6ed",
+                  color: "#fff",
                   fontWeight: 600,
                   borderRadius: 8,
                   fontSize: 12.5,
@@ -201,7 +201,7 @@ function AnimatedProductCard({ step, product, expanded, onToggle }) {
           </div>
           <div
             style={{
-              color: "#e7b3ff",
+              color: "#3878e6",
               opacity: 0.94,
               fontWeight: 500,
               fontSize: 14.2,
@@ -239,7 +239,7 @@ function AnimatedProductCard({ step, product, expanded, onToggle }) {
                   width: 90,
                   height: 90,
                   borderRadius: 13,
-                  boxShadow: "0 2px 12px #fadadd39",
+                  boxShadow: "0 2px 12px #77a6ed44",
                   background: "#fff",
                   objectFit: "cover",
                   marginRight: 0,
@@ -249,7 +249,7 @@ function AnimatedProductCard({ step, product, expanded, onToggle }) {
                 <div
                   style={{
                     fontWeight: 600,
-                    color: "#fadadd",
+                    color: "#2050aa",
                     fontSize: 16.9,
                     marginBottom: 2,
                   }}
@@ -259,21 +259,21 @@ function AnimatedProductCard({ step, product, expanded, onToggle }) {
                 </div>
                 <div
                   style={{
-                    color: "#f339db",
+                    color: "#3878e6",
                     fontWeight: 500,
                     fontSize: 14.7,
                   }}
                 >
                   Brand: {product.brand}
                 </div>
-                <div style={{color: "#e7b3ff", fontSize: 13.8, margin: "3px 0 2px 0"}}>
-                  Price: <span style={{color:'#fadadd', fontWeight:600}}>
+                <div style={{color: "#77a6ed", fontSize: 13.8, margin: "3px 0 2px 0"}}>
+                  Price: <span style={{color:'#2050aa', fontWeight:600}}>
                     {product.currency === "INR" || product.isLocalIN ? "₹" : "$"}
                     {product.price}
                   </span>
-                  <span style={{marginLeft:7, color:"#fadadd"}}>Rating: ★ {product.rating}</span>
+                  <span style={{marginLeft:7, color:"#2050aa"}}>Rating: ★ {product.rating}</span>
                   {product.isLocalIN && (
-                    <span style={{ color: "#f339db", fontSize: 11, marginLeft: 7 }}>
+                    <span style={{ color: "#2050aa", fontSize: 11, marginLeft: 7 }}>
                       India
                     </span>
                   )}
@@ -292,7 +292,7 @@ function AnimatedProductCard({ step, product, expanded, onToggle }) {
                       display: "inline-block",
                       marginTop: 8,
                       color: "#fff",
-                      background: "linear-gradient(92deg, #f339db 60%, #e7b3ff 100%)",
+                      background: "linear-gradient(92deg, #2050aa 55%, #77a6ed 100%)",
                       borderRadius: 7,
                       fontSize: 12.8,
                       padding: "6px 15px",
@@ -308,7 +308,7 @@ function AnimatedProductCard({ step, product, expanded, onToggle }) {
             <div
               style={{
                 marginTop: 13,
-                color: "#fadadd",
+                color: "#2050aa",
                 fontWeight: 500,
                 fontSize: 13.1,
                 letterSpacing: ".01em",
@@ -440,14 +440,14 @@ const RoutineBuilder = () => {
     return (
       <section className="container" style={{ minHeight: 433, textAlign: "center", paddingTop: 25 }}>
         <AppleFadeTransition>
-          <h2 style={{ color: "#fadadd" }}>Build Your Skincare Routine</h2>
-          <p style={{ color: "#e7b3ff", margin: "14px 0 30px 0", fontSize: 18 }}>
-            Please complete the <a href="/quiz" style={{ color: "#f339db", fontWeight: 600 }}>personalized quiz</a> to generate your custom morning and night routines.
+          <h2 style={{ color: "#2050aa" }}>Build Your Skincare Routine</h2>
+          <p style={{ color: "#3878e6", margin: "14px 0 30px 0", fontSize: 18 }}>
+            Please complete the <a href="/quiz" style={{ color: "#2050aa", fontWeight: 600 }}>personalized quiz</a> to generate your custom morning and night routines.
           </p>
           <a href="/quiz">
             <button className="btn btn-large" style={{
-              background: "linear-gradient(90deg,#fadadd 60%,#e7b3ff 100%)",
-              color: "#27275e", borderRadius: 15,
+              background: "linear-gradient(90deg,#2050aa 60%,#77a6ed 100%)",
+              color: "#fff", borderRadius: 15,
               fontWeight: 700, fontSize: "1.12rem"
             }}>
               Start Quiz
