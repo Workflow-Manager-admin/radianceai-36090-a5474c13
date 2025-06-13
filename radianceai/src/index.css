@@ -1,0 +1,7 @@
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background: #FADADD; /* Project's 'primary' color */
+  font-family: "Inter", "Segoe UI", Arial, sans-serif;
+}
