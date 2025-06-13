@@ -1,5 +1,13 @@
 # Lightweight React Template for KAVIA
 
+> NOTE: All required entry files for React must exist in `radianceai_frontend/src` and `radianceai_frontend/public`:
+> - src/index.js
+> - src/App.js
+> - src/index.css
+> - public/index.html
+
+This project structure has been checked and these files are present/created as needed.
+
 ## EmailJS Setup — **No Placeholders Allowed (REQUIRED)**
 
 RadianceAI’s email features (reminders, summaries, admin notifications) require **real** EmailJS credentials set as environment variables in `radianceai_frontend/.env` or your deployment config. **Only environment variables are accepted**—hardcoded/demo/placeholder keys are strictly rejected.
