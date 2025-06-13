@@ -37,7 +37,18 @@ export async function fetchRecommendedProducts({
   let products = [];
   try {
     const resp = await fetch(url, { headers });
-    if (!resp.ok) throw new Error(`Supabase fetch failed: ${resp.status}`);
+    if (!resp.ok) {
+      // More verbose error logging for devs (helps diagnose 502)
+      if (typeof window !== "undefined" && window.console) {
+        window.console.error(
+          "[Supabase fetch] Error:",
+          resp.status,
+          resp.statusText,
+          "URL:", url
+        );
+      }
+      throw new Error(`Supabase fetch failed: ${resp.status}`);
+    }
     products = await resp.json();
 
     // Harmonize with local usage
@@ -48,7 +59,10 @@ export async function fetchRecommendedProducts({
 
   } catch (e) {
     products = [];
-    // Optionally: log error for developers
+    // Log error in console for debug
+    if (typeof window !== "undefined" && window.console) {
+      window.console.error("[Supabase] fetch error:", e && e.message, e);
+    }
   }
 
   // Optional deduplicate by title/brand
