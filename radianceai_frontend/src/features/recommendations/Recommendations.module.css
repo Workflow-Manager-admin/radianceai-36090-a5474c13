@@ -1,0 +1,64 @@
+.recommendationsSection {
+  padding: 32px 0 20px 0;
+  margin: 0 auto;
+  max-width: 970px;
+}
+
+.heading {
+  font-size: 2.1rem;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 17px;
+  background: linear-gradient(90deg,#93bafe 50%,#e3f0ff 100%);
+  color: #2a6ae7;
+  border-radius: 13px;
+  padding: 20px 0 14px 0;
+  box-shadow: 0 2.5px 15px #93bafe33;
+}
+
+.recommendationsList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 26px;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.empty {
+  min-height: 63vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.emptyBox {
+  padding: 40px 32px 35px 32px;
+  background: linear-gradient(98deg,#93bafe 62%,#e3f0ff 100%);
+  color: #2a6ae7;
+  border-radius: 19px;
+  border: 3px solid #93bafe;
+  box-shadow: 0 4px 25px #93bafe55;
+  max-width: 380px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.quizBtn {
+  margin-top: 9px;
+  background: linear-gradient(92deg, #93bafe 54%, #e3f0ff 110%);
+  color: #2a6ae7;
+  border-radius: 14px;
+  padding: 11px 28px;
+  font-weight: 700;
+  font-size: 1.16em;
+  border: none;
+  box-shadow: 0 1.5px 8px #93bafe41;
+  transition: background 0.17s, color 0.17s, box-shadow 0.19s;
+  cursor: pointer;
+}
+.quizBtn:hover,
+.quizBtn:focus {
+  background: linear-gradient(92deg,#e3f0ff 54%,#93bafe 110%);
+  color: #fff;
+  box-shadow: 0 5px 18px #93bafe77;
+}
