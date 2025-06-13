@@ -16,47 +16,13 @@ import Home from './features/home/Home';
 import { AppleFadeTransition } from "./utils/animation";
 
 /**
- * DEEP UI ANALYSIS NOTES (2024-06-09)
+ * The rest of the file as before.
+ * Main point: Ensure Home.js (homepage) is responsible for structure (hero, quiz modal, navbar already global),
+ * and ProductList is called ONLY in its section (not as full-page route) on home.
  *
- * Examined for high z-index overlays, pointer-events, stacking and animation wrappers.
- * 
- * OVERLAY DEBUGGER: Temporary diagnostic overlay is present (OverlayDebugger): z-index: 99999, pointer-events: none.
- * - Harmless/helpful, does not block interactions. REMOVE when not debugging.
- * 
- * MAIN CONTAINER: <div className="app">
- * - min-height: 100vh; display: flex; flex-direction: column; pointer-events: auto !important (App.css)
- * 
- * MAIN <main> tag:
- * - pointer-events: auto !important (App.css)
- * - Used only for layout/padding, not positioning overlays.
- * 
- * ANIMATION WRAPPERS:
- * - AppleFadeTransition and motion wrappers use pointer-events: auto !important (App.css, utils/animation.js).
- * - Do not create overlays or passive layers with pointer-events: none.
- * 
- * NAVBARS:
- * - .top-navbar: z-index: 101, fixed top, pointer events enabled (App.css)
- * - .bottom-navbar: z-index: 121, fixed bottom, pointer events enabled (App.css)
- * 
- * MODALS/OVERLAYS:
- * - .quiz-modal-overlay: z-index: 4020, pointer-events: auto !important, semi-transparent color.
- *   This overlay only appears when quiz modal is open. It is visible and dismiss interaction is enabled (by pointer-events: auto and opacity).
- * 
- * No invisible overlays or accidental stacking found in App.js or its immediate containers/wrappers.
- * All overlays that appear (modal and debug overlay) have intentional pointer-events and stacking context.
- * 
- * No animation wrappers (AnimatePresence, AppleFadeTransition, motion.div) unexpectedly create overlays that would block clicks.
- * 
- * No unexpected pointer-events: none or high z-index elements in .app, main, navbars, overlay, or AppleFadeTransition.
- * 
- * If UI clicks are blocked: (a) Check for custom modals outside the above, (b) Confirm OverlayDebugger is removed, (c) Inspect .quiz-modal-overlay state and display.
+ * Recommendations/product page/etc. remain routed normally.
  */
-// End UI analysis notes
 
-/**
- * Diagnostic Overlay: Temporarily add a visual overlay with high z-index and pointer-events to aid troubleshooting.
- * Remove/comment this component out after confirming/solving UI blocking bugs.
- */
 const OverlayDebugger = () => {
   useEffect(() => {
     const overlay = document.createElement('div');
@@ -78,56 +44,102 @@ const OverlayDebugger = () => {
   }, []);
   return null;
 };
+
 // PUBLIC_INTERFACE
-// AppRoutes: Handles animated route transitions globally
+// Animated routes for all global pages (homepage = <Home /> for "/")
 function AppRoutes() {
   const location = useLocation();
   return (
     <AnimatePresence mode="wait">
-      {/* This key ensures AnimatePresence triggers on route change */}
       <Routes location={location} key={location.pathname}>
-        <Route path="/"
-          element={<AppleFadeTransition><Home /></AppleFadeTransition>}
+        <Route
+          path="/"
+          element={
+            <AppleFadeTransition>
+              <Home />
+            </AppleFadeTransition>
+          }
         />
-        <Route path="/quiz"
-          element={<AppleFadeTransition><Quiz /></AppleFadeTransition>}
+        <Route
+          path="/quiz"
+          element={
+            <AppleFadeTransition>
+              <Quiz />
+            </AppleFadeTransition>
+          }
         />
-        <Route path="/recommendations"
-          element={<AppleFadeTransition><Recommendations /></AppleFadeTransition>}
+        <Route
+          path="/recommendations"
+          element={
+            <AppleFadeTransition>
+              <Recommendations />
+            </AppleFadeTransition>
+          }
         />
-        <Route path="/routine"
-          element={<AppleFadeTransition><RoutineBuilder /></AppleFadeTransition>}
+        <Route
+          path="/routine"
+          element={
+            <AppleFadeTransition>
+              <RoutineBuilder />
+            </AppleFadeTransition>
+          }
         />
-        <Route path="/products"
-          element={<AppleFadeTransition><ProductList /></AppleFadeTransition>}
+        <Route
+          path="/products"
+          element={
+            <AppleFadeTransition>
+              <ProductList />
+            </AppleFadeTransition>
+          }
         />
-        <Route path="/progress"
-          element={<AppleFadeTransition><ProgressTracker /></AppleFadeTransition>}
+        <Route
+          path="/progress"
+          element={
+            <AppleFadeTransition>
+              <ProgressTracker />
+            </AppleFadeTransition>
+          }
         />
-        <Route path="/weather"
-          element={<AppleFadeTransition><WeatherSuggestions /></AppleFadeTransition>}
+        <Route
+          path="/weather"
+          element={
+            <AppleFadeTransition>
+              <WeatherSuggestions />
+            </AppleFadeTransition>
+          }
         />
-        <Route path="/email"
-          element={<AppleFadeTransition><EmailFeatures /></AppleFadeTransition>}
+        <Route
+          path="/email"
+          element={
+            <AppleFadeTransition>
+              <EmailFeatures />
+            </AppleFadeTransition>
+          }
         />
-        <Route path="/geolocation"
-          element={<AppleFadeTransition><Geolocation /></AppleFadeTransition>}
+        <Route
+          path="/geolocation"
+          element={
+            <AppleFadeTransition>
+              <Geolocation />
+            </AppleFadeTransition>
+          }
         />
-        <Route path="/chat"
-          element={<AppleFadeTransition><Chatbot /></AppleFadeTransition>}
+        <Route
+          path="/chat"
+          element={
+            <AppleFadeTransition>
+              <Chatbot />
+            </AppleFadeTransition>
+          }
         />
-        <Route path="*"
-          element={<Navigate to="/" replace />}
-        />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </AnimatePresence>
   );
 }
 
 // PUBLIC_INTERFACE
-// Main skeleton with persistent animated Apple-like top nav
 function App() {
-  // DEBUG: Temporarily mount z-index overlay visual checker to assist troubleshooting
   return (
     <Router>
       <div className="app">
@@ -137,7 +149,6 @@ function App() {
           style={{
             paddingTop: 70,
             minHeight: "calc(100vh - 70px)",
-            /* Inherit the gray gradient – ensures no solid/white bg on main region */
             background: "var(--gradient-gray-bg)",
             transition: "padding-bottom 0.25s cubic-bezier(.27,1.36,.48,1), background 0.7s cubic-bezier(.45,1.45,.48,1)",
             willChange: "padding-bottom, background",
@@ -145,7 +156,6 @@ function App() {
         >
           <AppRoutes />
         </main>
-        {/* BottomNavBar removed */}
       </div>
     </Router>
   );

@@ -1,223 +1,276 @@
-import React from "react";
-import useProducts from "../../hooks/useProducts";
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import Quiz from "../quiz/Quiz";
+import ProductList from "../products/ProductList";
 import { AppleFadeTransition, MotionWrapper } from "../../utils/animation";
 
-// Palette: use brand-approved blues, white, and creamy/neutral backgrounds
-const palette = {
-  blueDark: "#2050aa",
-  blueLight: "#77a6ed",
-  white: "#fff",
-  creamyWhite: "#FFF8EB",
-  cardBorder: "#eaf5ff",
-  cardShadow: "0 2px 16px #bcdcfd33"
-};
-
 /**
- * PUBLIC_INTERFACE
- * Home: Fetches and displays products in a responsive, modern grid.
- * Products pulled via Supabase API and rendered as visually appealing cards.
+ * Home: "GlowSkin" hero, quiz CTA, hero copy, and embedded ProductList
+ * - Retains hero/jumbotron, call-to-action, palette-compliant styling
+ * - Quiz launches in a modal
+ * - ProductList (Supabase-driven) appears in 'Best Sellers' section
+ * - All other content/layout/animation from original and requirements is preserved
  */
+
+const HERO_BG =
+  "linear-gradient(107deg, #eaf5ff 65%, #fff8eb 100%)";
+
+const SUBTEXT =
+  "Personalized skincare routines powered by AI, science, and the best-selling products.";
+
 function Home() {
-  const { recommended: products, loading } = useProducts({
-    sortBy: "rating", limit: 12, deduplicate: true
-  });
-  
+  const [quizOpen, setQuizOpen] = useState(false);
+
+  // Animation variants for hero
+  const heroVariants = {
+    hidden: { opacity: 0, y: 35, scale: 0.98 },
+    visible: {
+      opacity: 1, y: 0, scale: 1,
+      transition: { delay: 0.05, duration: 0.9, type: "spring", bounce: 0.34 }
+    }
+  };
+
+  // Animation for call-to-action button
+  const ctaMotion = {
+    rest: { scale: 1, boxShadow: "0 1.5px 19px #77a6ed41" },
+    hover: { scale: 1.05, boxShadow: "0 5px 36px #2050aa19" },
+    tap: { scale: 0.98 }
+  };
+
   return (
-    <section className="container" style={{ maxWidth: 1200, margin: "0 auto" }}>
-      <AppleFadeTransition>
-        <h1
-          style={{
-            fontSize: "2.7em",
-            fontWeight: 900,
-            color: palette.blueDark,
-            letterSpacing: "0.005em",
-            margin: "36px 0 14px 0"
-          }}
-          className="title"
-        >
-          Discover Best-Selling Skincare
-        </h1>
+    <div>
+      {/* Hero Section */}
+      <section
+        className="container"
+        style={{
+          background: HERO_BG,
+          borderRadius: 22,
+          margin: "0 auto",
+          marginTop: 12,
+          marginBottom: 44,
+          padding: "36px 18px 29px 18px",
+          boxShadow: "0 4px 32px #abd4fc13",
+          maxWidth: 1020,
+        }}
+      >
+        <MotionWrapper>
+          <motion.div
+            variants={heroVariants}
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            style={{
+              textAlign: "center",
+            }}
+          >
+            <h1
+              style={{
+                fontSize: "2.52rem",
+                fontWeight: 900,
+                letterSpacing: ".01em",
+                color: "#2050aa",
+                marginBottom: 10
+              }}
+            >
+              GlowSkin by RadianceAI
+            </h1>
+            <div
+              className="subtitle"
+              style={{
+                color: "#77a6ed",
+                fontSize: "1.34em",
+                marginBottom: 18,
+                fontWeight: 600,
+              }}
+            >
+              {SUBTEXT}
+            </div>
+
+            {/* Animated hero description */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 0.97, y: 0 }}
+              transition={{ delay: 0.24, duration: 0.8, type: "tween" }}
+              className="description"
+              style={{
+                color: "#2050aa",
+                fontSize: "1.08em",
+                marginBottom: 32,
+                maxWidth: 540,
+                marginLeft: "auto",
+                marginRight: "auto",
+                opacity: 0.92,
+              }}
+            >
+              Discover your perfect morning and night skincare routine.
+              <br />
+              Take our 2‑minute quiz and get verified matches for your skin type, goals, and budget—with AI-powered suggestions and real-time best-seller rankings.
+            </motion.div>
+
+            {/* Quiz Modal Trigger CTA */}
+            <motion.button
+              className="btn btn-large"
+              variants={ctaMotion}
+              initial="rest"
+              whileHover="hover"
+              whileTap="tap"
+              style={{
+                background: "linear-gradient(90deg,#2050aa 62%,#77a6ed 100%)",
+                color: "#fff",
+                borderRadius: 14,
+                fontWeight: 800,
+                fontSize: "1.15em",
+                padding: "15px 38px",
+                marginTop: 12,
+                marginBottom: 7,
+                letterSpacing: ".012em",
+                boxShadow: "0 4px 22px #2050aa18",
+                border: "none",
+                cursor: "pointer"
+              }}
+              onClick={() => setQuizOpen(true)}
+              aria-label="Take the Skincare Quiz"
+            >
+              Take the Quiz
+            </motion.button>
+            <div style={{ color: "#77a6ed", marginTop: 4, fontSize: 15.5 }}>
+              Already took the quiz? <a href="/recommendations" style={{ color: "#2050aa", textDecoration: "underline", fontWeight: 600 }}>See Recommendations</a>
+            </div>
+          </motion.div>
+        </MotionWrapper>
+      </section>
+
+      {/* Quiz Modal */}
+      {quizOpen && (
         <div
+          className="quiz-modal-overlay"
           style={{
-            color: palette.blueLight,
-            fontWeight: 500,
-            fontSize: 18,
-            marginBottom: 28,
-            opacity: 0.95,
+            position: "fixed",
+            top: 0, left: 0, width: "100vw", height: "100vh",
+            background: "rgba(119,166,237,0.19)",
+            zIndex: 4020,
+            pointerEvents: "auto",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center"
           }}
-          className="subtitle"
+          aria-modal="true"
         >
-          Shop the latest and most loved products, handpicked for your glow!
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.98 }}
+            transition={{ duration: 0.28, type: "spring" }}
+            style={{
+              zIndex: 4030,
+              background: "#fafdfe",
+              borderRadius: 19,
+              padding: 0,
+              boxShadow: "0 8px 38px #2050aa14",
+              width: "100%",
+              maxWidth: 560,
+              margin: 10
+            }}
+          >
+            {/* Close button (top right) */}
+            <div style={{ textAlign: "right", padding: 8 }}>
+              <button
+                tabIndex={0}
+                aria-label="Close Quiz"
+                onClick={() => setQuizOpen(false)}
+                style={{
+                  background: "transparent",
+                  color: "#2050aa",
+                  fontWeight: 900,
+                  fontSize: 23,
+                  border: "none",
+                  cursor: "pointer"
+                }}
+              >
+                ×
+              </button>
+            </div>
+            <AppleFadeTransition>
+              <Quiz />
+            </AppleFadeTransition>
+          </motion.div>
         </div>
+      )}
+
+      {/* Section: Best Sellers / ProductList */}
+      <section
+        className="container"
+        style={{
+          margin: "0 auto",
+          marginBottom: 42,
+          maxWidth: 1200,
+          background: "#fff",
+          borderRadius: 19,
+          boxShadow: "0 2px 16px #dde9ff38",
+          padding: "32px 7px 34px 7px"
+        }}
+      >
+        <MotionWrapper>
+          <h2
+            className="title"
+            style={{
+              textAlign: "center",
+              fontSize: "2.0rem",
+              fontWeight: 800,
+              color: "#2050aa",
+              margin: "2px 0 19px 0",
+              letterSpacing: ".01em"
+            }}
+          >
+            Trending & Best-Selling Products
+          </h2>
+          <div
+            className="subtitle"
+            style={{
+              color: "#77a6ed",
+              textAlign: "center",
+              fontWeight: 500,
+              fontSize: "1.19rem",
+              marginBottom: 28
+            }}
+          >
+            Top-rated and most-loved items, updated live from our Supabase database.
+          </div>
+          {/* The actual product list (Supabase-powered) */}
+          <div style={{ margin: "0 auto", maxWidth: 1050 }}>
+            <ProductList />
+          </div>
+        </MotionWrapper>
+      </section>
+
+      {/* Additional animated/structured UI section could be placed here */}
+      <section
+        className="container"
+        style={{
+          maxWidth: 1020,
+          margin: "0 auto",
+          marginBottom: 24,
+          textAlign: "center"
+        }}
+      >
         <MotionWrapper>
           <div
             style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-              gap: 31,
-              marginTop: 20,
-              marginBottom: 35,
-              alignItems: "stretch",
+              color: "#2050aa",
+              fontSize: "1.07rem",
+              background: "linear-gradient(98deg,#eaf5ff 80%,#fff8eb 100%)",
+              padding: "15px 12px",
+              borderRadius: 14,
+              boxShadow: "0 1.7px 10px #abd4fc15",
+              marginTop: 0,
+              marginBottom: 0,
             }}
           >
-            {loading ? (
-              Array.from({ length: 6 }).map((_, i) => (
-                <div
-                  key={i}
-                  style={{
-                    height: 340,
-                    borderRadius: 18,
-                    background: "linear-gradient(92deg, #eaf5ff 60%, #c1dbff 100%)",
-                    boxShadow: palette.cardShadow,
-                    opacity: 0.36,
-                  }}
-                />
-              ))
-            ) : !products.length ? (
-              <div style={{
-                gridColumn: "1/-1",
-                color: palette.blueDark,
-                background: "#eaf5ffb8",
-                borderRadius: 15,
-                textAlign: "center",
-                padding: "48px 15px 44px 15px",
-                fontWeight: 600,
-                fontSize: "1.25em",
-                boxShadow: palette.cardShadow,
-              }}>
-                No products found. Please try again later.
-              </div>
-            ) : (
-              products.map((prod) => (
-                <HomeProductCard key={prod.id || prod.title} product={prod} />
-              ))
-            )}
+            <strong>GlowSkin</strong> uses AI and dermatologist-backed algorithms to match you with the ideal products. <br />
+            Save your personalized routine, track your progress, and receive recommendations tailored to the weather in your region!
           </div>
         </MotionWrapper>
-      </AppleFadeTransition>
-    </section>
-  );
-}
-
-/** 
- * Product card for Home. Displays image, title, brand, price, short info.
- */
-function HomeProductCard({ product }) {
-  // Fallback text/image if missing
-  const imageUrl = product.image || "https://placehold.co/320x320/eee/222?text=No+Image";
-  const title = product.title || "Untitled";
-  const brand = product.brand || "";
-  const price = typeof product.price === "number" ? `₹${product.price}` : (product.price || "");
-  const rating = typeof product.rating === "number" ? product.rating.toFixed(1) : "";
-  const description = product.description || product.info || "";
-
-  // Filter short description
-  const shortDesc = (description.length > 92)
-    ? description.slice(0, 89).trim() + "..."
-    : description;
-
-  return (
-    <div
-      style={{
-        background: "linear-gradient(99deg, #fff 75%, #eaf5ff 100%)",
-        borderRadius: 18,
-        border: `2.5px solid ${palette.cardBorder}`,
-        boxShadow: palette.cardShadow,
-        padding: "17px 14px 22px 14px",
-        minHeight: 290,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        cursor: "pointer",
-        transition: "box-shadow 0.18s",
-        userSelect: "none",
-      }}
-      tabIndex={0}
-      aria-label={`Product card: ${title}`}
-    >
-      <div
-        style={{
-          width: 115,
-          height: 115,
-          borderRadius: 13,
-          overflow: "hidden",
-          marginBottom: 13,
-          boxShadow: "0 2.5px 11px #bcdcfd33",
-          background: "#eaf5ff",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <img
-          src={imageUrl}
-          alt={title}
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            borderRadius: 10,
-            display: imageUrl === "" ? "none" : "block"
-          }}
-          loading="lazy"
-        />
-      </div>
-      <div
-        style={{
-          fontWeight: 700,
-          fontSize: "1.13em",
-          color: palette.blueDark,
-          textAlign: "center",
-        }}
-      >
-        {title}
-      </div>
-      <div
-        style={{
-          color: palette.blueLight,
-          margin: "2.5px 0 3px 0",
-          fontSize: 15.5,
-          fontWeight: 600
-        }}
-      >
-        {brand}
-      </div>
-      <div
-        style={{
-          fontWeight: 600,
-          color: "#1663b7",
-          fontSize: 16.5,
-          margin: "5px 0",
-        }}
-      >
-        {price}
-        {rating && (
-          <span style={{
-            marginLeft: 10,
-            background: "#f7fbff",
-            borderRadius: 7,
-            fontWeight: 500,
-            fontSize: 14.2,
-            padding: "2px 11px",
-            color: "#2e6ff2",
-            border: "1px solid #bcdcfd88"
-          }}>
-            ★ {rating}
-          </span>
-        )}
-      </div>
-      <div
-        style={{
-          color: "#417ddc",
-          opacity: 0.82,
-          fontSize: 14.9,
-          margin: "6px 0 0 0",
-          minHeight: 39,
-          textAlign: "center",
-        }}
-      >
-        {shortDesc}
-      </div>
+      </section>
     </div>
   );
 }
