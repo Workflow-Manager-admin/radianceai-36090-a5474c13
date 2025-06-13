@@ -48,7 +48,7 @@ img {
   max-width: 100%;
   display: block;
   border-radius: 14px;
-  box-shadow: 0 2.5px 11px #fadadd19;
+  box-shadow: 0 2.5px 11px #a5beee19;
   transition: box-shadow 0.18s, border-radius 0.14s;
 }
 
