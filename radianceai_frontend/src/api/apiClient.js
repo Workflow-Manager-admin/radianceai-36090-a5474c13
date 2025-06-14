@@ -7,7 +7,7 @@
   */
 
 // Supabase config — provided in task context
-const SUPABASE_URL = "https://mwynbysbqrjrkmjptpcr.supabase.co/rest/v1";
+const SUPABASE_URL = "https://mwynbysbqrjrkmjptpcr.supabase.co/rest/v1/products";
 const SUPABASE_API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im13eW5ieXNicXJqcmttanB0cGNyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk3NzA5MzMsImV4cCI6MjA2NTM0NjkzM30.x01aA5UU_xkxBAEf3Q7XLRb-6o5BkwZl_tWYdISGDbo";
 const SUPABASE_PRODUCTS_TABLE = "products"; // Assumed table name for products
 

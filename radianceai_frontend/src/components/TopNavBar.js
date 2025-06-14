@@ -42,7 +42,7 @@ const TopNavBar = () => {
     >
       <div className="navbar-container" style={{ width: "100%", maxWidth: 1200, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 16px" }}>
         <span className="navbar-brand" style={{ fontFamily: "inherit", fontWeight: 700, fontSize: 22, color: "var(--kavia-orange, #E87A41)", letterSpacing: 1, marginRight: 20 }}>
-          RadianceAI
+          GlowSkin
         </span>
         <ul
           className="navbar-links"
