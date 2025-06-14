@@ -144,11 +144,12 @@ function App() {
     <Router>
       <div className="app">
         <OverlayDebugger />
+        {/* TopNavBar is always visible and fixed at top */}
         <TopNavBar />
         <main
           style={{
-            paddingTop: 70,
-            minHeight: "calc(100vh - 70px)",
+            paddingTop: 75, // Slightly increased if navbar gains border/shadow or dev needs
+            minHeight: "calc(100vh - 75px)",
             background: "var(--gradient-gray-bg)",
             transition: "padding-bottom 0.25s cubic-bezier(.27,1.36,.48,1), background 0.7s cubic-bezier(.45,1.45,.48,1)",
             willChange: "padding-bottom, background",
