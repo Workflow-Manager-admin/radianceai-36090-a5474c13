@@ -14,10 +14,6 @@ const palette = {
   error: "#e43c46"
 };
 
-// Your Supabase info here:
-const SUPABASE_PROJECT_REF = "your-project-ref"; // e.g. abcdefghijklmno
-const SUPABASE_BUCKET_NAME = "your-bucket-name"; // e.g. public-images
-
 /**
  * ProductList:
  * Fetches and displays products from Supabase for homepage showcase.
@@ -33,11 +29,10 @@ function ProductList() {
     let cancelled = false;
     setLoading(true);
     setError(null);
-    // Try fetching recommended products
+
     fetchRecommendedProducts()
       .then((res) => {
         if (cancelled) return;
-        // Defensive: If fetchRecommendedProducts returns any error-like object, treat as error
         if (Array.isArray(res)) {
           setProducts(res);
         } else if (res && res.error) {
@@ -164,8 +159,10 @@ function ProductList() {
       }}>
         Shop the most-loved products, powered by GlowSkin’s database.
       </div>
+
       {/* Loading/error/status message area */}
       {statusArea}
+
       {/* Product grid */}
       <div style={{
         display: "grid",
@@ -190,13 +187,17 @@ function ProductList() {
               minHeight: 184,
               cursor: "pointer"
             }}>
+            {/* Product Name */}
             <div style={{ fontWeight: 700, color: palette.accent, fontSize: 19, marginBottom: 3 }}>
-              {product.title}
+              {product.name}
             </div>
+
+            {/* Brand ID (replace or improve after joining brands) */}
             <div style={{ color: palette.blueLight, fontWeight: 500, fontSize: 15.2, marginBottom: 4 }}>
-              {product.brand}
+              Brand ID: {product.brand_id}
             </div>
-            {/* Render category and rating if present */}
+
+            {/* Category and rating */}
             <div style={{
               color: palette.blueDark,
               fontSize: 14.1,
@@ -213,10 +214,12 @@ function ProductList() {
                 </span>
               )}
             </div>
-            {product.image && (
+
+            {/* Image */}
+            {product.image_url && (
               <img
-                alt={product.title}
-                src={`https://${SUPABASE_PROJECT_REF}.supabase.co/storage/v1/object/public/${SUPABASE_BUCKET_NAME}/${product.image}`}
+                alt={product.name}
+                src={product.image_url}
                 style={{
                   width: "93%",
                   maxHeight: 110,
@@ -229,6 +232,8 @@ function ProductList() {
                 loading="lazy"
               />
             )}
+
+            {/* Description */}
             <div style={{
               color: "#232b45",
               fontSize: 13.7,
@@ -237,9 +242,16 @@ function ProductList() {
             }}>
               {product.description || ""}
             </div>
-            {product.link && (
+
+            {/* Price */}
+            <div style={{ fontWeight: "bold", fontSize: 16, marginTop: 8 }}>
+              ₹{product.price}
+            </div>
+
+            {/* Link */}
+            {product.official_product_url && (
               <a
-                href={product.link}
+                href={product.official_product_url}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
