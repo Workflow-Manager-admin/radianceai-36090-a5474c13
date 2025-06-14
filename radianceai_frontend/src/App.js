@@ -13,6 +13,7 @@ import EmailFeatures from './features/email/EmailFeatures';
 import Geolocation from './features/geolocation/Geolocation';
 import Chatbot from './features/chatbot/Chatbot';
 import Home from './features/home/Home';
+import AllProducts from './features/products/AllProducts';
 import { AppleFadeTransition } from "./utils/animation";
 
 /**
@@ -89,6 +90,14 @@ function AppRoutes() {
           element={
             <AppleFadeTransition>
               <ProductList />
+            </AppleFadeTransition>
+          }
+        />
+        <Route
+          path="/all-products"
+          element={
+            <AppleFadeTransition>
+              <AllProducts />
             </AppleFadeTransition>
           }
         />
