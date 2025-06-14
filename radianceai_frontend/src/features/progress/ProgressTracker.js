@@ -150,12 +150,12 @@ const ProgressTracker = () => {
     return (
       <section className="container" style={{ minHeight: 340, paddingTop: 33, textAlign: "center" }}>
         <AppleFadeTransition>
-          <h2 style={{ color: "#fadadd" }}>Progress Tracker</h2>
-          <div style={{ color: "#e7b3ff", marginTop: 16, fontSize: 17.5, marginBottom: 26 }}>
+          <h2 style={{ color: "#2050aa" }}>Progress Tracker</h2>
+          <div style={{ color: "#77a6ed", marginTop: 16, fontSize: 17.5, marginBottom: 26 }}>
             Save your personalized routine in the Routine Builder to start tracking progress.
           </div>
           <a href="/routine">
-            <button className="btn btn-large" style={{ background: "linear-gradient(90deg,#fadadd 60%,#e7b3ff 100%)", color: "#27275e", borderRadius: 14, fontWeight: 700, fontSize: "1.1rem" }}>
+            <button className="btn btn-large" style={{ background: "linear-gradient(90deg,#2050aa 60%,#77a6ed 100%)", color: "#fff", borderRadius: 14, fontWeight: 700, fontSize: "1.1rem" }}>
               Go to Routine Builder
             </button>
           </a>

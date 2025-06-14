@@ -10,7 +10,7 @@ import { NavLink } from "react-router-dom";
 const navItems = [
   { label: "Home", path: "/" },
   { label: "Quiz", path: "/quiz" },
-  { label: "Discover", path: "/recommendations" },
+  { label: "Recommendations", path: "/recommendations" },
   { label: "Routine", path: "/routine" },
   { label: "Progress", path: "/progress" },
   { label: "Weather", path: "/weather" },
