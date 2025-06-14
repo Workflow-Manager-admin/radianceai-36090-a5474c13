@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { AppleFadeTransition, MotionWrapper } from "../../utils/animation";
 
@@ -38,8 +39,12 @@ const QUIZ_QUESTIONS = [
   }
 ];
 
+
+
+
 // PUBLIC_INTERFACE
 function Quiz() {
+  const navigate = useNavigate();
   const [answers, setAnswers] = useState({});
   const [step, setStep] = useState(0);
   const [showResults, setShowResults] = useState(false);
@@ -112,12 +117,22 @@ function Quiz() {
                 We recommend a <b>{answers.primaryGoal || "hydration"}</b> routine for <b>{answers.skinType || "normal"}</b> skin.
               </div>
               <div style={{ color: blue, marginTop: 7 }}>
-                <a href="/recommendations"
-                   style={{
-                     color: blueAccent,
-                     textDecoration: "underline",
-                     fontWeight: 700
-                   }}>See Product Recommendations →</a>
+                <div
+                  onClick={() => navigate("/recommendations", { state: { answers } })}
+                  style={{
+                    cursor: "pointer",
+                    color: blueAccent,
+                    textDecoration: "underline",
+                    fontWeight: 700,
+                    display: "inline-block"
+                  }}
+                  tabIndex={0} // for keyboard accessibility
+                  onKeyPress={(e) => {
+                    if (e.key === "Enter") navigate("/recommendations", { state: { answers } });
+                  }}
+                >
+                  See Product Recommendations →
+                </div>
               </div>
             </div>
           </MotionWrapper>
