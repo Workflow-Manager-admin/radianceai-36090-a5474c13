@@ -139,18 +139,44 @@ export default function Home() {
         padding: '32px 15px 48px 15px',
         boxShadow: '0 4px 32px #77a6ed14',
       }}>
-        <h2
-          style={{
-            color: '#2050aa',
-            fontWeight: 900,
-            fontSize: '1.7em',
-            margin: '0 0 19px 0',
-            textAlign: 'center',
-            letterSpacing: '.01em',
-          }}
-        >
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          margin: '0 0 19px 0',
+          flexWrap: 'wrap',
+        }}>
+        <h2 style={{
+          color: '#2050aa',
+          fontWeight: 900,
+          fontSize: '1.7em',
+          margin: 0,
+          letterSpacing: '.01em',
+        }}>
           Best-Selling Skincare Products
-        </h2>
+       </h2>
+
+          <a
+            href="/explore" // 🔁 change this to your actual internal page route
+            style={{
+              textDecoration: 'none',
+              fontSize: '0.95em',
+              fontWeight: 600,
+              color: '#266fd6',
+              background: '#eaf5ff',
+              padding: '8px 14px',
+              borderRadius: 12,
+              border: '1px solid #dde9ff',
+              boxShadow: '0 1px 5px rgba(119, 166, 237, 0.1)',
+              transition: 'background 0.2s ease',
+            }}
+            onMouseOver={(e) => (e.currentTarget.style.background = '#d5e9ff')}
+            onMouseOut={(e) => (e.currentTarget.style.background = '#eaf5ff')}
+          >
+            View All Brands →
+          </a>
+        </div>
+
         <div style={{ maxWidth: 1120, margin: '0 auto' }}>
           {/* ONLY insert ProductList here (Supabase fetch) */}
           <ProductList />
