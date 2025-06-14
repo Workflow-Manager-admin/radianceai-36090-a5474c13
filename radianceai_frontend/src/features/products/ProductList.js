@@ -34,8 +34,11 @@ function ProductList() {
       .then((res) => {
         if (cancelled) return;
         if (Array.isArray(res)) {
-          setProducts(res);
-        } else if (res && res.error) {
+          const shuffled = res.sort(() => 0.5 - Math.random());
+          const selected = shuffled.slice(0, 6);
+          setProducts(selected);
+        }
+        else if (res && res.error) {
           setProducts([]);
           setError({
             message: "Failed to load products: " + (res.error || "Unknown error"),
