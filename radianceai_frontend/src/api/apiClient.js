@@ -25,7 +25,7 @@ export async function fetchRecommendedProducts({
   deduplicate = false,
 } = {}) {
   // Construct Supabase REST endpoint with filters
-  let url = `${SUPABASE_URL}/${SUPABASE_PRODUCTS_TABLE}?select=*&limit=${limit}`;
+  let url = `${SUPABASE_URL}?select=*&limit=${limit}`;
   if (sortBy) url += `&order=${encodeURIComponent(sortBy)}.desc.nullslast`;
   if (typeof minRating === "number") url += `&rating=gte.${encodeURIComponent(minRating)}`;
 
