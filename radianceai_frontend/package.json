@@ -14,10 +14,11 @@
     "preinstall": "npx npm-force-resolutions"
   },
   "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "@supabase/supabase-js": "^2.50.0",
     "emailjs-com": "^3.2.0",
     "framer-motion": "^11.18.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-router": "6.22.3",
     "react-router-dom": "^6.30.1",
     "react-scripts": "^5.0.1",
