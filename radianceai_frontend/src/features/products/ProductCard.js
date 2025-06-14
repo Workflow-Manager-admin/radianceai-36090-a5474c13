@@ -1,32 +1,35 @@
 import React from "react";
 import "./ProductCard.css";
 
-// PUBLIC_INTERFACE
 /**
- * Displays a product's image and essential details in a card layout.
- * @param {Object} product - Product object with image, name, brand, price, etc.
+ * Card showing a skincare product.
+ * Used in product lists and grid views.
+ *
+ * PUBLIC_INTERFACE
+ * @param {object} props - product object, expects at least:
+ *   { id, name, img (or image_url), price, brand, description }
  */
-function ProductCard({ product }) {
+function ProductCard({ name, img, image_url, price, brand, description }) {
+  // Support either 'img' (local/demo) or 'image_url' (from Supabase)
+  const imageSrc = image_url || img;
   return (
-    <div className="product-card">
-      <div className="product-image-wrapper">
-        <img
-          src={product.image || product.image_url || "/no-image.png"}
-          alt={product.name}
-          className="product-image"
-          loading="lazy"
-        />
-      </div>
-      <div className="product-info">
-        <h3 className="product-name">{product.name}</h3>
-        {product.brand && <p className="product-brand">{product.brand}</p>}
-        {product.price && (
-          <p className="product-price">${product.price.toFixed(2)}</p>
-        )}
-        {/* Add more details as needed */}
-        {product.description && (
-          <p className="product-desc">{product.description}</p>
-        )}
+    <div className="product-card" tabIndex={0} aria-label={`Product: ${name}`}>
+      <img
+        src={imageSrc}
+        alt={name}
+        className="product-card-img"
+        style={{ background: "#f5eef7", objectFit: "cover" }}
+        loading="lazy"
+        width={144}
+        height={144}
+      />
+      <div className="product-card-details">
+        <div className="product-card-title">{name}</div>
+        <div className="product-card-brand">
+          <span>{brand}</span>
+        </div>
+        {description && <div className="product-card-desc">{description}</div>}
+        <div className="product-card-price">{price}</div>
       </div>
     </div>
   );

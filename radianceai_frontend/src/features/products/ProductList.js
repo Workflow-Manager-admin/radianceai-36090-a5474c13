@@ -1,50 +1,61 @@
 import React from "react";
-import { useFetchProducts } from "../../hooks/useFetchProducts";
-import ProductCard from "./ProductCard";
 import "./ProductList.css";
+import ProductCard from "./ProductCard";
+import useFetchProducts from "../../hooks/useFetchProducts";
 
-// PUBLIC_INTERFACE
 /**
- * Displays all products fetched from Supabase in a grid layout.
- * Handles loading and error states.
+ * All Products Page at "/products".
+ * Fetches ALL products from Supabase using the shared client
+ * and displays product cards in a responsive grid. Handles loading and error states.
+ *
+ * This is the PUBLIC_INTERFACE for the full products page.
  */
+// PUBLIC_INTERFACE
 function ProductList() {
   const { products, loading, error } = useFetchProducts();
 
   if (loading) {
     return (
-      <div className="productlist-state productlist-loading">
-        <div className="loader" role="status" aria-label="Loading products..." />
-        <p>Loading products...</p>
-      </div>
+      <section className="product-list-section">
+        <div className="products-loading-state" role="status" aria-live="polite">
+          <span className="spinner" /> Loading products...
+        </div>
+      </section>
     );
   }
 
   if (error) {
     return (
-      <div className="productlist-state productlist-error">
-        <p>Failed to load products: <span className="error-text">{error}</span></p>
-      </div>
+      <section className="product-list-section">
+        <div className="products-error-state" role="alert">
+          <span style={{color: "#e04f8b", fontWeight:600}}>Failed to load products:</span>
+          <pre style={{color:"#f339db", margin:0, fontSize:"90%"}}>
+            {typeof error === "string" ? error : (error?.message || "Unknown error")}
+          </pre>
+        </div>
+      </section>
     );
   }
 
-  if (!products.length) {
+  if (!products || products.length === 0) {
     return (
-      <div className="productlist-state">
-        <p>No products found.</p>
-      </div>
+      <section className="product-list-section">
+        <div className="products-empty-state">
+          <p>No products available at the moment.</p>
+        </div>
+      </section>
     );
   }
 
   return (
-    <div className="productlist-container">
-      <h2 className="productlist-title">All Products</h2>
-      <div className="productlist-grid">
+    <section className="product-list-section" aria-labelledby="all-products-heading">
+      <h1 id="all-products-heading" className="products-title">All Products</h1>
+      <div className="product-list-grid">
         {products.map((product) => (
-          <ProductCard key={product.id || product.name} product={product} />
+          <ProductCard key={product.id} {...product} />
         ))}
       </div>
-    </div>
+    </section>
   );
 }
 
