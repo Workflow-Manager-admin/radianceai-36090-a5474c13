@@ -267,13 +267,13 @@ const ProgressTracker = () => {
           <button
             className="btn btn-large"
             style={{
-              background: "linear-gradient(90deg, #fadadd 60%, #e7b3ff 100%)",
+              background: "linear-gradient(90deg, #2050aa 60%, #77a6ed 100%)",
               color: "#27275e",
               fontWeight: 700,
               fontSize: "1.09rem",
               borderRadius: 14
             }}
-            onClick={saveCurrentRoutine}
+            onClick={saveCurrentRoutine} 
           >
             Save My Current Routine Here
           </button>
