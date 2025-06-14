@@ -14,7 +14,10 @@ const palette = {
   error: "#e43c46"
 };
 
-// PUBLIC_INTERFACE
+// Your Supabase info here:
+const SUPABASE_PROJECT_REF = "your-project-ref"; // e.g. abcdefghijklmno
+const SUPABASE_BUCKET_NAME = "your-bucket-name"; // e.g. public-images
+
 /**
  * ProductList:
  * Fetches and displays products from Supabase for homepage showcase.
@@ -213,7 +216,7 @@ function ProductList() {
             {product.image && (
               <img
                 alt={product.title}
-                src={product.image}
+                src={`https://${SUPABASE_PROJECT_REF}.supabase.co/storage/v1/object/public/${SUPABASE_BUCKET_NAME}/${product.image}`}
                 style={{
                   width: "93%",
                   maxHeight: 110,

@@ -41,7 +41,7 @@ const TopNavBar = () => {
       }}
     >
       <div className="navbar-container" style={{ width: "100%", maxWidth: 1200, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 16px" }}>
-        <span className="navbar-brand" style={{ fontFamily: "inherit", fontWeight: 700, fontSize: 22, color: "var(--kavia-orange, #E87A41)", letterSpacing: 1, marginRight: 20 }}>
+        <span className="navbar-brand" style={{ fontFamily: "inherit", fontWeight: 700, fontSize: 22, color: "var(--blueAccent, #2a6ae7)", letterSpacing: 1, marginRight: 20 }}>
           GlowSkin
         </span>
         <ul
@@ -68,9 +68,9 @@ const TopNavBar = () => {
                 aria-label={item.label}
                 style={({ isActive }) => ({
                   textDecoration: "none",
-                  color: isActive ? "var(--kavia-orange, #E87A41)" : "var(--kavia-dark, #1A1A1A)",
+                  color: isActive ? "var(--blue,  #93bafe)" : "var(--kavia-dark, #1A1A1A)",
                   paddingBottom: 3,
-                  borderBottom: isActive ? "2px solid var(--kavia-orange, #E87A41)" : "2px solid transparent",
+                  borderBottom: isActive ? "2px solid var(--blueAccen, #2a6ae7)" : "2px solid transparent",
                   fontWeight: isActive ? 700 : 500,
                   transition: "all 0.2s cubic-bezier(.42,0,1,1.38)",
                   background: "none",

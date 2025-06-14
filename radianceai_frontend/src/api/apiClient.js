@@ -1,10 +1,10 @@
- /*
-  * PRODUCT API CLIENT for RadianceAI – fetches skincare products
-  * — Now powered by Supabase REST API endpoint
-  * 
-  * SECURITY WARNING: Never hardcode API keys in production or public repos!
-  * This is for demo/dev/testing only per instructions.
-  */
+/*
+ * PRODUCT API CLIENT for RadianceAI – fetches skincare products
+ * — Now powered by Supabase REST API endpoint
+ * 
+ * SECURITY WARNING: Never hardcode API keys in production or public repos!
+ * This is for demo/dev/testing only per instructions.
+ */
 
 // Supabase config — provided in task context
 const SUPABASE_URL = "https://mwynbysbqrjrkmjptpcr.supabase.co/rest/v1/products";
@@ -38,7 +38,6 @@ export async function fetchRecommendedProducts({
   try {
     const resp = await fetch(url, { headers });
     if (!resp.ok) {
-      // More verbose error logging for devs (helps diagnose 502)
       if (typeof window !== "undefined" && window.console) {
         window.console.error(
           "[Supabase fetch] Error:",
@@ -51,7 +50,7 @@ export async function fetchRecommendedProducts({
     }
     products = await resp.json();
 
-    // Harmonize with local usage
+    // Harmonize with local usage: add isLocalIN flag for some brands
     products = products.map((p) => ({
       ...p,
       isLocalIN: ["Wow", "Plum", "Minimalist", "DermaCo"].includes(p.brand),
@@ -59,7 +58,6 @@ export async function fetchRecommendedProducts({
 
   } catch (e) {
     products = [];
-    // Log error in console for debug
     if (typeof window !== "undefined" && window.console) {
       window.console.error("[Supabase] fetch error:", e && e.message, e);
     }
@@ -91,7 +89,6 @@ export async function fetchRecommendedProducts({
  * Replace with real weather fetch logic as needed.
  */
 export async function fetchWeather(/* options */) {
-  // Basic placeholder (will always fail)
   return Promise.reject(new Error("fetchWeather is not implemented in this environment."));
 }
 
