@@ -157,7 +157,7 @@ export default function Home() {
        </h2>
 
           <a
-            href="/AllProducts" // 🔁 change this to your actual internal page route
+            href="/allproducts" // 🔁 change this to your actual internal page route
             style={{
               textDecoration: 'none',
               fontSize: '0.95em',
