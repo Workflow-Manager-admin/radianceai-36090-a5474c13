@@ -1,6 +1,7 @@
 import React from "react";
 import "./ProductCard.css";
 
+
 /**
  * Card showing a skincare product.
  * Used in product lists and grid views.
