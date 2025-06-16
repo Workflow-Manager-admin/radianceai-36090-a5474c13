@@ -87,6 +87,18 @@ function TopNavBar() {
           Quiz
         </Link>
         <Link
+          to="/all-products"
+          style={{
+            color: location.pathname === "/all-products" ? "#77a6ed" : "var(--kavia-dark)",
+            fontWeight: location.pathname === "/all-products" ? 700 : 500,
+            opacity: 0.88,
+            textDecoration: "none",
+            transition: "color 0.19s",
+          }}
+        >
+          Products
+        </Link>
+        <Link
           to="/routine"
           style={{
             color: location.pathname === "/routine" ? "#77a6ed" : "var(--kavia-dark)",
@@ -111,18 +123,6 @@ function TopNavBar() {
           Recommendations
         </Link>
         <Link
-          to="/all-products"
-          style={{
-            color: location.pathname === "/all-products" ? "#77a6ed" : "var(--kavia-dark)",
-            fontWeight: location.pathname === "/all-products" ? 700 : 500,
-            opacity: 0.88,
-            textDecoration: "none",
-            transition: "color 0.19s",
-          }}
-        >
-          Products
-        </Link>
-        <Link
           to="/weather"
           style={{
             color: location.pathname === "/weather" ? "#77a6ed" : "var(--kavia-dark)",
@@ -135,18 +135,6 @@ function TopNavBar() {
           Weather
         </Link>
         <Link
-          to="/email"
-          style={{
-            color: location.pathname === "/email" ? "#77a6ed" : "var(--kavia-dark)",
-            fontWeight: location.pathname === "/email" ? 700 : 500,
-            opacity: 0.88,
-            textDecoration: "none",
-            transition: "color 0.19s",
-          }}
-        >
-          Email
-        </Link>
-        <Link
           to="/chat"
           style={{
             color: location.pathname === "/chat" ? "#77a6ed" : "var(--kavia-dark)",
@@ -157,6 +145,18 @@ function TopNavBar() {
           }}
         >
           Chatbot
+        </Link>
+        <Link
+          to="/email"
+          style={{
+            color: location.pathname === "/email" ? "#77a6ed" : "var(--kavia-dark)",
+            fontWeight: location.pathname === "/email" ? 700 : 500,
+            opacity: 0.88,
+            textDecoration: "none",
+            transition: "color 0.19s",
+          }}
+        >
+          Email
         </Link>
       </nav>
     </header>
