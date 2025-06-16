@@ -45,26 +45,25 @@ const QUIZ_QUESTIONS = [
 function Quiz() {
   const navigate = useNavigate();
 
-  // Load saved answers or start empty
   const [answers, setAnswers] = useState(() => {
     const saved = localStorage.getItem("quizAnswers");
     return saved ? JSON.parse(saved) : {};
   });
 
-  // Load saved step or start at 0
   const [step, setStep] = useState(() => {
     const savedStep = localStorage.getItem("quizStep");
     return savedStep !== null ? parseInt(savedStep, 10) : 0;
   });
 
-  const [showResults, setShowResults] = useState(false);
+  const [mode, setMode] = useState(() => {
+    const saved = localStorage.getItem("quizAnswers");
+    return saved ? "report" : "quiz";
+  });
 
-  // Save answers to localStorage whenever answers change
   useEffect(() => {
     localStorage.setItem("quizAnswers", JSON.stringify(answers));
   }, [answers]);
 
-  // Save step to localStorage whenever step changes
   useEffect(() => {
     localStorage.setItem("quizStep", step.toString());
   }, [step]);
@@ -75,7 +74,7 @@ function Quiz() {
 
   const nextStep = () => {
     if (step < QUIZ_QUESTIONS.length - 1) setStep((s) => s + 1);
-    else setShowResults(true);
+    else setMode("result");
   };
 
   const prevStep = () => {
@@ -84,10 +83,61 @@ function Quiz() {
 
   const submitQuiz = (e) => {
     e.preventDefault();
-    setShowResults(true);
+    setMode("result");
   };
 
-  if (showResults) {
+  if (mode === "report") {
+    return (
+      <section className="container" style={{ maxWidth: 500, margin: "0 auto", padding: "40px 0 32px 0" }}>
+        <AppleFadeTransition>
+          <h2 style={{ fontSize: "1.31rem", fontWeight: 800, color: blueAccent, textAlign: "center", marginBottom: 16 }}>
+            Your Last Quiz Answers
+          </h2>
+          <div style={{
+            background: "linear-gradient(97deg,#93bafe 60%,#e3f0ff 100%)",
+            border: "2px solid #2a6ae7",
+            borderRadius: 18,
+            padding: "18px 20px",
+            color: blueAccent,
+            fontWeight: 600,
+          }}>
+            {QUIZ_QUESTIONS.map((q) => (
+              <div key={q.key} style={{ marginBottom: 10 }}>
+                <strong>{q.question}</strong><br />
+                <span style={{ color: blue }}>{answers[q.key] || "Not answered"}</span>
+              </div>
+            ))}
+          </div>
+          <div style={{ textAlign: "center", marginTop: 20 }}>
+            <button
+              onClick={() => {
+                setAnswers({});
+                setStep(0);
+                setMode("quiz");
+                localStorage.removeItem("quizAnswers");
+                localStorage.removeItem("quizStep");
+              }}
+              style={{
+                backgroundColor: blueAccent,
+                color: "#fff",
+                fontWeight: 700,
+                padding: "10px 24px",
+                fontSize: 16,
+                border: "none",
+                borderRadius: 12,
+                cursor: "pointer",
+                boxShadow: "0 4px 15px #93bafe70",
+              }}
+            >
+              Take Quiz Again →
+            </button>
+          </div>
+        </AppleFadeTransition>
+      </section>
+    );
+  }
+
+  if (mode === "result") {
     return (
       <section
         className="container"
@@ -272,12 +322,10 @@ function Quiz() {
               marginRight: "auto",
             }}
           >
-            {/* Back button, only show if not first step */}
             {step > 0 ? (
               <button
                 type="button"
                 onClick={prevStep}
-                className="btn btn-large"
                 style={{
                   background: "#fff",
                   color: blueAccent,
@@ -289,19 +337,16 @@ function Quiz() {
                   padding: "10px 22px",
                   cursor: "pointer",
                 }}
-                aria-label="Previous Question"
               >
                 ← Back
               </button>
             ) : (
-              <div style={{ width: 92 }} /> // spacer to keep buttons aligned
+              <div style={{ width: 92 }} />
             )}
 
-            {/* Next or Submit button */}
             {step < QUIZ_QUESTIONS.length - 1 ? (
               <button
                 type="button"
-                className="btn btn-large"
                 style={{
                   background: "linear-gradient(91deg,#2a6ae7 54%,#93bafe 100%)",
                   color: "#fff",
@@ -314,14 +359,12 @@ function Quiz() {
                 }}
                 onClick={nextStep}
                 disabled={!answers[q.key]}
-                aria-label="Next Question"
               >
                 Next
               </button>
             ) : (
               <button
                 type="submit"
-                className="btn btn-large"
                 style={{
                   background: "linear-gradient(91deg,#2a6ae7 54%,#93bafe 100%)",
                   color: "#fff",
@@ -333,36 +376,12 @@ function Quiz() {
                   cursor: answers[q.key] ? "pointer" : "not-allowed",
                 }}
                 disabled={!answers[q.key]}
-                aria-label="Submit Quiz"
               >
                 Submit Quiz
               </button>
             )}
           </div>
         </form>
-        <AnimatePresence>
-          <motion.div
-            className="quiz-modal-overlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.99 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
-            style={{
-              display: "none",
-              position: "fixed",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: "rgba(147,186,254,0.19)",
-              zIndex: 4020,
-              pointerEvents: "auto",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-            aria-label="Quiz modal background"
-          />
-        </AnimatePresence>
       </AppleFadeTransition>
     </section>
   );
