@@ -2,9 +2,9 @@
 > radianceai-frontend@1.0.0 start
 > craco start
 
-(node:28129) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+(node:28656) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-(node:28129) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+(node:28656) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
 Starting the development server...
 
 Failed to compile.
@@ -86,3 +86,32 @@ src/components/TopNavBar.js
   Line 87:32:  Parsing error: Missing semicolon. (87:32)
 
 webpack compiled with 5 errors and 1 warning
+Compiling...
+Failed to compile.
+
+Module not found: Error: Can't resolve '../hooks/useProgress' in '/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/src/context'
+WARNING in [eslint] 
+src/api/apiClient.js
+  Line 12:7:  'SUPABASE_PRODUCTS_TABLE' is assigned a value but never used  no-unused-vars
+
+src/features/recommendations/Recommendations.js
+  Line 11:24:  'skinType' is assigned a value but never used  no-unused-vars
+
+src/hooks/useProducts.js
+  Line 24:6:  React Hook useEffect has a missing dependency: 'options'. Either include it or remove the dependency array                                react-hooks/exhaustive-deps
+  Line 24:7:  React Hook useEffect has a complex expression in the dependency array. Extract it to a separate variable so it can be statically checked  react-hooks/exhaustive-deps
+
+src/hooks/useWeather.js
+  Line 26:9:   'resolvedLat' is assigned a value but never used  no-unused-vars
+  Line 26:28:  'resolvedLon' is assigned a value but never used  no-unused-vars
+
+ERROR in ./src/context/GlobalStateContext.js 8:0-47
+Module not found: Error: Can't resolve '../hooks/useProgress' in '/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/src/context'
+
+ERROR in ./src/features/products/AllProducts.js 30:18-31
+export 'supabase' (imported as 'supabase') was not found in '../../api/supabaseClient' (possible exports: default)
+
+ERROR in ./src/features/products/AllProducts.js 51:14-27
+export 'supabase' (imported as 'supabase') was not found in '../../api/supabaseClient' (possible exports: default)
+
+webpack compiled with 3 errors and 1 warning
