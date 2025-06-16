@@ -1,367 +1,235 @@
-import React, { useRef, useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { AppleFadeTransition, MotionWrapper } from "../../utils/animation";
+import React, { useState, useEffect, useRef } from "react";
+import supabase from "../../api/supabaseClient"; // Adjust path if needed
 
-/**
- * PUBLIC_INTERFACE
- * Chatbot: Apple-like animated AI chat with contextual rule-based (stub) logic for skin/routine/product help.
- */
+// Your existing rule-based AI function
+function ruleBasedAI(question) {
+  question = question.toLowerCase();
 
-// Palette
-const palette = {
-  blueDark: "#2050aa",
-  blueLight: "#77a6ed",
-  white: "#fff",
-  blueBG: "linear-gradient(120deg,#2050aa 40%,#77a6ed 100%)",
-  blueBGUser: "linear-gradient(120deg, #dde9ff 60%, #e9f6fb 100%)",
-  gradientLight: "linear-gradient(115deg,#19155e 50%,#dde9ff24 120%)",
-  msgBotBG: "linear-gradient(110deg,#dde9ff0c 60%,#e9f6fb27 120%)",
-  msgUserBG: "linear-gradient(97deg, #dde9ff 65%, #e9f6fb 120%)",
-  botColor: "#2050aa",
-  badge: "#77a6ed"
-};
-
-const SUGGESTIONS = [
-  "How do I start a skincare routine?",
-  "Best products for dry skin?",
-  "How often should I exfoliate?",
-  "What's my skin type?",
-  "Suggest a morning routine",
-  "Why use sunscreen daily?",
-  "Recommend me a moisturizer"
-];
-
-const BOT_AVATAR =
-  <span style={{
-    display: "inline-block",
-    width: 35, height: 35,
-    borderRadius: "50%", background: palette.blueBG,
-    boxShadow: "0 1.5px 7px #2050aa15",
-    display_: "flex", alignItems_: "center", justifyContent_: "center", fontSize: 27, textAlign: "center"
-  }} aria-label="bot">💬</span>;
-
-// Rule-based AI stub: modify this map for better logic
-function ruleBasedAI(query) {
-  const q = query.trim().toLowerCase();
-  if (/routine/.test(q) && /morning/.test(q)) {
-    return "Here's a gentle morning routine: 1. Cleanser, 2. Toner, 3. Serum, 4. Moisturizer, 5. Sunscreen.";
-  }
-  if (/routine/.test(q) && /night/.test(q)) {
-    return "Night routine: 1. Cleanser, 2. Treatment or Serum, 3. Night Moisturizer.";
-  }
-  if (/skin ?type/.test(q)) {
-    return "Take the quiz for precise skin type analysis, or tell me about your skin (e.g., oily, dry, sensitive)!";
-  }
-  if (/dry skin/.test(q)) {
-    return "For dry skin: Use gentle cleansers, hydrating serums (like hyaluronic acid), and rich moisturizers.";
-  }
-  if (/moisturizer/.test(q)) {
-    return "Moisturizers help lock in hydration. Prefer fragrance-free products for sensitive skin. Want recommendations?";
-  }
-  if (/sunscreen/.test(q)) {
-    return "Sunscreen protects skin from UV damage. Apply SPF 30+ every morning, and reapply as needed.";
-  }
-  if (/how often.*exfoliat/.test(q) || /exfoliat.*how often/.test(q)) {
-    return "For most: exfoliate 1–2×/week with a mild exfoliant. Over-exfoliation can irritate. Choose gentle scrubs or acids.";
-  }
-  if (/recommend.*product/.test(q) || /product.*recommend/.test(q)) {
-    return "What is your main skin goal or concern? (e.g., hydration, acne, aging, brightness)";
-  }
-  if (/hi|hello|hey|^$/.test(q)) {
-    return "Hi there! I'm your RadianceAI skincare assistant. How can I help with products or routines today?";
-  }
-  return "I'm learning—can you rephrase or ask about skin, routines, or products?";
+  if (question.includes("hello")) return "Hey there! How can I help you with your skincare today?";
+  if (question.includes("recommend")) return "Please tell me your skin concern like acne, hydration, or anti-aging.";
+  if (question.includes("thank")) return "You’re welcome! Feel free to ask me anything else.";
+  return "Sorry, I didn't get that. Can you please rephrase?";
 }
 
-const USER_AVATAR =
-  <span style={{
-    display: "inline-block",
-    width: 35, height: 35,
-    borderRadius: "50%", background: palette.blueBGUser,
-    boxShadow: "0 1.5px 7px #dde9ff18",
-    display_: "flex", alignItems_: "center", justifyContent_: "center", fontSize: 25, textAlign: "center"
-  }} aria-label="user">🧑‍💻</span>;
+// Fetch products by concern from Supabase
+async function fetchProductsByConcern(concern) {
+  const { data, error } = await supabase
+    .from("products")
+    .select("id, name, brand, product_url")
+    .ilike("concerns", `%${concern}%`)
+    .limit(5);
 
-// Scroll helper
-function useAutoScroll(ref, deps=[]) {
-  useEffect(() => {
-    if (ref.current) {
-      ref.current.scrollTop = ref.current.scrollHeight+100;
-    }
-    // eslint-disable-next-line
-  }, deps);
+  if (error) {
+    console.error("Supabase fetch error:", error);
+    return null;
+  }
+  return data;
 }
 
-// Chatbot component
-const Chatbot = () => {
+export default function Chatbot() {
   const [messages, setMessages] = useState([
-    { sender: "bot", text: "Hi! Need help with your skin, routine, or products? Ask me anything ✨", ts: Date.now() }
+    { sender: "bot", text: "Hello! Ask me for skincare product recommendations or general help.", ts: Date.now() }
   ]);
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
-  const [showSuggest, setShowSuggest] = useState(true);
-  const scrollRef = useRef();
+  const chatBottomRef = useRef(null);
 
-  // Auto scroll to bottom on messages
-  useAutoScroll(scrollRef, [messages, typing]);
+  // Scroll chat to bottom when messages update
+  useEffect(() => {
+    chatBottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
-  // Send message (simulate AI delay)
-  function sendMessage(msg) {
+  // Handle sending message and getting bot reply
+  async function sendMessage(msg) {
     if (!msg.trim()) return;
-    setMessages(m => [...m, { sender: "user", text: msg.trim(), ts: Date.now() }]);
+
+    // Add user message
+    setMessages((m) => [...m, { sender: "user", text: msg.trim(), ts: Date.now() }]);
+    setInput("");
     setTyping(true);
+
+    const q = msg.trim().toLowerCase();
+
+    // Detect if user wants product recommendations
+    if (/recommend.*product/.test(q) || /product.*recommend/.test(q)) {
+      // Try to find a known concern keyword
+      const concerns = ["acne", "hydration", "aging", "brightness", "dry", "oily", "sensitive"];
+      let foundConcern = null;
+      for (let c of concerns) {
+        if (q.includes(c)) {
+          foundConcern = c;
+          break;
+        }
+      }
+
+      if (foundConcern) {
+        const products = await fetchProductsByConcern(foundConcern);
+        if (products && products.length > 0) {
+          // Format bot message listing products
+          const productList = products.map(
+            (p) => `• ${p.brand} - ${p.name} [View Product](${p.product_url})`
+          ).join("\n");
+
+          setMessages((m) => [
+            ...m,
+            {
+              sender: "bot",
+              text: `Here are some products for *${foundConcern}*: \n${productList}`,
+              ts: Date.now() + 1,
+            },
+          ]);
+        } else {
+          setMessages((m) => [
+            ...m,
+            {
+              sender: "bot",
+              text: `Sorry, I couldn't find products for "${foundConcern}". Try another concern or ask for general help!`,
+              ts: Date.now() + 1,
+            },
+          ]);
+        }
+        setTyping(false);
+        return;
+      }
+    }
+
+    // Fallback to rule-based AI after a short delay
     setTimeout(() => {
       const reply = ruleBasedAI(msg);
-      setMessages(m => [...m, { sender: "bot", text: reply, ts: Date.now() + 1 }]);
+      setMessages((m) => [...m, { sender: "bot", text: reply, ts: Date.now() + 1 }]);
       setTyping(false);
-    }, 650 + Math.random()*400); // random typing time
-  }
-
-  function handleInput(e) {
-    setInput(e.target.value);
-  }
-  function handleSubmit(e) {
-    e.preventDefault();
-    if (input.trim()) {
-      sendMessage(input);
-      setInput("");
-      setShowSuggest(false);
-    }
-  }
-  function handleSuggest(s) {
-    sendMessage(s);
-    setInput("");
-    setShowSuggest(false);
+    }, 700 + Math.random() * 500);
   }
 
   return (
-    <section className="container" style={{ maxWidth: 480, margin: "0 auto", paddingTop: 36, paddingBottom: 32 }}>
-      <AppleFadeTransition>
-        <h2 style={{
-          fontWeight: 700, fontSize: "1.48rem",
-          color: palette.blueDark, textAlign: "center", letterSpacing: ".01em",
-          margin: "10px 0 7px 0"
-        }}>
-          RadianceAI Chatbot
-        </h2>
-        <div style={{
-          color: palette.blueLight,
+    <div
+      style={{
+        maxWidth: 500,
+        margin: "auto",
+        border: "1px solid #ccc",
+        borderRadius: 8,
+        display: "flex",
+        flexDirection: "column",
+        height: "80vh",
+      }}
+    >
+      <div
+        style={{
+          padding: "10px",
+          borderBottom: "1px solid #ccc",
+          fontWeight: "bold",
+          fontSize: 18,
+          backgroundColor: "#f5f5f5",
           textAlign: "center",
-          fontSize: 16,
-          marginBottom: 15,
-        }}>
-          Get personalized answers about your skin, routines, or products—in real time.
-        </div>
-        <MotionWrapper>
-          <motion.div
-            className="ai-chatbot-frame"
-            initial={{ boxShadow: "0 2px 20px #dde9ff17", scale: 0.97 }}
-            animate={{ boxShadow: "0 4px 38px #dde9ff26", scale: 1 }}
-            transition={{ duration: 0.6, type: "spring", bounce: 0.29 }}
+        }}
+      >
+        Skincare Chatbot
+      </div>
+
+      <div
+        style={{
+          flexGrow: 1,
+          padding: "10px",
+          overflowY: "auto",
+          backgroundColor: "#fafafa",
+          fontSize: 15,
+        }}
+      >
+        {messages.map((msg, i) => (
+          <div
+            key={msg.ts + i}
             style={{
-              background: palette.gradientLight,
-              borderRadius: 24,
-              padding: "26px 10px 12px 10px",
-              boxShadow: "0 1.5px 9px #dde9ff12",
-              minHeight: 440,
-              margin: "0 auto 12px auto",
-              position: "relative",
-              maxWidth: 470,
+              marginBottom: 10,
               display: "flex",
-              flexDirection: "column",
-              overflow: "hidden",
+              justifyContent: msg.sender === "user" ? "flex-end" : "flex-start",
             }}
           >
-            {/* Message area */}
-            <motion.div
-              ref={scrollRef}
+            <div
               style={{
-                width: "100%",
-                height: 340,
-                overflowY: "auto",
-                overscrollBehavior: "contain",
-                background: "rgba(221,233,255,0.055)",
-                borderRadius: 16,
-                boxShadow: "0 1px 11px #dde9ff19",
-                padding: "6px 8px 8px 8px",
-                marginBottom: 9,
-                position: "relative",
-                scrollbarWidth: "thin"
+                maxWidth: "75%",
+                backgroundColor: msg.sender === "user" ? "#007bff" : "#e2e3e5",
+                color: msg.sender === "user" ? "white" : "#333",
+                padding: "8px 12px",
+                borderRadius: 15,
+                whiteSpace: "pre-wrap",
               }}
             >
-              {messages.map((msg, i) => (
-                <motion.div
-                  key={msg.ts + "-" + i}
-                  initial={{ opacity: 0, y: 8, scale: 0.98 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  transition={{ duration: 0.29, type: "spring", bounce: 0.26 }}
-                  style={{
-                    display: "flex",
-                    flexDirection: msg.sender === "user" ? "row-reverse" : "row",
-                    alignItems: "flex-start",
-                    gap: 9,
-                    marginBottom: 5,
-                  }}
-                >
-                  <div>{msg.sender === "bot" ? BOT_AVATAR : USER_AVATAR}</div>
-                  <div
-                    style={{
-                      background: msg.sender === "bot"
-                        ? palette.msgBotBG
-                        : palette.msgUserBG,
-                      color: msg.sender === "bot" ? palette.blueDark : "#233869",
-                      padding: "12px 15px",
-                      borderRadius: msg.sender === "bot" ? "13px 13px 13px 2.5em" : "13px 13px 2.5em 13px",
-                      fontSize: 15.9,
-                      minWidth: 40,
-                      minHeight: 22,
-                      maxWidth: 320,
-                      fontWeight: 500,
-                      boxShadow: msg.sender === "bot"
-                        ? "0 2px 14px #dde9ff15"
-                        : "0 2px 19px #dde9ff43",
-                      marginBottom: 5,
-                      marginLeft: msg.sender === "user" ? 0 : 5,
-                      marginRight: msg.sender === "user" ? 5 : 0,
-                      whiteSpace: "pre-line",
-                      wordBreak: "break-word"
-                    }}>
-                    {msg.text}
-                  </div>
-                </motion.div>
-              ))}
-              {/* Typing animation */}
-              <AnimatePresence>
-                {typing &&
-                  <motion.div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 8,
-                      marginBottom: 3,
-                      marginLeft: 2
-                    }}
-                    initial={{ opacity: 0, y: 10, scale: 0.94 }}
-                    animate={{ opacity: 1, y: 0, scale: 1.05 }}
-                    exit={{ opacity: 0, y: -13, scale: 0.96 }}
-                    transition={{ duration: 0.18, type: "tween" }}
-                  >
-                    <div>{BOT_AVATAR}</div>
-                    <div style={{
-                      display: "inline-block", padding: "12px 20px",
-                      borderRadius: "14px 14px 18px 14px", background: "#dde9ff29",
-                      color: palette.blueDark
-                    }}>
-                      <BlinkingDots />
-                    </div>
-                  </motion.div>
-                }
-              </AnimatePresence>
-            </motion.div>
-            {/* Quick suggestions */}
-            {showSuggest && (
-              <div style={{
-                width: "100%", margin: "0 auto",
-                display: "flex", flexWrap: "wrap", gap: 7, justifyContent: "center", marginBottom: 9,
-              }}>
-                {SUGGESTIONS.slice(0, 4).map((s, idx) =>
-                  <motion.button
-                    key={s}
-                    onClick={() => handleSuggest(s)}
-                    whileTap={{ scale: 0.98 }}
-                    style={{
-                      padding: "7px 15px",
-                      borderRadius: 12,
-                      border: "none",
-                      background: "linear-gradient(90deg,#dde9ff 60%,#e9f6fb 100%)",
-                      color: "#2050aa",
-                      fontWeight: 600,
-                      fontSize: 14,
-                      boxShadow: "0 1px 6px #dde9ff1d",
-                      marginBottom: 2,
-                      cursor: "pointer",
-                    }}>
-                    {s}
-                  </motion.button>
-                )}
-              </div>
-            )}
-            {/* Input and send */}
-            <form onSubmit={handleSubmit} autoComplete="off" style={{
-              marginTop: 2,
-              width: "100%",
-              display: "flex",
-              gap: 8
-            }}>
-              <input
-                value={input}
-                onChange={handleInput}
-                placeholder="Type your skincare question…"
-                aria-label="Chat input"
-                disabled={typing}
-                maxLength={200}
-                style={{
-                  flex: 1,
-                  borderRadius: 13,
-                  border: "none",
-                  fontSize: 16,
-                  padding: "12px 14px",
-                  background: "#dde9ff19",
-                  color: palette.blueDark,
-                  outline: "none",
-                  marginRight: 2,
-                  boxShadow: "0 1px 4px #dde9ff15"
-                }}
-                onFocus={() => setShowSuggest(false)}
-              />
-              <motion.button
-                type="submit"
-                whileTap={{ scale: 0.96 }}
-                disabled={typing || !input.trim()}
-                style={{
-                  borderRadius: 13,
-                  border: "none",
-                  fontWeight: 700,
-                  fontSize: 16.2,
-                  background: "linear-gradient(90deg,#dde9ff 60%,#e9f6fb 100%)",
-                  color: "#2050aa",
-                  padding: "11px 24px",
-                  minWidth: 65,
-                  cursor: typing || !input.trim() ? "not-allowed" : "pointer",
-                  opacity: typing || !input.trim() ? 0.69 : 1,
-                  boxShadow: "0 1px 4px #dde9ff13"
-                }}
-                aria-label="Send"
-              >Send</motion.button>
-            </form>
-            <div style={{
-              color: palette.blueLight,
-              fontSize: 13.2,
-              opacity: 0.56,
-              margin: "8px 0 0 0",
-              textAlign: "center"
-            }}>
-              Chatbot is learning. For product recommendations, try the <a href="/quiz" style={{
-                color: palette.blueDark, textDecoration: "underline"
-              }}>quiz</a> or <a href="/products" style={{
-                color: palette.blueLight, textDecoration: "underline"
-              }}>browse products</a>.
+              {/* If bot message contains product list, render as clickable links */}
+              {msg.sender === "bot" && msg.text.startsWith("Here are some products for") ? (
+                <ul style={{ paddingLeft: 20, margin: 0 }}>
+                  {msg.text
+                    .split("\n")
+                    .slice(1)
+                    .map((line, idx) => {
+                      const match = line.match(/• (.+) - (.+) \[View Product\]\((.+)\)/);
+                      if (!match) return <li key={idx}>{line}</li>;
+                      const [, brand, name, url] = match;
+                      return (
+                        <li key={idx}>
+                          <strong>{brand}</strong> -{" "}
+                          <a href={url} target="_blank" rel="noopener noreferrer" style={{ color: "#007bff" }}>
+                            {name}
+                          </a>
+                        </li>
+                      );
+                    })}
+                </ul>
+              ) : (
+                msg.text
+              )}
             </div>
-          </motion.div>
-        </MotionWrapper>
-      </AppleFadeTransition>
-    </section>
+          </div>
+        ))}
+        {typing && (
+          <div style={{ fontStyle: "italic", color: "#666" }}>Bot is typing...</div>
+        )}
+        <div ref={chatBottomRef} />
+      </div>
+
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          sendMessage(input);
+        }}
+        style={{
+          display: "flex",
+          padding: 10,
+          borderTop: "1px solid #ccc",
+          backgroundColor: "#f9f9f9",
+        }}
+      >
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Type your message..."
+          style={{
+            flexGrow: 1,
+            padding: "10px",
+            borderRadius: 20,
+            border: "1px solid #ccc",
+            outline: "none",
+            fontSize: 15,
+          }}
+          disabled={typing}
+        />
+        <button
+          type="submit"
+          disabled={typing || !input.trim()}
+          style={{
+            marginLeft: 8,
+            padding: "10px 18px",
+            borderRadius: 20,
+            border: "none",
+            backgroundColor: "#007bff",
+            color: "white",
+            fontWeight: "bold",
+            cursor: typing ? "not-allowed" : "pointer",
+          }}
+        >
+          Send
+        </button>
+      </form>
+    </div>
   );
-};
-
-// Typing indicator
-function BlinkingDots() {
-  const [dotCount, setDotCount] = useState(1);
-  useEffect(() => {
-    const interval = setInterval(() => setDotCount(d => (d + 1) > 3 ? 1 : d + 1), 350);
-    return () => clearInterval(interval);
-  }, []);
-  return <span>{'.'.repeat(dotCount)}<span style={{ opacity: 0.35 }}>{'.'.repeat(3 - dotCount)}</span></span>
 }
-
-export default Chatbot;
