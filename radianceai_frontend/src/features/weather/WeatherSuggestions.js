@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { fetchWeather } from "../../api/apiClient";
-import { fetchGeolocation } from "../../api/geo"; // ✅ import your geo function
+import { fetchGeolocation } from "../../api/geo";
 import { MotionWrapper, AppleFadeTransition } from "../../utils/animation";
 
 const palette = {
@@ -14,20 +14,23 @@ const palette = {
 
 function WeatherSuggestions() {
   const [weather, setWeather] = useState(null);
-  const [location, setLocation] = useState(null); // will contain lat/lon, city, etc.
 
   useEffect(() => {
-    const fetchLocationAndWeather = async () => {
+    async function fetchLocationAndWeather() {
       const geo = await fetchGeolocation();
-      if (geo.error) {
-        setWeather({ error: true, reason: geo.error });
+      if (!geo || geo.error || !geo.latitude || !geo.longitude) {
+        setWeather({ error: true, reason: geo?.error || "Unable to determine location" });
         return;
       }
 
-      setLocation(geo);
       const weatherData = await fetchWeather(geo.latitude, geo.longitude);
+      if (weatherData.error) {
+        setWeather({ error: true, reason: weatherData.reason || "Weather API failed" });
+        return;
+      }
+
       setWeather(weatherData);
-    };
+    }
 
     fetchLocationAndWeather();
   }, []);
@@ -74,18 +77,23 @@ function WeatherSuggestions() {
               <span style={{ color: palette.blueLight }}>Detecting weather for your region…</span>
             ) : weather.error ? (
               <span style={{ color: palette.blueLight }}>
-                Weather not available ({weather.reason || weather.error || "N/A"}).
+                Weather not available ({weather.reason || "N/A"}).
               </span>
             ) : (
               <span>
-                Weather in <b style={{ color: palette.blueLight }}>
-                  {location?.city}{location?.country ? `, ${location.country}` : ""}
-                </b>:<br />
+                Weather in{" "}
+                <b style={{ color: palette.blueLight }}>
+                  {weather.city}
+                  {weather.country ? `, ${weather.country}` : ""}
+                </b>
+                :<br />
                 <span style={{ color: palette.creamyWhite }}>
                   {weather.temp}°C, {weather.weatherMain}
                 </span>
                 <br />
-                <span style={{ color: "#fff", fontWeight: 600 }}>{getSuggestion(weather)}</span>
+                <span style={{ color: "#fff", fontWeight: 600 }}>
+                  {getSuggestion(weather)}
+                </span>
               </span>
             )}
           </div>
@@ -96,4 +104,3 @@ function WeatherSuggestions() {
 }
 
 export default WeatherSuggestions;
-
