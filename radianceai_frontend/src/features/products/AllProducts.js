@@ -34,11 +34,7 @@ function AllProducts() {
 
   useEffect(() => {
     fetchDropdownOptions();
-  }, []);
-
-  // You can optionally fetch products on mount or only on button click
-  useEffect(() => {
-    fetchProducts();
+    fetchProducts(); // fetch default products on mount
   }, []);
 
   const fetchDropdownOptions = async () => {
@@ -61,18 +57,22 @@ function AllProducts() {
     }
   };
 
-  const fetchProducts = async () => {
+  const fetchProducts = async (filterParams = filters) => {
     try {
       let query = supabase.from("products").select("*");
 
-      if (filters.brand) query = query.eq("brand", filters.brand);
-      if (filters.concern) query = query.eq("concern", filters.concern);
-      if (filters.skin_type) query = query.eq("skin_type", filters.skin_type);
-      if (filters.type) query = query.eq("type", filters.type);
-      if (filters.maxPrice) query = query.lte("price", filters.maxPrice);
+      if (filterParams.brand) query = query.eq("brand", filterParams.brand);
+      if (filterParams.concern) query = query.eq("concern", filterParams.concern);
+      if (filterParams.skin_type) query = query.eq("skin_type", filterParams.skin_type);
+      if (filterParams.type) query = query.eq("type", filterParams.type);
+      if (filterParams.maxPrice)
+        query = query.lte("price", Number(filterParams.maxPrice));
 
-      if (sortBy === "priceLow") query = query.order("price", { ascending: true });
-      else if (sortBy === "priceHigh") query = query.order("price", { ascending: false });
+      if (sortBy === "priceLow") {
+        query = query.order("price", { ascending: true });
+      } else if (sortBy === "priceHigh") {
+        query = query.order("price", { ascending: false });
+      }
 
       const { data, error } = await query;
 
@@ -180,7 +180,7 @@ function AllProducts() {
           >
             <option value="">All</option>
             {typeOptions.map((type) => (
-              <option key={type} value={type.toLowerCase()}>
+              <option key={type} value={type}>
                 {type}
               </option>
             ))}
@@ -225,7 +225,7 @@ function AllProducts() {
 
         {/* Apply Filters Button */}
         <button
-          onClick={fetchProducts}
+          onClick={() => fetchProducts({ ...filters })}
           style={{
             backgroundColor: palette.blueDark,
             color: "#fff",
@@ -253,7 +253,7 @@ function AllProducts() {
           products.map((product) => (
             <ProductCard
               key={product.id}
-              id={product.id} // Pass id for links
+              id={product.id}
               name={product.name}
               image_url={product.image_url}
               price={`₹${product.price}`}
