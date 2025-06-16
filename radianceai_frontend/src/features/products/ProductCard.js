@@ -7,10 +7,22 @@ import "./ProductCard.css";
  *
  * PUBLIC_INTERFACE
  * @param {object} props - product object, expects at least:
- *   { id, name, img (or image_url), price, brand, description }
+ *   { id, name, img (or image_url), price, brand, description, official_product_url }
  */
-function ProductCard({ id, name, img, image_url, price, brand, description }) {
+function ProductCard({
+  id,
+  name,
+  img,
+  image_url,
+  price,
+  brand,
+  description,
+  official_product_url,
+}) {
   const imageSrc = image_url || img;
+
+  const isExternal = official_product_url && official_product_url.startsWith("http");
+
   return (
     <div className="product-card" tabIndex={0} aria-label={`Product: ${name}`}>
       <img
@@ -31,21 +43,41 @@ function ProductCard({ id, name, img, image_url, price, brand, description }) {
         <div className="product-card-price">{price}</div>
 
         {/* VIEW PRODUCT LINK */}
-        <a
-          href={`/product/${id}`}
-          className="view-product-link"
-          style={{
-            display: "inline-block",
-            marginTop: 8,
-            color: "#fff",
-            fontWeight: "bold",
-            textDecoration: "underline",
-            cursor: "pointer",
-          }}
-          aria-label={`View details for ${name}`}
-        >
-          View Product
-        </a>
+        {isExternal ? (
+          <a
+            href={official_product_url}
+            className="view-product-link"
+            style={{
+              display: "inline-block",
+              marginTop: 8,
+              color: "#fff",
+              fontWeight: "bold",
+              textDecoration: "underline",
+              cursor: "pointer",
+            }}
+            aria-label={`View official product page for ${name}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            View Product
+          </a>
+        ) : (
+          <a
+            href={`/product/${id}`}
+            className="view-product-link"
+            style={{
+              display: "inline-block",
+              marginTop: 8,
+              color: "#fff",
+              fontWeight: "bold",
+              textDecoration: "underline",
+              cursor: "pointer",
+            }}
+            aria-label={`View details for ${name}`}
+          >
+            View Product
+          </a>
+        )}
       </div>
     </div>
   );

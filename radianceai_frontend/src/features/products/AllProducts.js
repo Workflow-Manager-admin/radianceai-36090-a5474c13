@@ -10,6 +10,16 @@ const palette = {
 const typeOptions = ["Facewash", "Serum", "Cleanser", "Cream", "Moisturizer", "Cleanser", "Toner", "Body Wash"];
 const brandOptions = ["DermaCo", "Kiehl's", "Minimalist", "Wow SkinScience", "Foxtale"];
 
+// Utility to shuffle array
+function shuffleArray(array) {
+  let arr = array.slice();
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
 function AllProducts() {
   const [products, setProducts] = useState([]);
   const [filters, setFilters] = useState({
@@ -63,7 +73,7 @@ function AllProducts() {
       if (filterParams.brand) {
         const { data: brandData, error: brandError } = await supabase
           .from("brands")
-          .select("id") // Adjust this if your primary key is named differently
+          .select("id")
           .eq("name", filterParams.brand)
           .single();
 
@@ -89,7 +99,9 @@ function AllProducts() {
       if (error) {
         console.error("Error fetching products:", error);
       } else {
-        setProducts(data);
+        // Shuffle products array for random display order
+        const shuffled = shuffleArray(data || []);
+        setProducts(shuffled);
       }
     } catch (err) {
       console.error("Error fetching products:", err);
@@ -280,6 +292,7 @@ function AllProducts() {
               price={`₹${product.price}`}
               brand={product.brands?.name || "Unknown Brand"}
               description={product.description}
+              official_product_url={product.official_product_url} // <-- Correct prop passed here
             />
           ))
         ) : (
