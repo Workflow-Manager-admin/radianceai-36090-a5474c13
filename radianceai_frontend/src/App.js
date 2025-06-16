@@ -9,7 +9,6 @@ import RoutineBuilder from './features/routine/RoutineBuilder';
 import ProductList from './features/products/ProductList';
 
 import WeatherSuggestions from './features/weather/WeatherSuggestions';
-import EmailFeatures from './features/email/EmailFeatures';
 import Geolocation from './features/geolocation/Geolocation';
 import Chatbot from './features/chatbot/Chatbot';
 import Home from './features/home/Home';
@@ -110,14 +109,7 @@ function AppRoutes() {
             </AppleFadeTransition>
           }
         />
-        <Route
-          path="/email"
-          element={
-            <AppleFadeTransition>
-              <EmailFeatures />
-            </AppleFadeTransition>
-          }
-        />
+
         <Route
           path="/geolocation"
           element={

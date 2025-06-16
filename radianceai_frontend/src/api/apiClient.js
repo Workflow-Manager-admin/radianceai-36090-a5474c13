@@ -92,8 +92,4 @@ export async function fetchWeather(/* options */) {
   return Promise.reject(new Error("fetchWeather is not implemented in this environment."));
 }
 
-// PUBLIC_INTERFACE
-export async function sendEmail(payload) {
-  // See EmailFeatures.js for usage (no change for Supabase)
-  return false;
-}
+

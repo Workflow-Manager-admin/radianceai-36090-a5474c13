@@ -146,18 +146,7 @@ function TopNavBar() {
         >
           Chatbot
         </Link>
-        <Link
-          to="/email"
-          style={{
-            color: location.pathname === "/email" ? "#77a6ed" : "var(--kavia-dark)",
-            fontWeight: location.pathname === "/email" ? 700 : 500,
-            opacity: 0.88,
-            textDecoration: "none",
-            transition: "color 0.19s",
-          }}
-        >
-          Email
-        </Link>
+
       </nav>
     </header>
   );

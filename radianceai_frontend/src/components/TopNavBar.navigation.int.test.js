@@ -12,7 +12,7 @@ const NAV_TEST_CONFIG = [
   { label: "Progress", path: "/progress", contentMatch: /progress|tracked days|weekly/i },
   { label: "Weather", path: "/weather", contentMatch: /weather|suggestions/i },
   { label: "AI Chat", path: "/chat", contentMatch: /chatbot|ai chat/i },
-  { label: "Email", path: "/email", contentMatch: /send email|email reminders|summary/i },
+
 ];
 
 // Attempt to get nav link by label
