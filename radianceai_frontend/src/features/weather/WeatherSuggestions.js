@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { fetchGeolocation } from "../../api/geo"; // your geo.js file
-import supabase from "../../api/supabaseClient"; // Import your Supabase client here
+import { fetchGeolocation } from "../../api/geo";
+import supabase from "../../api/supabaseClient";
+import ProductCardWeather from "../components/ProductCardWeather";
 
 const palette = {
   blueDark: "#2050aa",
@@ -12,7 +13,6 @@ const OPENWEATHER_API_KEY = "1545b3a636a95548e533bcdca59dde0f";
 
 async function fetchWeatherFromCoords(lat, lon) {
   const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${OPENWEATHER_API_KEY}`;
-
   try {
     const res = await fetch(url);
     if (!res.ok) throw new Error("Weather API error");
@@ -28,25 +28,16 @@ async function fetchWeatherFromCoords(lat, lon) {
   }
 }
 
-// Map weather conditions to product categories in your inventory
 const weatherToCategories = (weatherObj) => {
   if (!weatherObj || weatherObj.error) return [];
 
   const temp = weatherObj.temp;
   const main = weatherObj.weatherMain.toLowerCase();
 
-  if (main.includes("rain")) {
-    return ["Moisturizer", "Water Resistant Sunscreen"];
-  }
-  if (temp < 16) {
-    return ["Hydrating Serum", "Moisturizer"];
-  }
-  if (temp > 28) {
-    return ["Sunscreen", "Toner", "Lightweight Moisturizer"];
-  }
-  if (main.includes("clear") || main.includes("cloud")) {
-    return ["Sunscreen", "Cleanser"];
-  }
+  if (main.includes("rain")) return ["Moisturizer", "Water Resistant Sunscreen"];
+  if (temp < 16) return ["Hydrating Serum", "Moisturizer"];
+  if (temp > 28) return ["Sunscreen", "Toner", "Lightweight Moisturizer"];
+  if (main.includes("clear") || main.includes("cloud")) return ["Sunscreen", "Cleanser"];
 
   return ["Moisturizer", "Sunscreen"];
 };
@@ -56,7 +47,7 @@ async function fetchProductsByCategories(categories) {
 
   const { data, error } = await supabase
     .from("products")
-    .select("*")
+    .select("*, brands(name)")
     .in("category", categories);
 
   if (error) {
@@ -64,7 +55,10 @@ async function fetchProductsByCategories(categories) {
     return [];
   }
 
-  return data || [];
+  return data.map((p) => ({
+    ...p,
+    brand_name: p.brands?.name || "Unknown"
+  }));
 }
 
 function WeatherSuggestions() {
@@ -76,7 +70,6 @@ function WeatherSuggestions() {
     async function getLocationAndWeather() {
       setLoading(true);
 
-      // Get geolocation from IP
       const geo = await fetchGeolocation();
       if (geo.error) {
         setWeather({ error: "Could not get location" });
@@ -84,13 +77,11 @@ function WeatherSuggestions() {
         return;
       }
 
-      // Fetch weather from OpenWeatherMap API
       const weatherData = await fetchWeatherFromCoords(geo.latitude, geo.longitude);
       setWeather(weatherData);
       setLoading(false);
 
       if (!weatherData.error) {
-        // Fetch matching products from Supabase based on weather categories
         const categories = weatherToCategories(weatherData);
         const fetchedProducts = await fetchProductsByCategories(categories);
         setProducts(fetchedProducts);
@@ -103,28 +94,16 @@ function WeatherSuggestions() {
   const getSuggestion = (w) => {
     if (!w || w.error) return "";
     const t = w.temp;
-    if (t < 16)
-      return "Hydrating products (serum/moisturizer) recommended — cold/dry air can dehydrate skin.";
-    if (t > 28)
-      return "Lightweight, non-greasy sunscreen & toner recommended due to heat/humidity.";
-    if (w.weatherMain === "Rain")
-      return "Moisturizer and water-resistant sunscreen are a must during rainy weather.";
-    if (w.weatherMain === "Clear" || w.weatherMain === "Clouds")
-      return "Keep using sunscreen daily—even when cloudy!";
+    if (t < 16) return "Hydrating products (serum/moisturizer) recommended — cold/dry air can dehydrate skin.";
+    if (t > 28) return "Lightweight, non-greasy sunscreen & toner recommended due to heat/humidity.";
+    if (w.weatherMain === "Rain") return "Moisturizer and water-resistant sunscreen are a must during rainy weather.";
+    if (w.weatherMain === "Clear" || w.weatherMain === "Clouds") return "Keep using sunscreen daily—even when cloudy!";
     return "";
   };
 
   return (
     <section className="container" style={{ maxWidth: 440, margin: "0 auto" }}>
-      <h2
-        style={{
-          fontWeight: 700,
-          fontSize: "1.34rem",
-          color: palette.blueDark,
-          margin: "20px 0 8px 0",
-          textAlign: "center"
-        }}
-      >
+      <h2 style={{ fontWeight: 700, fontSize: "1.34rem", color: palette.blueDark, margin: "20px 0 8px", textAlign: "center" }}>
         Weather-Based Skincare Suggestions
       </h2>
 
@@ -136,9 +115,9 @@ function WeatherSuggestions() {
           color: "#fff",
           fontWeight: 600,
           fontSize: 16,
-          padding: "23px 12px 13px 12px",
+          padding: "23px 12px 13px",
           textAlign: "center",
-          margin: "17px auto 8px auto"
+          margin: "17px auto 8px"
         }}
       >
         {loading ? (
@@ -160,21 +139,11 @@ function WeatherSuggestions() {
       {products.length > 0 && (
         <div style={{ marginTop: 20 }}>
           <h3 style={{ color: palette.blueDark, textAlign: "center" }}>Recommended Products</h3>
-          <ul style={{ listStyleType: "none", paddingLeft: 0 }}>
-            {products.map((prod) => (
-              <li key={prod.id} style={{ marginBottom: 10 }}>
-                <a
-                  href={prod.product_url || "#"}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ color: palette.blueLight, fontWeight: 600, textDecoration: "none" }}
-                >
-                  {prod.name}
-                </a>
-                {prod.price && <span> - ₹{prod.price}</span>}
-              </li>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {products.map((product) => (
+              <ProductCardWeather key={product.id} product={product} />
             ))}
-          </ul>
+          </div>
         </div>
       )}
     </section>
