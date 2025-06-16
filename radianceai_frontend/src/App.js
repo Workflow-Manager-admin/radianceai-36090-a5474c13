@@ -7,7 +7,7 @@ import Quiz from './features/quiz/Quiz';
 import Recommendations from './features/recommendations/Recommendations';
 import RoutineBuilder from './features/routine/RoutineBuilder';
 import ProductList from './features/products/ProductList';
-import ProgressTracker from './features/progress/ProgressTracker';
+
 import WeatherSuggestions from './features/weather/WeatherSuggestions';
 import EmailFeatures from './features/email/EmailFeatures';
 import Geolocation from './features/geolocation/Geolocation';
@@ -101,14 +101,7 @@ function AppRoutes() {
             </AppleFadeTransition>
           }
         />
-        <Route
-          path="/progress"
-          element={
-            <AppleFadeTransition>
-              <ProgressTracker />
-            </AppleFadeTransition>
-          }
-        />
+
         <Route
           path="/weather"
           element={
