@@ -1,33 +1,46 @@
-import React, { createContext } from "react";
-import useQuiz from "../hooks/useQuiz";
-import useRoutine from "../hooks/useRoutine";
-import useProgress from "../hooks/useProgress";
-import useGeo from "../hooks/useGeo";
-import useWeather from "../hooks/useWeather";
-import useProducts from "../hooks/useProducts";
+import React, { createContext, useReducer, useContext, useMemo } from "react";
+
+const initialState = {
+  // Define your global state properties here
+  quizAnswers: {},
+  savedRoutines: [],
+};
+
+const GlobalStateContext = createContext();
 
 // PUBLIC_INTERFACE
-/**
- * GlobalStateContext provides shared state via context:
- * - quizAnswers, routine, progress, geo, weather, products
- */
-export const GlobalStateContext = createContext(null);
-
 export function GlobalStateProvider({ children }) {
-  const quiz = useQuiz();
-  const routine = useRoutine();
-  const progress = useProgress();
-  const geo = useGeo();
-  const weather = useWeather({ autoDetect: true });
-  const products = useProducts();
+  const [state, dispatch] = useReducer((state, action) => {
+    switch (action.type) {
+      case "SET_QUIZ_ANSWERS":
+        return { ...state, quizAnswers: action.payload };
+      case "SAVE_ROUTINE":
+        return {
+          ...state,
+          savedRoutines: [...state.savedRoutines, action.payload],
+        };
+      // Add more actions as needed
+      default:
+        return state;
+    }
+  }, initialState);
 
-  const ctxValue = {
-    quiz, routine, progress, geo, weather, products,
-  };
+  const value = useMemo(
+    () => ({
+      state,
+      dispatch,
+    }),
+    [state]
+  );
 
   return (
-    <GlobalStateContext.Provider value={ctxValue}>
+    <GlobalStateContext.Provider value={value}>
       {children}
     </GlobalStateContext.Provider>
   );
+}
+
+// PUBLIC_INTERFACE
+export function useGlobalState() {
+  return useContext(GlobalStateContext);
 }
