@@ -1,13 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { fetchWeather } from "../../api/apiClient";
-import useGeo from "../../hooks/useGeo";
+import { fetchGeolocation } from "../../api/geo"; // ✅ import your geo function
 import { MotionWrapper, AppleFadeTransition } from "../../utils/animation";
 
-/**
- * PUBLIC_INTERFACE
- * WeatherSuggestions: Suggests products/steps based on current weather.
- * Uses only brand-approved color palette (blue, light blue, white, creamy, beige).
- */
 const palette = {
   blueDark: "#2050aa",
   blueLight: "#77a6ed",
@@ -19,13 +14,23 @@ const palette = {
 
 function WeatherSuggestions() {
   const [weather, setWeather] = useState(null);
-  const { lat, lon } = useGeo();
+  const [location, setLocation] = useState(null); // will contain lat/lon, city, etc.
 
   useEffect(() => {
-    if (typeof lat === "number" && typeof lon === "number") {
-      fetchWeather(lat, lon).then(setWeather);
-    }
-  }, [lat, lon]);
+    const fetchLocationAndWeather = async () => {
+      const geo = await fetchGeolocation();
+      if (geo.error) {
+        setWeather({ error: true, reason: geo.error });
+        return;
+      }
+
+      setLocation(geo);
+      const weatherData = await fetchWeather(geo.latitude, geo.longitude);
+      setWeather(weatherData);
+    };
+
+    fetchLocationAndWeather();
+  }, []);
 
   const getSuggestion = (weatherObj) => {
     if (!weatherObj || weatherObj.error) return "";
@@ -73,8 +78,12 @@ function WeatherSuggestions() {
               </span>
             ) : (
               <span>
-                Weather in <b style={{ color: palette.blueLight }}>{weather.city}{weather.country ? `, ${weather.country}` : ""}</b>:<br />
-                <span style={{ color: palette.creamyWhite }}>{weather.temp}°C, {weather.weatherMain}</span>
+                Weather in <b style={{ color: palette.blueLight }}>
+                  {location?.city}{location?.country ? `, ${location.country}` : ""}
+                </b>:<br />
+                <span style={{ color: palette.creamyWhite }}>
+                  {weather.temp}°C, {weather.weatherMain}
+                </span>
                 <br />
                 <span style={{ color: "#fff", fontWeight: 600 }}>{getSuggestion(weather)}</span>
               </span>
