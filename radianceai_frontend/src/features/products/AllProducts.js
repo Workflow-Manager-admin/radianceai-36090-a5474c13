@@ -8,13 +8,6 @@ const palette = {
 };
 
 const typeOptions = ["Facewash", "Serum", "Cleanser", "Cream"];
-const priceOptions = [
-  { label: "Below ₹300", value: "300" },
-  { label: "₹300 – ₹600", value: "600" },
-  { label: "₹600 – ₹1000", value: "1000" },
-  { label: "₹1000+", value: "10000" }
-];
-
 const brandOptions = [
   "DermaCo", "Kiehl's", "Minimalist", "Wow SkinScience", "Foxtale"
 ];
@@ -25,8 +18,7 @@ function AllProducts() {
     brand: "",
     concern: "",
     type: "",
-    skin_type: "",
-    maxPrice: ""
+    skin_type: ""
   });
   const [sortBy, setSortBy] = useState("");
   const [concernOptions, setConcernOptions] = useState([]);
@@ -34,8 +26,11 @@ function AllProducts() {
 
   useEffect(() => {
     fetchDropdownOptions();
-    fetchProducts(); // fetch default products on mount
   }, []);
+
+  useEffect(() => {
+    fetchProducts(filters, sortBy);
+  }, [filters, sortBy]);
 
   const fetchDropdownOptions = async () => {
     try {
@@ -57,7 +52,7 @@ function AllProducts() {
     }
   };
 
-  const fetchProducts = async (filterParams = filters) => {
+  const fetchProducts = async (filterParams, sortParam) => {
     try {
       let query = supabase.from("products").select("*");
 
@@ -65,12 +60,10 @@ function AllProducts() {
       if (filterParams.concern) query = query.eq("concern", filterParams.concern);
       if (filterParams.skin_type) query = query.eq("skin_type", filterParams.skin_type);
       if (filterParams.type) query = query.eq("type", filterParams.type);
-      if (filterParams.maxPrice)
-        query = query.lte("price", Number(filterParams.maxPrice));
 
-      if (sortBy === "priceLow") {
+      if (sortParam === "priceLow") {
         query = query.order("price", { ascending: true });
-      } else if (sortBy === "priceHigh") {
+      } else if (sortParam === "priceHigh") {
         query = query.order("price", { ascending: false });
       }
 
@@ -187,26 +180,6 @@ function AllProducts() {
           </select>
         </div>
 
-        {/* Price */}
-        <div>
-          <label style={{ fontWeight: "bold", marginBottom: 6, display: "block" }}>
-            Filter by Price
-          </label>
-          <select
-            name="maxPrice"
-            value={filters.maxPrice}
-            onChange={handleChange}
-            style={{ padding: 8, borderRadius: 6 }}
-          >
-            <option value="">All</option>
-            {priceOptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
         {/* Sort */}
         <div>
           <label style={{ fontWeight: "bold", marginBottom: 6, display: "block" }}>
@@ -222,23 +195,6 @@ function AllProducts() {
             <option value="priceHigh">Price: High to Low</option>
           </select>
         </div>
-
-        {/* Apply Filters Button */}
-        <button
-          onClick={() => fetchProducts({ ...filters })}
-          style={{
-            backgroundColor: palette.blueDark,
-            color: "#fff",
-            padding: "10px 16px",
-            borderRadius: 6,
-            border: "none",
-            fontWeight: "bold",
-            cursor: "pointer",
-            marginTop: 28,
-          }}
-        >
-          Apply Filters
-        </button>
       </div>
 
       {/* PRODUCT GRID */}
