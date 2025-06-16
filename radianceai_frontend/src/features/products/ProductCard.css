@@ -60,3 +60,19 @@
   margin-top: 8px;
   color: #2050aa;
 }
+
+.view-product-link {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 6px 14px;
+  background-color: #2050aa;
+  color: #fff;
+  border-radius: 6px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 0.2s ease;
+}
+
+.view-product-link:hover {
+  background-color: #163b85;
+}
