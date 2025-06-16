@@ -16,106 +16,159 @@ const QUIZ_QUESTIONS = [
     question: "What is your primary skin goal?",
     options: ["Acne", "Anti-aging", "Hydration", "Brightening"],
   },
-  // Add more questions if you have
+  // Add more questions if needed
 ];
 
 export default function Quiz() {
+  // Load saved state or start fresh
   const [step, setStep] = useState(() => {
-    // Load saved step or start at 0
     const savedStep = localStorage.getItem("quizStep");
     return savedStep ? Number(savedStep) : 0;
   });
-
   const [answers, setAnswers] = useState(() => {
-    // Load saved answers or empty object
     const savedAnswers = localStorage.getItem("quizAnswers");
     return savedAnswers ? JSON.parse(savedAnswers) : {};
   });
 
-  // Derived mode: if all questions answered, show result, else quiz
-  const hasAnswers =
-    Object.keys(answers).length === QUIZ_QUESTIONS.length;
-  const mode = hasAnswers ? "result" : "quiz";
+  // Check if all questions are answered
+  const allAnswered = Object.keys(answers).length === QUIZ_QUESTIONS.length;
 
+  // Save step & answers to localStorage on change
   useEffect(() => {
-    // Save current step in localStorage whenever it changes
     localStorage.setItem("quizStep", step.toString());
   }, [step]);
 
   useEffect(() => {
-    // Save answers in localStorage whenever they change
     localStorage.setItem("quizAnswers", JSON.stringify(answers));
   }, [answers]);
 
-  // Handle answer select
+  // Handle option selection
   const handleAnswer = (questionId, option) => {
-    setAnswers((prev) => ({
-      ...prev,
-      [questionId]: option,
-    }));
-    // Move to next question or show result
+    setAnswers((prev) => ({ ...prev, [questionId]: option }));
     if (step + 1 < QUIZ_QUESTIONS.length) {
       setStep(step + 1);
     }
   };
 
-  // Retake quiz button handler
-  const retakeQuiz = () => {
+  // Reset quiz
+  const resetQuiz = () => {
     setAnswers({});
     setStep(0);
     localStorage.removeItem("quizAnswers");
     localStorage.removeItem("quizStep");
   };
 
-  if (mode === "quiz") {
-    // Show current question
+  if (!allAnswered) {
+    // Show quiz question card
     const currentQuestion = QUIZ_QUESTIONS[step];
     return (
-      <div className="quiz-container">
-        <h2>{currentQuestion.question}</h2>
-        <div className="options">
+      <div
+        style={{
+          maxWidth: 500,
+          margin: "50px auto",
+          padding: 20,
+          borderRadius: 8,
+          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+          backgroundColor: "#fff",
+          fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+        }}
+      >
+        <h2 style={{ marginBottom: 20 }}>{currentQuestion.question}</h2>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {currentQuestion.options.map((option) => (
             <button
               key={option}
               onClick={() => handleAnswer(currentQuestion.id, option)}
+              style={{
+                padding: "12px 20px",
+                fontSize: 16,
+                borderRadius: 6,
+                border: "1.5px solid #007bff",
+                backgroundColor: "#fff",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+              }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.backgroundColor = "#007bff", e.currentTarget.style.color = "#fff")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.backgroundColor = "#fff", e.currentTarget.style.color = "#000")
+              }
             >
               {option}
             </button>
           ))}
         </div>
-        <p>
+        <p style={{ marginTop: 24, fontSize: 14, color: "#555" }}>
           Question {step + 1} of {QUIZ_QUESTIONS.length}
         </p>
       </div>
     );
-  }
-
-  if (mode === "result") {
-    // Show routine recommendation + button to Recommendations page
-    // Customize this message based on answers if you want
+  } else {
+    // Show recommendation summary + link
     const { skinType, ageRange, primaryGoal } = answers;
     return (
-      <div className="result-container">
-        <h2>
-          We recommend a {primaryGoal?.toLowerCase()} routine for {skinType?.toLowerCase()} skin
-          in the age range {ageRange}.
+      <div
+        style={{
+          maxWidth: 500,
+          margin: "50px auto",
+          padding: 20,
+          borderRadius: 8,
+          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+          backgroundColor: "#fff",
+          fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+          textAlign: "center",
+        }}
+      >
+        <h2 style={{ marginBottom: 20 }}>
+          We recommend a {primaryGoal?.toLowerCase()} routine for {skinType?.toLowerCase()} skin in the age range {ageRange}.
         </h2>
         <button
           onClick={() => {
-            // Navigate to Recommendations page, e.g. /recommendations
-            // Use your router here, e.g., React Router's useNavigate
             window.location.href = "/recommendations";
           }}
+          style={{
+            marginTop: 20,
+            padding: "12px 30px",
+            fontSize: 16,
+            borderRadius: 6,
+            backgroundColor: "#007bff",
+            color: "#fff",
+            border: "none",
+            cursor: "pointer",
+          }}
+          onMouseEnter={(e) =>
+            (e.currentTarget.style.backgroundColor = "#0056b3")
+          }
+          onMouseLeave={(e) =>
+            (e.currentTarget.style.backgroundColor = "#007bff")
+          }
         >
           See Product Recommendations →
         </button>
         <br />
-        <button onClick={retakeQuiz} style={{ marginTop: "20px" }}>
+        <button
+          onClick={resetQuiz}
+          style={{
+            marginTop: 30,
+            padding: "8px 20px",
+            fontSize: 14,
+            borderRadius: 6,
+            backgroundColor: "#6c757d",
+            color: "#fff",
+            border: "none",
+            cursor: "pointer",
+          }}
+          onMouseEnter={(e) =>
+            (e.currentTarget.style.backgroundColor = "#5a6268")
+          }
+          onMouseLeave={(e) =>
+            (e.currentTarget.style.backgroundColor = "#6c757d")
+          }
+        >
           Retake Quiz
         </button>
       </div>
     );
   }
-
-  return null; // fallback
 }
