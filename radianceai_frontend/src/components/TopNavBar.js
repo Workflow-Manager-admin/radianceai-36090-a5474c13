@@ -41,7 +41,7 @@ function TopNavBar() {
           alignItems: "center",
           gap: "0.7em",
           fontWeight: 700,
-          color: "var(--kavia-orange, #e87a41)",
+          color: "var( #77a6ed)",
           fontSize: "1.45rem",
           letterSpacing: "-0.03em",
           padding: "0.1em 0.5em 0.1em 0",
@@ -56,7 +56,7 @@ function TopNavBar() {
             height: 28,
             borderRadius: "50%",
             background:
-              "linear-gradient(133deg, #fadadd 55%, #e7b3ff 100%)",
+              "linear-gradient(133deg, #77a6ed 55%, #e7b3ff 100%)",
             boxShadow: "0 2px 8px #fadadd55, 0 1px #fadadd77",
             marginRight: 7,
             transform: "translateY(1px)",
@@ -77,7 +77,7 @@ function TopNavBar() {
         <Link
           to="/quiz"
           style={{
-            color: location.pathname === "/quiz" ? "#f339db" : "var(--kavia-dark)",
+            color: location.pathname === "/quiz" ? "#77a6ed" : "var(--kavia-dark)",
             fontWeight: location.pathname === "/quiz" ? 700 : 500,
             opacity: 0.88,
             textDecoration: "none",
@@ -89,7 +89,7 @@ function TopNavBar() {
         <Link
           to="/routine"
           style={{
-            color: location.pathname === "/routine" ? "#f339db" : "var(--kavia-dark)",
+            color: location.pathname === "/routine" ? "#77a6ed" : "var(--kavia-dark)",
             fontWeight: location.pathname === "/routine" ? 700 : 500,
             opacity: 0.88,
             textDecoration: "none",
@@ -101,7 +101,7 @@ function TopNavBar() {
         <Link
           to="/recommendations"
           style={{
-            color: location.pathname === "/recommendations" ? "#f339db" : "var(--kavia-dark)",
+            color: location.pathname === "/recommendations" ? "#77a6ed" : "var(--kavia-dark)",
             fontWeight: location.pathname === "/recommendations" ? 700 : 500,
             opacity: 0.88,
             textDecoration: "none",
@@ -113,7 +113,7 @@ function TopNavBar() {
         <Link
           to="/all-products"
           style={{
-            color: location.pathname === "/all-products" ? "#f339db" : "var(--kavia-dark)",
+            color: location.pathname === "/all-products" ? "#77a6ed" : "var(--kavia-dark)",
             fontWeight: location.pathname === "/all-products" ? 700 : 500,
             opacity: 0.88,
             textDecoration: "none",
@@ -125,7 +125,7 @@ function TopNavBar() {
         <Link
           to="/weather"
           style={{
-            color: location.pathname === "/weather" ? "#f339db" : "var(--kavia-dark)",
+            color: location.pathname === "/weather" ? "#77a6ed" : "var(--kavia-dark)",
             fontWeight: location.pathname === "/weather" ? 700 : 500,
             opacity: 0.88,
             textDecoration: "none",
@@ -137,7 +137,7 @@ function TopNavBar() {
         <Link
           to="/email"
           style={{
-            color: location.pathname === "/email" ? "#f339db" : "var(--kavia-dark)",
+            color: location.pathname === "/email" ? "#77a6ed" : "var(--kavia-dark)",
             fontWeight: location.pathname === "/email" ? 700 : 500,
             opacity: 0.88,
             textDecoration: "none",
@@ -149,7 +149,7 @@ function TopNavBar() {
         <Link
           to="/chat"
           style={{
-            color: location.pathname === "/chat" ? "#f339db" : "var(--kavia-dark)",
+            color: location.pathname === "/chat" ? "#77a6ed" : "var(--kavia-dark)",
             fontWeight: location.pathname === "/chat" ? 700 : 500,
             opacity: 0.88,
             textDecoration: "none",
