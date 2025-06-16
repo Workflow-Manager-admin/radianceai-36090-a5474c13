@@ -49,20 +49,28 @@ function AllProducts() {
 
   const fetchProducts = async (filterParams = filters, sortParam = sortBy) => {
     try {
-      let query = supabase.from("products").select("*");
+      // Select from products and join brands table to get brand name
+      let query = supabase
+        .from("products")
+        .select(`
+          *,
+          brands (
+            name
+          )
+        `);
 
-      // Filter by brand name → get brand_id
+      // Filter by brand name → get brand_id from brands table
       if (filterParams.brand) {
         const { data: brandData, error: brandError } = await supabase
           .from("brands")
-          .select("brand_id")
+          .select("id") // Adjust this if your primary key is named differently
           .eq("name", filterParams.brand)
           .single();
 
         if (brandError) {
           console.error("Error fetching brand ID:", brandError);
-        } else if (brandData?.brand_id) {
-          query = query.eq("brand_id", brandData.brand_id);
+        } else if (brandData?.id) {
+          query = query.eq("brand_id", brandData.id);
         }
       }
 
@@ -270,7 +278,7 @@ function AllProducts() {
               name={product.name}
               image_url={product.image_url}
               price={`₹${product.price}`}
-              brand={product.brand} // OR product.brands?.name if you're joining
+              brand={product.brands?.name || "Unknown Brand"}
               description={product.description}
             />
           ))
