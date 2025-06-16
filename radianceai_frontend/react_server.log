@@ -246,3 +246,33 @@ ERROR in ./src/features/products/AllProducts.js 7:0-41
 Module not found: Error: Can't resolve '../supabaseClient' in '/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/src/features/products'
 
 webpack compiled with 1 error and 1 warning
+Compiling...
+Failed to compile.
+
+Module not found: Error: Can't resolve '../../supabaseClient' in '/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/src/features/products'
+WARNING in [eslint] 
+src/api/apiClient.js
+  Line 12:7:  'SUPABASE_PRODUCTS_TABLE' is assigned a value but never used  no-unused-vars
+
+src/features/recommendations/Recommendations.js
+  Line 11:24:  'skinType' is assigned a value but never used  no-unused-vars
+
+ERROR in ./src/features/products/AllProducts.js 7:0-44
+Module not found: Error: Can't resolve '../../supabaseClient' in '/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/src/features/products'
+
+webpack compiled with 1 error and 1 warning
+Compiling...
+Failed to compile.
+
+Module not found: Error: Can't resolve '../../supabaseClient' in '/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/src/features/products'
+WARNING in [eslint] 
+src/api/apiClient.js
+  Line 12:7:  'SUPABASE_PRODUCTS_TABLE' is assigned a value but never used  no-unused-vars
+
+src/features/recommendations/Recommendations.js
+  Line 11:24:  'skinType' is assigned a value but never used  no-unused-vars
+
+ERROR in ./src/features/products/AllProducts.js 7:0-44
+Module not found: Error: Can't resolve '../../supabaseClient' in '/home/kavia/workspace/code-generation/radianceai-36090-a5474c13/radianceai_frontend/src/features/products'
+
+webpack compiled with 1 error and 1 warning

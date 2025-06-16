@@ -1,6 +1,6 @@
 // AllProducts.js
 import React, { useEffect, useState } from "react";
-import supabase from "../supabaseClient";
+import supabase from "../../supabaseClient";
 import ProductCard from "./ProductCard";
 
 function AllProducts() {
