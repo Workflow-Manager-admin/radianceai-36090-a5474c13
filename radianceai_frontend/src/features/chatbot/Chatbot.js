@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { supabase } from "../../utils/supabaseClient";
+import supabase from "../../api/supabaseClient";
 
 // Rule-based fallback AI
 function ruleBasedAI(question) {
