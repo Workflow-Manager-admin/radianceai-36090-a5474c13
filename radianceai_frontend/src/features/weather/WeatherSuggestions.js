@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { fetchGeolocation } from "../../api/geo";
 import supabase from "../../api/supabaseClient";
-import ProductCardWeather from "../components/ProductCardWeather";
+import ProductCardWeather from "./ProductCardWeather";
 
 const palette = {
   blueDark: "#2050aa",
