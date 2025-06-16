@@ -26,11 +26,8 @@ function AllProducts() {
 
   useEffect(() => {
     fetchDropdownOptions();
+    fetchProducts(); // Fetch all products initially
   }, []);
-
-  useEffect(() => {
-    fetchProducts(filters, sortBy);
-  }, [filters, sortBy]);
 
   const fetchDropdownOptions = async () => {
     try {
@@ -52,7 +49,7 @@ function AllProducts() {
     }
   };
 
-  const fetchProducts = async (filterParams, sortParam) => {
+  const fetchProducts = async (filterParams = filters, sortParam = sortBy) => {
     try {
       let query = supabase.from("products").select("*");
 
@@ -82,6 +79,22 @@ function AllProducts() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleApplyFilters = () => {
+    fetchProducts(filters, sortBy);
+  };
+
+  const handleResetFilters = () => {
+    const cleared = {
+      brand: "",
+      concern: "",
+      type: "",
+      skin_type: ""
+    };
+    setFilters(cleared);
+    setSortBy("");
+    fetchProducts(cleared, "");
   };
 
   return (
@@ -195,6 +208,38 @@ function AllProducts() {
             <option value="priceHigh">Price: High to Low</option>
           </select>
         </div>
+
+        {/* Buttons */}
+        <div style={{ display: "flex", gap: "10px", marginTop: 28 }}>
+          <button
+            onClick={handleApplyFilters}
+            style={{
+              backgroundColor: palette.blueDark,
+              color: "#fff",
+              padding: "10px 16px",
+              borderRadius: 6,
+              border: "none",
+              fontWeight: "bold",
+              cursor: "pointer",
+            }}
+          >
+            Apply Filters
+          </button>
+          <button
+            onClick={handleResetFilters}
+            style={{
+              backgroundColor: "#888",
+              color: "#fff",
+              padding: "10px 16px",
+              borderRadius: 6,
+              border: "none",
+              fontWeight: "bold",
+              cursor: "pointer",
+            }}
+          >
+            Reset Filters
+          </button>
+        </div>
       </div>
 
       {/* PRODUCT GRID */}
@@ -226,3 +271,4 @@ function AllProducts() {
 }
 
 export default AllProducts;
+
