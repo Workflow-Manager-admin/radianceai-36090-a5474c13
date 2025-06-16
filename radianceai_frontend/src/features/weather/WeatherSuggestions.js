@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { fetchGeolocation } from "../../api/geo"; // your geo.js file
-import  supabase  from "../../api/supabaseClient"; // Import your Supabase client here
+import supabase from "../../api/supabaseClient"; // Import your Supabase client here
 
 const palette = {
   blueDark: "#2050aa",
