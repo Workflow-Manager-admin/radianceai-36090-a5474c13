@@ -96,3 +96,4 @@ function WeatherSuggestions() {
 }
 
 export default WeatherSuggestions;
+
