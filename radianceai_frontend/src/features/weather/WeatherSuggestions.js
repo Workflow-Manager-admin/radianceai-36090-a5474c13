@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { fetchGeolocation } from "../../api/geo"; // your geo.js file
+import  supabase  from "../../api/supabaseClient"; // Import your Supabase client here
 
 const palette = {
   blueDark: "#2050aa",
@@ -27,9 +28,49 @@ async function fetchWeatherFromCoords(lat, lon) {
   }
 }
 
+// Map weather conditions to product categories in your inventory
+const weatherToCategories = (weatherObj) => {
+  if (!weatherObj || weatherObj.error) return [];
+
+  const temp = weatherObj.temp;
+  const main = weatherObj.weatherMain.toLowerCase();
+
+  if (main.includes("rain")) {
+    return ["Moisturizer", "Water Resistant Sunscreen"];
+  }
+  if (temp < 16) {
+    return ["Hydrating Serum", "Moisturizer"];
+  }
+  if (temp > 28) {
+    return ["Sunscreen", "Toner", "Lightweight Moisturizer"];
+  }
+  if (main.includes("clear") || main.includes("cloud")) {
+    return ["Sunscreen", "Cleanser"];
+  }
+
+  return ["Moisturizer", "Sunscreen"];
+};
+
+async function fetchProductsByCategories(categories) {
+  if (!categories.length) return [];
+
+  const { data, error } = await supabase
+    .from("products")
+    .select("*")
+    .in("category", categories);
+
+  if (error) {
+    console.error("Error fetching products:", error);
+    return [];
+  }
+
+  return data || [];
+}
+
 function WeatherSuggestions() {
   const [weather, setWeather] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState([]);
 
   useEffect(() => {
     async function getLocationAndWeather() {
@@ -47,6 +88,13 @@ function WeatherSuggestions() {
       const weatherData = await fetchWeatherFromCoords(geo.latitude, geo.longitude);
       setWeather(weatherData);
       setLoading(false);
+
+      if (!weatherData.error) {
+        // Fetch matching products from Supabase based on weather categories
+        const categories = weatherToCategories(weatherData);
+        const fetchedProducts = await fetchProductsByCategories(categories);
+        setProducts(fetchedProducts);
+      }
     }
 
     getLocationAndWeather();
@@ -108,6 +156,27 @@ function WeatherSuggestions() {
           </span>
         )}
       </div>
+
+      {products.length > 0 && (
+        <div style={{ marginTop: 20 }}>
+          <h3 style={{ color: palette.blueDark, textAlign: "center" }}>Recommended Products</h3>
+          <ul style={{ listStyleType: "none", paddingLeft: 0 }}>
+            {products.map((prod) => (
+              <li key={prod.id} style={{ marginBottom: 10 }}>
+                <a
+                  href={prod.product_url || "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: palette.blueLight, fontWeight: 600, textDecoration: "none" }}
+                >
+                  {prod.name}
+                </a>
+                {prod.price && <span> - ₹{prod.price}</span>}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </section>
   );
 }
