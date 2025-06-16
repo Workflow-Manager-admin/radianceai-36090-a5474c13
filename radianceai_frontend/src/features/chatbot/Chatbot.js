@@ -12,13 +12,23 @@ function ruleBasedAI(question) {
 
 // Skin concerns dictionary with synonyms
 const concernsDict = {
-  acne: ["acne", "pimples", "blemishes", "breakouts"],
+  acne: ["acne", "pimples", "blemishes", "breakouts", "oil control"],
   hydration: ["hydration", "dry", "dryness", "dehydration", "moisture"],
-  aging: ["aging", "wrinkles", "fine lines", "age spots", "anti-aging"],
+  aging: ["aging", "wrinkles", "fine lines", "age spots", "anti-aging", "texture"],
   brightness: ["brightness", "dull", "radiance", "glow"],
   sensitive: ["sensitive", "redness", "irritation", "allergic"],
   oily: ["oily", "greasy", "shine"],
-  pigmentation: ["pigmentation", "dark spots", "hyperpigmentation"],
+  pigmentation: ["pigmentation", "dark spots", "hyperpigmentation", "uneven skin tone", "blemishes"],
+  sun_protection: ["sun protection", "sun damage", "barrier repair"],
+  dark_circles: ["dark circles", "fine lines"],
+};
+
+// Common skin types dictionary with synonyms
+const skinTypesDict = {
+  all: ["all", "any", "all skin types", "every skin type"],
+  dry: ["dry", "dry skin"],
+  oily_combination_sensitive: ["oily", "combination", "sensitive", "oily skin", "combination skin", "sensitive skin"],
+  oily_acne_prone: ["oily acne-prone", "acne-prone", "acne prone", "acne skin", "oily acne prone"],
 };
 
 // Find best matching concern from user input
@@ -32,18 +42,41 @@ function findConcern(text) {
   return null;
 }
 
-// Fetch products with images and URL by concern
-async function fetchProductsByConcern(concern) {
-  const { data, error } = await supabase
+// Find best matching skin type from user input
+function findSkinType(text) {
+  const lowerText = text.toLowerCase();
+  for (const [key, synonyms] of Object.entries(skinTypesDict)) {
+    for (const synonym of synonyms) {
+      if (lowerText.includes(synonym)) return key;
+    }
+  }
+  // If none found, default to 'all'
+  return "all";
+}
+
+// Fetch products filtered by concern and skin type
+async function fetchProducts(concern, skinType) {
+  let query = supabase
     .from("products")
     .select("id, name, brand, product_url, image_url")
-    .ilike("concerns", `%${concern}%`)
     .limit(5);
+
+  if (concern) {
+    query = query.ilike("concerns", `%${concern}%`);
+  }
+
+  // Only filter skin type if not 'all'
+  if (skinType && skinType !== "all") {
+    query = query.ilike("skin_types", `%${skinType}%`);
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     console.error("Supabase fetch error:", error);
     return { error };
   }
+
   return { data };
 }
 
@@ -51,7 +84,7 @@ export default function Chatbot() {
   const [messages, setMessages] = useState([
     {
       sender: "bot",
-      text: "Hello! Ask me for skincare product recommendations or general help.",
+      text: "Hello! Ask me for skincare product recommendations or general help. You can mention your skin concern and skin type for better suggestions.",
       ts: Date.now(),
     },
   ]);
@@ -93,67 +126,70 @@ export default function Chatbot() {
     const normalizedMsg = msg.toLowerCase();
 
     // Check if user is asking for product recommendations
-    const wantsRecommendation =
-      /recommend|suggest|products?|help with/.test(normalizedMsg);
+    const wantsRecommendation = /recommend|suggest|products?|help with/.test(normalizedMsg);
 
     if (wantsRecommendation) {
+      // Detect concern and skin type from message
       const concern = findConcern(normalizedMsg);
+      const skinType = findSkinType(normalizedMsg);
 
-      if (concern) {
-        const { data, error } = await fetchProductsByConcern(concern);
-
-        if (error) {
-          setMessages((m) => [
-            ...m,
-            {
-              sender: "bot",
-              text: "Oops! There was a problem fetching products. Please try again later.",
-              ts: Date.now() + 1,
-            },
-          ]);
-          setTyping(false);
-          return;
-        }
-
-        if (data.length === 0) {
-          setMessages((m) => [
-            ...m,
-            {
-              sender: "bot",
-              text: `Sorry, I couldn't find any products for "${concern}". Try another concern or ask for general help!`,
-              ts: Date.now() + 1,
-            },
-          ]);
-          setTyping(false);
-          return;
-        }
-
-        // Show products with images and links
-        setMessages((m) => [
-          ...m,
-          {
-            sender: "bot",
-            text: `Here are some products for *${concern}*:`,
-            ts: Date.now() + 1,
-            products: data, // attach products for rendering images
-          },
-        ]);
-        setTyping(false);
-        return;
-      } else {
-        // No concern found, ask for clarification
+      if (!concern) {
+        // Ask user to specify concern if missing
         setMessages((m) => [
           ...m,
           {
             sender: "bot",
             text:
-              "Could you please specify your skin concern? For example: acne, hydration, aging, sensitive, oily, pigmentation, brightness.",
+              "Could you please specify your skin concern? For example: acne, hydration, aging, sensitive, oily, pigmentation, sun protection, dark circles.",
             ts: Date.now() + 1,
           },
         ]);
         setTyping(false);
         return;
       }
+
+      const { data, error } = await fetchProducts(concern, skinType);
+
+      if (error) {
+        setMessages((m) => [
+          ...m,
+          {
+            sender: "bot",
+            text: "Oops! There was a problem fetching products. Please try again later.",
+            ts: Date.now() + 1,
+          },
+        ]);
+        setTyping(false);
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        setMessages((m) => [
+          ...m,
+          {
+            sender: "bot",
+            text: `Sorry, I couldn't find any products for your concern "${concern}"${
+              skinType !== "all" ? ` and skin type "${skinType.replace(/_/g, " ")}"` : ""
+            }. Try another concern or skin type, or ask for general help!`,
+            ts: Date.now() + 1,
+          },
+        ]);
+        setTyping(false);
+        return;
+      }
+
+      // Show products with images and links
+      setMessages((m) => [
+        ...m,
+        {
+          sender: "bot",
+          text: `Here are some products for *${concern.replace(/_/g, " ")}*${skinType !== "all" ? ` and skin type *${skinType.replace(/_/g, " ")}*` : ""}:`,
+          ts: Date.now() + 1,
+          products: data, // attach products for rendering images
+        },
+      ]);
+      setTyping(false);
+      return;
     }
 
     // Fallback to rule-based AI with delay and typing animation
