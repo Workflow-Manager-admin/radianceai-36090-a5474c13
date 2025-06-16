@@ -1,11 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
-
-// Initialize Supabase
-const supabase = createClient(
-  "https://YOUR_SUPABASE_URL.supabase.co",
-  "YOUR_SUPABASE_ANON_KEY"
-);
+import supabase from "../../api/supabaseClient"; // Import your existing Supabase client
 
 const RoutineBuilder = () => {
   const [answers, setAnswers] = useState(null);
@@ -25,13 +19,23 @@ const RoutineBuilder = () => {
   // Fetch routine from Supabase
   useEffect(() => {
     const fetchRoutine = async () => {
-      if (!answers?.primaryGoal) return;
+      if (!answers?.primaryGoal) {
+        setLoading(false);
+        return;
+      }
 
       const { data, error } = await supabase
         .from("routine_steps")
-        .select(
-          "step_order, step_name, description, brand_id, official_product_url, brands(name)"
-        )
+        .select(`
+          step_order,
+          step_name,
+          description,
+          brand_id,
+          official_product_url,
+          brands!routine_steps_brand_id_fkey (
+            name
+          )
+        `)
         .eq("concerns", answers.primaryGoal)
         .order("step_order", { ascending: true });
 

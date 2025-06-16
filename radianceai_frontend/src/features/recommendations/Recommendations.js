@@ -10,17 +10,16 @@ import supabase from "../../api/supabaseClient";
 async function fetchRecommendationsFromSupabase(primaryGoal, skinType) {
   const { data, error } = await supabase
     .from("products")
-    .select(
-      `
+    .select(`
       name,
       description,
       category,
       official_product_url,
+      image_url,
       brand (
         name
       )
-    `
-    )
+    `)
     .ilike("concerns", `%${primaryGoal}%`)
     .ilike("skin_type", `%${skinType}%`);
 
@@ -35,8 +34,9 @@ async function fetchRecommendationsFromSupabase(primaryGoal, skinType) {
     title: product.name,
     description: product.description,
     category: product.category,
-    brand: product.brand ? product.brand.name : "Unknown Brand",
+    brand: product.brand?.name ?? "Unknown Brand",
     link: product.official_product_url,
+    imageUrl: product.image_url ?? "/default-product-image.jpg",
   }));
 }
 
