@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { fetchGeolocation } from "./geo"; // your geo.js file
+import { fetchGeolocation } from "../../api/geo"; // your geo.js file
 
 const palette = {
   blueDark: "#2050aa",
