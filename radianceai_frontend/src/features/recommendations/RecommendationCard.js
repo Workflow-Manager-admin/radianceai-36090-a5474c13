@@ -1,16 +1,10 @@
 import React from "react";
 import styles from "./RecommendationCard.module.css";
 
-/* 
- * RecommendationCard: For each recommended routine step or product.
- * Pink accent: #fadadd, #e7b3ff, #f339db. Blue palette: #93bafe, #e3f0ff, #2a6ae7.
+/**
+ * Displays a single product recommendation.
  */
-
-// PUBLIC_INTERFACE
-function RecommendationCard({ data = {}, index = 0 }) {
-  // Debug data received for this card
-  console.log("RecommendationCard data:", data);
-
+function RecommendationCard({ data, index }) {
   return (
     <div
       className={styles.card}
@@ -24,7 +18,6 @@ function RecommendationCard({ data = {}, index = 0 }) {
       onFocus={(e) => (e.currentTarget.style.boxShadow = "0 0 12px 3px #2a6ae7cc")}
       onBlur={(e) => (e.currentTarget.style.boxShadow = "0 2px 18px #93bafe55")}
     >
-      {/* Badge for step order */}
       <div
         className={styles.badge}
         style={{

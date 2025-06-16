@@ -1,581 +1,208 @@
 import React, { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { fetchRecommendedProducts } from "../../api/apiClient";
-import { AppleFadeTransition, MotionWrapper } from "../../utils/animation";
-import useLocalStorage from "../../hooks/useLocalStorage";
+import { createClient } from "@supabase/supabase-js";
 
-/**
- * Routine steps mapped for both morning and night routines
- * Steps mapped to product types/categories in API
- */
-const ROUTINE_STEPS = [
-  {
-    key: "cleanser",
-    name: "Cleanser",
-    icon: "🧼",
-    slot: "morning",
-    description: "Removes dirt and excess oil, prepping skin for the day.",
-    category: "skincare", // API category
-    tags: ["cleanser", "face wash", "gel"],
-  },
-  {
-    key: "toner",
-    name: "Toner",
-    icon: "💧",
-    slot: "morning",
-    description: "Balances skin pH, refreshes and delivers hydration.",
-    category: "skincare",
-    tags: ["toner", "essence"],
-  },
-  {
-    key: "serum",
-    name: "Serum",
-    icon: "🧪",
-    slot: "morning",
-    description: "Targets skincare goals: brightening, anti-aging, hydration.",
-    category: "skincare",
-    tags: ["serum"],
-  },
-  {
-    key: "moisturizer",
-    name: "Moisturizer",
-    icon: "🥛",
-    slot: "morning",
-    description: "Hydrates and locks in skincare benefits.",
-    category: "skincare",
-    tags: ["moisturizer", "cream", "lotion"],
-  },
-  {
-    key: "sunscreen",
-    name: "Sunscreen",
-    icon: "🌞",
-    slot: "morning",
-    description: "Shields skin from UV and sun damage.",
-    category: "skincare",
-    tags: ["sunscreen", "spf"],
-    isPrimary: true,
-  },
-  // Night routine
-  {
-    key: "cleanser_night",
-    name: "Cleanser",
-    icon: "🧼",
-    slot: "night",
-    description: "Removes daily build-up, pollution, and SPF.",
-    category: "skincare",
-    tags: ["cleanser", "face wash", "gel"],
-  },
-  {
-    key: "treatment",
-    name: "Treatment",
-    icon: "💊",
-    slot: "night",
-    description: "Treatments for acne, anti-aging, or other concerns.",
-    category: "skincare",
-    tags: ["treatment", "retinol", "acne", "serum", "blemish"],
-  },
-  {
-    key: "night_serum",
-    name: "Serum / Oil",
-    icon: "🌙",
-    slot: "night",
-    description: "Nourishes skin overnight (serum/face oil).",
-    category: "skincare",
-    tags: ["serum", "face oil", "night"],
-  },
-  {
-    key: "night_moisturizer",
-    name: "Moisturizer",
-    icon: "🥛",
-    slot: "night",
-    description: "Repairs and hydrates skin overnight.",
-    category: "skincare",
-    tags: ["moisturizer", "cream", "lotion", "night"],
-    isPrimary: true,
-  },
-];
+// Initialize Supabase
+const supabase = createClient(
+  "https://YOUR_SUPABASE_URL.supabase.co",
+  "YOUR_SUPABASE_ANON_KEY"
+);
 
+const RoutineBuilder = () => {
+  const [answers, setAnswers] = useState(null);
+  const [routineSteps, setRoutineSteps] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-// Helper to personalize step order based on quiz answers
-function getRoutineSteps(slot, quiz) {
-  // Reorders, removes, or highlights steps based on quiz
-  // (For now: assign all, enhance if quiz provided)
-  let steps = ROUTINE_STEPS.filter((s) => s.slot === slot);
-  // Example: if sensitive skin, remove "treatment"
-  if (quiz?.skinType === "sensitive") {
-    steps = steps.filter((s) => s.key !== "treatment");
-  }
-  return steps;
-}
+  // Load answers from localStorage
+  useEffect(() => {
+    const stored = localStorage.getItem("quizAnswers");
+    if (stored) {
+      setAnswers(JSON.parse(stored));
+    } else {
+      setLoading(false); // No answers, stop loading
+    }
+  }, []);
 
-// Tag matching for product fetching
-function tagsMatch(product, tags = []) {
-  // Check if product title/category/keywords matches tags (fuzzy)
-  const haystack =
-    [
-      product.title,
-      product.brand,
-      product.category,
-      ...(product.tags || []),
-      product.description,
-    ]
-      .join(" ")
-      .toLowerCase() || "";
-  return tags.some((tag) => haystack.includes(tag));
-}
+  // Fetch routine from Supabase
+  useEffect(() => {
+    const fetchRoutine = async () => {
+      if (!answers?.primaryGoal) return;
 
-// Animated, Expandable Product Card
-function AnimatedProductCard({ step, product, expanded, onToggle }) {
-  return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: 22, scale: 0.96 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: -18, scale: 0.98 }}
-      transition={{
-        duration: 0.32,
-        ease: [0.39, 1.22, 0.48, 1],
-      }}
-      style={{
-        marginBottom: 18,
-        background:
-          "linear-gradient(101deg,#1c1850bb 10%,#77a6ed14 100%)",
-        borderRadius: 19,
-        padding: expanded ? "28px 24px" : "17px 18px",
-        boxShadow: expanded
-          ? "0 4px 18px 0 #77a6ed33"
-          : "0 1.5px 7px 0 #2050aa13",
-        border: step.isPrimary
-          ? "2.2px solid #2050aa"
-          : "1.5px solid #77a6ed55",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "flex-start",
-        cursor: "pointer",
-        position: "relative",
-        transition: "box-shadow 0.2s",
-      }}
-      onClick={onToggle}
-      aria-expanded={expanded}
-      tabIndex={0}
-      role="button"
-    >
-      <div style={{ display: "flex", alignItems: "center", gap: 13 }}>
-        <span
-          style={{
-            fontSize: 27,
-            marginRight: 3,
-            filter: "drop-shadow(0 0 2px #77a6ed99)",
-          }}
-        >
-          {step.icon}
-        </span>
-        <div>
-          <div
-            style={{
-              fontWeight: 700,
-              color: "#2050aa",
-              fontSize: 19,
-              marginBottom: 2,
-            }}
-          >
-            {step.name}
-            {step.isPrimary && (
-              <span
-                style={{
-                  background: "#77a6ed",
-                  color: "#fff",
-                  fontWeight: 600,
-                  borderRadius: 8,
-                  fontSize: 12.5,
-                  marginLeft: 8,
-                  padding: "2.2px 8px",
-                  letterSpacing: ".03em",
-                  position: "relative",
-                  top: -1,
-                }}
-              >
-                Must-have
-              </span>
-            )}
-          </div>
-          <div
-            style={{
-              color: "#3878e6",
-              opacity: 0.94,
-              fontWeight: 500,
-              fontSize: 14.2,
-              marginBottom: 1,
-            }}
-          >
-            {step.description}
-          </div>
+      const { data, error } = await supabase
+        .from("routine_steps")
+        .select(
+          "step_order, step_name, description, brand_id, official_product_url, brands(name)"
+        )
+        .eq("concerns", answers.primaryGoal)
+        .order("step_order", { ascending: true });
+
+      if (error) {
+        console.error("Error fetching routine steps:", error);
+      } else {
+        setRoutineSteps(data);
+      }
+      setLoading(false);
+    };
+
+    fetchRoutine();
+  }, [answers]);
+
+  if (loading) {
+    return (
+      <div style={wrapperStyle}>
+        <div style={boxStyle}>
+          <h2 style={headingStyle}>Building your routine...</h2>
         </div>
       </div>
-      <AnimatePresence>
-        {expanded && product && (
-          <motion.div
-            layout
-            key="expandedCard"
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{
-              duration: 0.33,
-              ease: [0.36, 1.12, 0.52, 1],
-            }}
-            style={{
-              width: "100%",
-              overflow: "hidden",
-              marginTop: 19,
-            }}
-          >
-            {/* Product details */}
-            <div style={{display: "flex", gap: 18, alignItems: "center" }}>
-              <img
-                src={product.thumbnail}
-                alt={product.title}
-                style={{
-                  width: 90,
-                  height: 90,
-                  borderRadius: 13,
-                  boxShadow: "0 2px 12px #77a6ed44",
-                  background: "#fff",
-                  objectFit: "cover",
-                  marginRight: 0,
-                }}
-              />
-              <div style={{flex: 1}}>
-                <div
-                  style={{
-                    fontWeight: 600,
-                    color: "#2050aa",
-                    fontSize: 16.9,
-                    marginBottom: 2,
-                  }}
-                  title={product.title}
-                >
-                  {product.title}
-                </div>
-                <div
-                  style={{
-                    color: "#3878e6",
-                    fontWeight: 500,
-                    fontSize: 14.7,
-                  }}
-                >
-                  Brand: {product.brand}
-                </div>
-                <div style={{color: "#77a6ed", fontSize: 13.8, margin: "3px 0 2px 0"}}>
-                  Price: <span style={{color:'#2050aa', fontWeight:600}}>
-                    {product.currency === "INR" || product.isLocalIN ? "₹" : "$"}
-                    {product.price}
-                  </span>
-                  <span style={{marginLeft:7, color:"#2050aa"}}>Rating: ★ {product.rating}</span>
-                  {product.isLocalIN && (
-                    <span style={{ color: "#2050aa", fontSize: 11, marginLeft: 7 }}>
-                      India
-                    </span>
-                  )}
-                </div>
-                <div style={{color: "#fff", fontSize:13.5, opacity: 0.78, minHeight: 20, marginTop: 3}}>
-                  {product.description && product.description.length > 60
-                    ? product.description.slice(0, 60) + "…"
-                    : product.description}
-                </div>
-                {product.link && (
-                  <a
-                    href={product.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      display: "inline-block",
-                      marginTop: 8,
-                      color: "#fff",
-                      background: "linear-gradient(92deg, #2050aa 55%, #77a6ed 100%)",
-                      borderRadius: 7,
-                      fontSize: 12.8,
-                      padding: "6px 15px",
-                      fontWeight: 600,
-                      textDecoration: "none",
-                    }}
-                  >
-                    View Product →
-                  </a>
-                )}
-              </div>
-            </div>
-            <div
-              style={{
-                marginTop: 13,
-                color: "#2050aa",
-                fontWeight: 500,
-                fontSize: 13.1,
-                letterSpacing: ".01em",
-              }}
-            >
-              Usage Tip: <span style={{ color: "#fff", fontWeight: 400 }}>{expandUsageTip(step, product)}</span>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
-  );
-}
-
-// Helper: usage tips per step and product
-function expandUsageTip(step, product) {
-  // Example tip (could be enhanced)
-  if (!product) return "";
-  switch (step.key) {
-    case "cleanser":
-    case "cleanser_night":
-      return "Massage onto damp skin for 30–60 seconds, rinse with lukewarm water.";
-    case "serum":
-    case "night_serum":
-      return "Apply 2–3 drops and gently pat into skin post-toner.";
-    case "toner":
-      return "Sweep over clean skin with cotton pad or press in with palms.";
-    case "treatment":
-      return "Use small amount on targeted areas after cleansing, before moisturizer.";
-    case "moisturizer":
-    case "night_moisturizer":
-      return "Apply evenly to face and neck as the final step.";
-    case "sunscreen":
-      return "Apply generously as the final step in morning routine. Reapply every 2–3 hours when exposed to sun.";
-    default:
-      return "See product label for usage instructions.";
-  }
-}
-
-
-// PUBLIC_INTERFACE
-/**
- * RoutineBuilder: generates personalized routines and displays as animated cards.
- */
-const RoutineBuilder = () => {
-  // Retrieve user's quiz answers from localStorage
-  // - Key convention: "quizAnswers"
-  const [quizAnswers] = useLocalStorage("quizAnswers", null);
-  const [routineProducts, setRoutineProducts] = useState({});
-  const [loading, setLoading] = useState(true);
-  const [expandedStep, setExpandedStep] = useState(null);
-
-  // Map skin goals/budget to API queries
-  useEffect(() => {
-    let isMounted = true;
-    async function buildRoutine() {
-      setLoading(true);
-      const freshProducts = {};
-      // For each step, fetch a relevant product based on quiz answers
-      // Could enhance by fetching once and matching locally if needed
-      for (let slot of ["morning", "night"]) {
-        const steps = getRoutineSteps(slot, quizAnswers);
-        for (let step of steps) {
-          // Determine quiz influence for tags/category
-          let tags = [...step.tags];
-
-          // If quiz has goals, boost most relevant tags for serums/treatments
-          if (
-            (step.key === "serum" || step.key === "night_serum" || step.key === "treatment") &&
-            quizAnswers?.goals &&
-            Array.isArray(quizAnswers.goals)
-          ) {
-            tags = [
-              ...tags,
-              ...quizAnswers.goals.map((g) =>
-                g
-                  .toLowerCase()
-                  .replace(/[^a-z]/g, "")
-                  .slice(0, 10)
-              ),
-            ];
-          }
-
-          // Map budget to price, if supported, but DummyJSON won't filter
-          let minRating = 3.7;
-          let limit = 16;
-
-          const products = await fetchRecommendedProducts({
-            limit,
-            minRating,
-            // Could add category: step.category,
-          });
-
-          // Filter to only allowed brands
-          const allowedBrands = [
-            "DermaCo",
-            "Kiehl's",
-            "Minimalist",
-            "Plum",
-            "Wow"
-          ];
-          const filtered = (products || []).filter(
-            (p) => allowedBrands.includes(p.brand)
-          );
-
-          // Fuzzy match by tags/goals first; fallback to any with required keyword
-          let matched =
-            filtered.find((p) => tagsMatch(p, tags)) ||
-            filtered.find((p) => tagsMatch(p, [step.key])) ||
-            filtered[Math.floor(Math.random() * filtered.length)];
-
-          freshProducts[step.key] = matched;
-        }
-      }
-      if (isMounted) {
-        setRoutineProducts(freshProducts);
-        setLoading(false);
-      }
-    }
-    buildRoutine();
-    return () => {
-      isMounted = false;
-    };
-    // trigger rebuild if quiz answers change
-  }, [quizAnswers]);
-
-  // If no quiz data, show prompt
-  if (!quizAnswers) {
-    return (
-      <section className="container" style={{ minHeight: 433, textAlign: "center", paddingTop: 25 }}>
-        <AppleFadeTransition>
-          <h2 style={{ color: "#2050aa" }}>Build Your Skincare Routine</h2>
-          <p style={{ color: "#3878e6", margin: "14px 0 30px 0", fontSize: 18 }}>
-            Please complete the <a href="/quiz" style={{ color: "#2050aa", fontWeight: 600 }}>personalized quiz</a> to generate your custom morning and night routines.
-          </p>
-          <a href="/quiz">
-            <button className="btn btn-large" style={{
-              background: "linear-gradient(90deg,#2050aa 60%,#77a6ed 100%)",
-              color: "#fff", borderRadius: 15,
-              fontWeight: 700, fontSize: "1.12rem"
-            }}>
-              Start Quiz
-            </button>
-          </a>
-        </AppleFadeTransition>
-      </section>
     );
   }
 
-  // Main: routines are ready
+  if (!answers || routineSteps.length === 0) {
+    return (
+      <div style={wrapperStyle}>
+        <div style={boxStyle}>
+          <h2 style={headingStyle}>No routine available</h2>
+          <p style={paragraphStyle}>
+            Please complete the{" "}
+            <a href="/quiz" style={linkStyle}>
+              quiz
+            </a>{" "}
+            to get a personalized routine.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <section className="container" style={{ maxWidth: 800, margin: "0 auto" }}>
-      <AppleFadeTransition>
-        <h2 style={{
-          color: "#2050aa", fontWeight: 700, fontSize: "2.0rem", marginTop: 17, marginBottom: 7, textAlign: "center"
-        }}>
-          Your Personalized Routines
-        </h2>
-        <div style={{ textAlign: "center", color: "#77a6ed", margin: "0 0 16px 0", fontSize: 17 }}>
-          Morning and night routines crafted for your skin, goals, and preferences.
-        </div>
-        {/* Routine cards */}
-        <div style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 43,
-          margin: "36px 0 22px 0"
-        }}>
-          {/* Morning routine */}
-          <MotionWrapper>
-            <div>
-              <div style={{
-                color: "#2050aa", fontWeight: 600, fontSize: "1.25rem", marginBottom: 15,
-                letterSpacing: ".01em", display: "flex", alignItems: "center"
-              }}>
-                <span style={{
-                  fontSize: 23,
-                  marginRight: 5,
-                  filter: "drop-shadow(0 1px 3px #77a6ed80)"
-                }}>🌞</span>Morning Routine
-              </div>
-              <div>
-                {getRoutineSteps("morning", quizAnswers).map((step) => (
-                  <AnimatedProductCard
-                    key={step.key}
-                    step={step}
-                    product={routineProducts[step.key]}
-                    expanded={expandedStep === step.key}
-                    onToggle={(e) => {
-                      e?.stopPropagation();
-                      setExpandedStep(expandedStep === step.key ? null : step.key);
-                    }}
-                  />
-                ))}
-              </div>
-            </div>
-          </MotionWrapper>
-          {/* Night routine */}
-          <MotionWrapper>
-            <div>
-              <div style={{
-                color: "#2050aa", fontWeight: 600, fontSize: "1.25rem", marginBottom: 15,
-                letterSpacing: ".01em", display: "flex", alignItems: "center"
-              }}>
-                <span style={{
-                  fontSize: 23,
-                  marginRight: 5,
-                  filter: "drop-shadow(0 1px 3px #77a6ed80)"
-                }}>🌙</span>Night Routine
-              </div>
-              <div>
-                {getRoutineSteps("night", quizAnswers).map((step) => (
-                  <AnimatedProductCard
-                    key={step.key}
-                    step={step}
-                    product={routineProducts[step.key]}
-                    expanded={expandedStep === step.key}
-                    onToggle={(e) => {
-                      e?.stopPropagation();
-                      setExpandedStep(expandedStep === step.key ? null : step.key);
-                    }}
-                  />
-                ))}
-              </div>
-            </div>
-          </MotionWrapper>
-        </div>
-        <div style={{
-          marginTop: 24,
-          color: "#2050aa",
-          textAlign: "center",
-          fontSize: 15.2,
-          opacity: 0.86
-        }}>
-          Tap a step to expand. For a new routine, <a href="/quiz" style={{ color: "#33aaff", fontWeight: 500 }}>retake the quiz</a>.
-        </div>
-      </AppleFadeTransition>
-      <AnimatePresence>
-        {loading && (
-          <motion.div
-            key="loading"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.93 }}
-            exit={{ opacity: 0 }}
+    <div style={{ padding: 24 }}>
+      <h2 style={{ ...headingStyle, marginBottom: 24 }}>
+        Your Personalized Skincare Routine
+      </h2>
+      <div style={{ display: "grid", gap: 20 }}>
+        {routineSteps.map((step, idx) => (
+          <div
+            key={idx}
             style={{
-              position: "fixed",
-              zIndex: 2999,
-              left: 0,
-              top: 0,
-              right: 0,
-              bottom: 0,
-              background: "rgba(32,80,170,0.92)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 26,
-              color: "#fff",
-              fontWeight: 600,
-              pointerEvents: "all",
+              background: "linear-gradient(90deg, #e3f0ff 45%, #93bafe 100%)",
+              border: "2px solid #93bafe",
+              borderRadius: 12,
+              boxShadow: "0 2px 18px #93bafe55",
+              padding: 20,
+              position: "relative",
             }}
           >
-            Building your routine…
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </section>
+            {/* Step badge */}
+            <div
+              style={{
+                position: "absolute",
+                top: -10,
+                left: -10,
+                background: "#2a6ae7",
+                color: "#fff",
+                padding: "6px 12px",
+                borderRadius: 20,
+                fontWeight: 700,
+                fontSize: 14,
+                border: "2px solid #93bafe",
+              }}
+            >
+              Step {step.step_order}
+            </div>
+
+            {/* Title */}
+            <h3 style={{ color: "#2a6ae7", fontWeight: 700 }}>
+              {step.step_name || "Unnamed Step"}
+            </h3>
+
+            {/* Brand */}
+            <p style={{ marginBottom: 4, color: "#47567f" }}>
+              <strong>Brand:</strong> {step.brands?.name || "Unknown"}
+            </p>
+
+            {/* Description */}
+            <p style={{ color: "#47567f" }}>{step.description}</p>
+
+            {/* Learn More */}
+            {step.official_product_url ? (
+              <a
+                href={step.official_product_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={buttonStyle}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.background =
+                    "linear-gradient(94deg, #1f52c7 52%, #7ea7f3 110%)")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.background =
+                    "linear-gradient(94deg, #2a6ae7 52%, #93bafe 110%)")
+                }
+              >
+                Learn More
+              </a>
+            ) : (
+              <span
+                style={{
+                  color: "#888",
+                  fontStyle: "italic",
+                  fontSize: 14,
+                }}
+              >
+                No product link available
+              </span>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
   );
+};
+
+// Inline styles
+const wrapperStyle = {
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  minHeight: "60vh",
+  padding: 20,
+};
+
+const boxStyle = {
+  background: "linear-gradient(95deg, #93bafe 60%, #e3f0ff 100%)",
+  color: "#2a6ae7",
+  border: "2px solid #2a6ae755",
+  padding: 32,
+  borderRadius: 14,
+  textAlign: "center",
+  maxWidth: 420,
+};
+
+const headingStyle = {
+  fontSize: 22,
+  fontWeight: 700,
+  marginBottom: 12,
+};
+
+const paragraphStyle = {
+  fontSize: 15,
+};
+
+const linkStyle = {
+  color: "#2a6ae7",
+  textDecoration: "underline",
+};
+
+const buttonStyle = {
+  marginTop: 14,
+  display: "inline-block",
+  background: "linear-gradient(94deg, #2a6ae7 52%, #93bafe 110%)",
+  color: "#fff",
+  padding: "8px 16px",
+  fontWeight: 700,
+  borderRadius: 6,
+  textDecoration: "none",
+  transition: "background 0.3s ease",
+  fontSize: 14.5,
 };
 
 export default RoutineBuilder;
