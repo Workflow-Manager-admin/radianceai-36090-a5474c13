@@ -41,8 +41,8 @@ function AllProducts() {
   }, []);
 
   const fetchDropdownOptions = async () => {
-    const { data: concerns } = await supabase.from("concerns").select("name");
-    const { data: skinTypes } = await supabase.from("product_skin_types").select("name");
+    const { data: concerns } = await supabase.from("concerns").select("concern");
+    const { data: skinTypes } = await supabase.from("skin_types").select("type");
 
     setConcernOptions(concerns?.map((c) => c.name) || []);
     setSkinTypeOptions(skinTypes?.map((s) => s.name) || []);
