@@ -36,35 +36,53 @@ function AllProducts() {
     fetchDropdownOptions();
   }, []);
 
+  // You can optionally fetch products on mount or only on button click
   useEffect(() => {
-    fetchProducts(); // Fetch all initially
+    fetchProducts();
   }, []);
 
   const fetchDropdownOptions = async () => {
-    const { data: concerns } = await supabase.from("concerns").select("concern");
-    const { data: skinTypes } = await supabase.from("skin_types").select("type");
+    try {
+      const { data: concerns, error: errConcerns } = await supabase
+        .from("concerns")
+        .select("concern");
 
-    setConcernOptions(concerns?.map((c) => c.name) || []);
-    setSkinTypeOptions(skinTypes?.map((s) => s.name) || []);
+      const { data: skinTypes, error: errSkinTypes } = await supabase
+        .from("skin_types")
+        .select("type");
+
+      if (errConcerns) console.error("Concerns error:", errConcerns);
+      if (errSkinTypes) console.error("Skin types error:", errSkinTypes);
+
+      setConcernOptions(concerns?.map((c) => c.concern) || []);
+      setSkinTypeOptions(skinTypes?.map((s) => s.type) || []);
+    } catch (err) {
+      console.error("Error fetching dropdown options:", err);
+    }
   };
 
   const fetchProducts = async () => {
-    let query = supabase.from("products").select("*");
+    try {
+      let query = supabase.from("products").select("*");
 
-    if (filters.brand) query = query.ilike("brand", `%${filters.brand}%`);
-    if (filters.concern) query = query.ilike("concern", `%${filters.concern}%`);
-    if (filters.skin_type) query = query.ilike("skin_type", `%${filters.skin_type}%`);
-    if (filters.type) query = query.ilike("type", `%${filters.type}%`);
-    if (filters.maxPrice) query = query.lte("price", filters.maxPrice);
-    if (sortBy === "priceLow") query = query.order("price", { ascending: true });
-    if (sortBy === "priceHigh") query = query.order("price", { ascending: false });
+      if (filters.brand) query = query.eq("brand", filters.brand);
+      if (filters.concern) query = query.eq("concern", filters.concern);
+      if (filters.skin_type) query = query.eq("skin_type", filters.skin_type);
+      if (filters.type) query = query.eq("type", filters.type);
+      if (filters.maxPrice) query = query.lte("price", filters.maxPrice);
 
-    const { data, error } = await query;
+      if (sortBy === "priceLow") query = query.order("price", { ascending: true });
+      else if (sortBy === "priceHigh") query = query.order("price", { ascending: false });
 
-    if (error) {
-      console.error("Error fetching products:", error);
-    } else {
-      setProducts(data);
+      const { data, error } = await query;
+
+      if (error) {
+        console.error("Error fetching products:", error);
+      } else {
+        setProducts(data);
+      }
+    } catch (err) {
+      console.error("Error fetching products:", err);
     }
   };
 
@@ -89,8 +107,11 @@ function AllProducts() {
           alignItems: "flex-end"
         }}
       >
+        {/* Brand */}
         <div>
-          <label style={{ fontWeight: "bold", marginBottom: 6, display: "block" }}>Filter by Brand</label>
+          <label style={{ fontWeight: "bold", marginBottom: 6, display: "block" }}>
+            Filter by Brand
+          </label>
           <select
             name="brand"
             value={filters.brand}
@@ -99,13 +120,18 @@ function AllProducts() {
           >
             <option value="">All</option>
             {brandOptions.map((brand) => (
-              <option key={brand} value={brand}>{brand}</option>
+              <option key={brand} value={brand}>
+                {brand}
+              </option>
             ))}
           </select>
         </div>
 
+        {/* Concern */}
         <div>
-          <label style={{ fontWeight: "bold", marginBottom: 6, display: "block" }}>Filter by Concern</label>
+          <label style={{ fontWeight: "bold", marginBottom: 6, display: "block" }}>
+            Filter by Concern
+          </label>
           <select
             name="concern"
             value={filters.concern}
@@ -114,13 +140,18 @@ function AllProducts() {
           >
             <option value="">All</option>
             {concernOptions.map((concern) => (
-              <option key={concern} value={concern}>{concern}</option>
+              <option key={concern} value={concern}>
+                {concern}
+              </option>
             ))}
           </select>
         </div>
 
+        {/* Skin Type */}
         <div>
-          <label style={{ fontWeight: "bold", marginBottom: 6, display: "block" }}>Filter by Skin Type</label>
+          <label style={{ fontWeight: "bold", marginBottom: 6, display: "block" }}>
+            Filter by Skin Type
+          </label>
           <select
             name="skin_type"
             value={filters.skin_type}
@@ -129,13 +160,18 @@ function AllProducts() {
           >
             <option value="">All</option>
             {skinTypeOptions.map((type) => (
-              <option key={type} value={type}>{type}</option>
+              <option key={type} value={type}>
+                {type}
+              </option>
             ))}
           </select>
         </div>
 
+        {/* Type */}
         <div>
-          <label style={{ fontWeight: "bold", marginBottom: 6, display: "block" }}>Filter by Type</label>
+          <label style={{ fontWeight: "bold", marginBottom: 6, display: "block" }}>
+            Filter by Type
+          </label>
           <select
             name="type"
             value={filters.type}
@@ -144,13 +180,18 @@ function AllProducts() {
           >
             <option value="">All</option>
             {typeOptions.map((type) => (
-              <option key={type} value={type.toLowerCase()}>{type}</option>
+              <option key={type} value={type.toLowerCase()}>
+                {type}
+              </option>
             ))}
           </select>
         </div>
 
+        {/* Price */}
         <div>
-          <label style={{ fontWeight: "bold", marginBottom: 6, display: "block" }}>Filter by Price</label>
+          <label style={{ fontWeight: "bold", marginBottom: 6, display: "block" }}>
+            Filter by Price
+          </label>
           <select
             name="maxPrice"
             value={filters.maxPrice}
@@ -159,13 +200,18 @@ function AllProducts() {
           >
             <option value="">All</option>
             {priceOptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
             ))}
           </select>
         </div>
 
+        {/* Sort */}
         <div>
-          <label style={{ fontWeight: "bold", marginBottom: 6, display: "block" }}>Sort by</label>
+          <label style={{ fontWeight: "bold", marginBottom: 6, display: "block" }}>
+            Sort by
+          </label>
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
@@ -177,6 +223,7 @@ function AllProducts() {
           </select>
         </div>
 
+        {/* Apply Filters Button */}
         <button
           onClick={fetchProducts}
           style={{
@@ -187,7 +234,7 @@ function AllProducts() {
             border: "none",
             fontWeight: "bold",
             cursor: "pointer",
-            marginTop: 28
+            marginTop: 28,
           }}
         >
           Apply Filters
@@ -199,19 +246,24 @@ function AllProducts() {
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-          gap: "22px"
+          gap: "22px",
         }}
       >
-        {products.map((product) => (
-          <ProductCard
-            key={product.id}
-            name={product.name}
-            image_url={product.image_url}
-            price={`₹${product.price}`}
-            brand={product.brand}
-            description={product.description}
-          />
-        ))}
+        {products.length > 0 ? (
+          products.map((product) => (
+            <ProductCard
+              key={product.id}
+              id={product.id} // Pass id for links
+              name={product.name}
+              image_url={product.image_url}
+              price={`₹${product.price}`}
+              brand={product.brand}
+              description={product.description}
+            />
+          ))
+        ) : (
+          <p>No products found matching your filters.</p>
+        )}
       </div>
     </section>
   );
