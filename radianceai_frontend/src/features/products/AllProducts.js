@@ -7,7 +7,7 @@ const palette = {
   blueLight: "#77a6ed",
 };
 
-const typeOptions = ["Facewash", "Serum", "Cleanser", "Cream"];
+const typeOptions = ["Facewash", "Serum", "Cleanser", "Cream", "Moisturizer", "Cleanser", "Toner", "Body Wash"];
 const brandOptions = ["DermaCo", "Kiehl's", "Minimalist", "Wow SkinScience", "Foxtale"];
 
 function AllProducts() {
