@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import RecommendationCard from "./RecommendationCard";
 import styles from "./Recommendations.module.css";
-import supabase from "../../api/supabaseClient"; // Ensure you have the Supabase client set up
+import supabase from "../../api/supabaseClient";
 
 /**
  * Fetches product recommendations from Supabase based on user's quiz answers.
@@ -10,25 +10,26 @@ import supabase from "../../api/supabaseClient"; // Ensure you have the Supabase
 async function fetchRecommendationsFromSupabase(primaryGoal, skinType) {
   const { data, error } = await supabase
     .from("products")
-    .select(`
+    .select(
+      `
       name,
       description,
       category,
-      brand_id,
       official_product_url,
       brand (
         name
       )
-    `)
-    .eq("concerns", primaryGoal)
-    .eq("skin_type", skinType);
+    `
+    )
+    .ilike("concerns", `%${primaryGoal}%`)
+    .ilike("skin_type", `%${skinType}%`);
 
   if (error) {
-    console.error("Error fetching recommendations:", error);
+    console.error("Error fetching recommendations:", error.message);
     return [];
   }
 
-  console.log("Fetched products with brands:", data); // Debug log
+  console.log("Fetched products:", data);
 
   return data.map((product) => ({
     title: product.name,
