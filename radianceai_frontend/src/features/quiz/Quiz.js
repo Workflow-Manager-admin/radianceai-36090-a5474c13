@@ -8,6 +8,7 @@ const Quiz = () => {
     primaryGoal: "",
     productPreference: "",
     fragrance: "",
+    age: "",
   });
 
   const handleChange = (e) => {
@@ -21,16 +22,16 @@ const Quiz = () => {
     // Save answers to localStorage
     localStorage.setItem("quizAnswers", JSON.stringify(answers));
 
-    // Navigate to recommendations with state
-    navigate("/recommendations", { state: { answers } });
+    // Navigate to recommendations
+    navigate("/recommendations");
   };
 
   return (
     <div
       style={{
-        maxWidth: 640,
+        maxWidth: 600,
         margin: "0 auto",
-        padding: 24,
+        padding: 20,
         background: "#f4f8ff",
         borderRadius: 16,
         boxShadow: "0 4px 12px rgba(32, 80, 170, 0.12)",
@@ -41,13 +42,31 @@ const Quiz = () => {
       </h2>
       <form onSubmit={handleSubmit} style={{ marginTop: 20 }}>
         <div style={{ marginBottom: 18 }}>
-          <label style={labelStyle}>Your Skin Type:</label>
+          <label
+            style={{
+              display: "block",
+              marginBottom: 6,
+              fontWeight: 600,
+              color: "#2050aa",
+              fontSize: 15.5,
+            }}
+          >
+            Your Skin Type:
+          </label>
           <select
             name="skinType"
             value={answers.skinType}
             onChange={handleChange}
             required
-            style={selectStyle}
+            style={{
+              width: "100%",
+              padding: "10px 12px",
+              fontSize: 15.5,
+              borderRadius: 8,
+              border: "1.5px solid #77a6ed",
+              outline: "none",
+              backgroundColor: "#fff",
+            }}
           >
             <option value="">Select...</option>
             <option value="dry">Dry</option>
@@ -59,13 +78,31 @@ const Quiz = () => {
         </div>
 
         <div style={{ marginBottom: 18 }}>
-          <label style={labelStyle}>Your Primary Skin Concern:</label>
+          <label
+            style={{
+              display: "block",
+              marginBottom: 6,
+              fontWeight: 600,
+              color: "#2050aa",
+              fontSize: 15.5,
+            }}
+          >
+            Your Primary Skin Concern:
+          </label>
           <select
             name="primaryGoal"
             value={answers.primaryGoal}
             onChange={handleChange}
             required
-            style={selectStyle}
+            style={{
+              width: "100%",
+              padding: "10px 12px",
+              fontSize: 15.5,
+              borderRadius: 8,
+              border: "1.5px solid #77a6ed",
+              outline: "none",
+              backgroundColor: "#fff",
+            }}
           >
             <option value="">Select...</option>
             <option value="hydration">Hydration</option>
@@ -76,13 +113,67 @@ const Quiz = () => {
         </div>
 
         <div style={{ marginBottom: 18 }}>
-          <label style={labelStyle}>Product Preference:</label>
+          <label
+            style={{
+              display: "block",
+              marginBottom: 6,
+              fontWeight: 600,
+              color: "#2050aa",
+              fontSize: 15.5,
+            }}
+          >
+            Your Age Range:
+          </label>
+          <select
+            name="age"
+            value={answers.age}
+            onChange={handleChange}
+            required
+            style={{
+              width: "100%",
+              padding: "10px 12px",
+              fontSize: 15.5,
+              borderRadius: 8,
+              border: "1.5px solid #77a6ed",
+              outline: "none",
+              backgroundColor: "#fff",
+            }}
+          >
+            <option value="">Select...</option>
+            <option value="18-24">18–24</option>
+            <option value="25-34">25–34</option>
+            <option value="35-44">35–44</option>
+            <option value="45-54">45–54</option>
+            <option value="55+">55+</option>
+          </select>
+        </div>
+
+        <div style={{ marginBottom: 18 }}>
+          <label
+            style={{
+              display: "block",
+              marginBottom: 6,
+              fontWeight: 600,
+              color: "#2050aa",
+              fontSize: 15.5,
+            }}
+          >
+            Product Preference:
+          </label>
           <select
             name="productPreference"
             value={answers.productPreference}
             onChange={handleChange}
             required
-            style={selectStyle}
+            style={{
+              width: "100%",
+              padding: "10px 12px",
+              fontSize: 15.5,
+              borderRadius: 8,
+              border: "1.5px solid #77a6ed",
+              outline: "none",
+              backgroundColor: "#fff",
+            }}
           >
             <option value="">Select...</option>
             <option value="minimal">Minimal (3–4 steps)</option>
@@ -93,13 +184,31 @@ const Quiz = () => {
         </div>
 
         <div style={{ marginBottom: 18 }}>
-          <label style={labelStyle}>Do you prefer fragrance-free products?</label>
+          <label
+            style={{
+              display: "block",
+              marginBottom: 6,
+              fontWeight: 600,
+              color: "#2050aa",
+              fontSize: 15.5,
+            }}
+          >
+            Do you prefer fragrance-free products?
+          </label>
           <select
             name="fragrance"
             value={answers.fragrance}
             onChange={handleChange}
             required
-            style={selectStyle}
+            style={{
+              width: "100%",
+              padding: "10px 12px",
+              fontSize: 15.5,
+              borderRadius: 8,
+              border: "1.5px solid #77a6ed",
+              outline: "none",
+              backgroundColor: "#fff",
+            }}
           >
             <option value="">Select...</option>
             <option value="yes">Yes</option>
@@ -128,24 +237,6 @@ const Quiz = () => {
       </form>
     </div>
   );
-};
-
-const labelStyle = {
-  display: "block",
-  marginBottom: 6,
-  fontWeight: 600,
-  color: "#2050aa",
-  fontSize: 15.5,
-};
-
-const selectStyle = {
-  width: "100%",
-  padding: "10px 12px",
-  fontSize: 15.5,
-  borderRadius: 8,
-  border: "1.5px solid #77a6ed",
-  outline: "none",
-  backgroundColor: "#fff",
 };
 
 export default Quiz;
