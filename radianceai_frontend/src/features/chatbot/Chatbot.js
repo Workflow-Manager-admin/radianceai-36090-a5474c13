@@ -1,104 +1,167 @@
 import React, { useState, useEffect, useRef } from "react";
-import supabase from "../../api/supabaseClient"; // Adjust path if needed
+import { supabase } from "../../utils/supabaseClient";
 
-// Your existing rule-based AI function
+// Rule-based fallback AI
 function ruleBasedAI(question) {
   question = question.toLowerCase();
 
   if (question.includes("hello")) return "Hey there! How can I help you with your skincare today?";
-  if (question.includes("recommend")) return "Please tell me your skin concern like acne, hydration, or anti-aging.";
   if (question.includes("thank")) return "You’re welcome! Feel free to ask me anything else.";
   return "Sorry, I didn't get that. Can you please rephrase?";
 }
 
-// Fetch products by concern from Supabase
+// Skin concerns dictionary with synonyms
+const concernsDict = {
+  acne: ["acne", "pimples", "blemishes", "breakouts"],
+  hydration: ["hydration", "dry", "dryness", "dehydration", "moisture"],
+  aging: ["aging", "wrinkles", "fine lines", "age spots", "anti-aging"],
+  brightness: ["brightness", "dull", "radiance", "glow"],
+  sensitive: ["sensitive", "redness", "irritation", "allergic"],
+  oily: ["oily", "greasy", "shine"],
+  pigmentation: ["pigmentation", "dark spots", "hyperpigmentation"],
+};
+
+// Find best matching concern from user input
+function findConcern(text) {
+  const lowerText = text.toLowerCase();
+  for (const [key, synonyms] of Object.entries(concernsDict)) {
+    for (const synonym of synonyms) {
+      if (lowerText.includes(synonym)) return key;
+    }
+  }
+  return null;
+}
+
+// Fetch products with images and URL by concern
 async function fetchProductsByConcern(concern) {
   const { data, error } = await supabase
     .from("products")
-    .select("id, name, brand, product_url")
+    .select("id, name, brand, product_url, image_url")
     .ilike("concerns", `%${concern}%`)
     .limit(5);
 
   if (error) {
     console.error("Supabase fetch error:", error);
-    return null;
+    return { error };
   }
-  return data;
+  return { data };
 }
 
 export default function Chatbot() {
   const [messages, setMessages] = useState([
-    { sender: "bot", text: "Hello! Ask me for skincare product recommendations or general help.", ts: Date.now() }
+    {
+      sender: "bot",
+      text: "Hello! Ask me for skincare product recommendations or general help.",
+      ts: Date.now(),
+    },
   ]);
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
   const chatBottomRef = useRef(null);
 
-  // Scroll chat to bottom when messages update
   useEffect(() => {
     chatBottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Handle sending message and getting bot reply
+  // Typing dots component
+  const TypingDots = () => (
+    <div style={{ fontStyle: "italic", color: "#666" }}>
+      Bot is typing
+      <span className="dots">...</span>
+      <style>{`
+        .dots {
+          animation: dots 1.5s steps(3, end) infinite;
+          display: inline-block;
+        }
+        @keyframes dots {
+          0%, 20% {content: "";}
+          40% {content: ".";}
+          60% {content: "..";}
+          80%, 100% {content: "...";}
+        }
+      `}</style>
+    </div>
+  );
+
   async function sendMessage(msg) {
     if (!msg.trim()) return;
 
-    // Add user message
     setMessages((m) => [...m, { sender: "user", text: msg.trim(), ts: Date.now() }]);
     setInput("");
     setTyping(true);
 
-    const q = msg.trim().toLowerCase();
+    const normalizedMsg = msg.toLowerCase();
 
-    // Detect if user wants product recommendations
-    if (/recommend.*product/.test(q) || /product.*recommend/.test(q)) {
-      // Try to find a known concern keyword
-      const concerns = ["acne", "hydration", "aging", "brightness", "dry", "oily", "sensitive"];
-      let foundConcern = null;
-      for (let c of concerns) {
-        if (q.includes(c)) {
-          foundConcern = c;
-          break;
-        }
-      }
+    // Check if user is asking for product recommendations
+    const wantsRecommendation =
+      /recommend|suggest|products?|help with/.test(normalizedMsg);
 
-      if (foundConcern) {
-        const products = await fetchProductsByConcern(foundConcern);
-        if (products && products.length > 0) {
-          // Format bot message listing products
-          const productList = products.map(
-            (p) => `• ${p.brand} - ${p.name} [View Product](${p.product_url})`
-          ).join("\n");
+    if (wantsRecommendation) {
+      const concern = findConcern(normalizedMsg);
 
+      if (concern) {
+        const { data, error } = await fetchProductsByConcern(concern);
+
+        if (error) {
           setMessages((m) => [
             ...m,
             {
               sender: "bot",
-              text: `Here are some products for *${foundConcern}*: \n${productList}`,
+              text: "Oops! There was a problem fetching products. Please try again later.",
               ts: Date.now() + 1,
             },
           ]);
-        } else {
+          setTyping(false);
+          return;
+        }
+
+        if (data.length === 0) {
           setMessages((m) => [
             ...m,
             {
               sender: "bot",
-              text: `Sorry, I couldn't find products for "${foundConcern}". Try another concern or ask for general help!`,
+              text: `Sorry, I couldn't find any products for "${concern}". Try another concern or ask for general help!`,
               ts: Date.now() + 1,
             },
           ]);
+          setTyping(false);
+          return;
         }
+
+        // Show products with images and links
+        setMessages((m) => [
+          ...m,
+          {
+            sender: "bot",
+            text: `Here are some products for *${concern}*:`,
+            ts: Date.now() + 1,
+            products: data, // attach products for rendering images
+          },
+        ]);
+        setTyping(false);
+        return;
+      } else {
+        // No concern found, ask for clarification
+        setMessages((m) => [
+          ...m,
+          {
+            sender: "bot",
+            text:
+              "Could you please specify your skin concern? For example: acne, hydration, aging, sensitive, oily, pigmentation, brightness.",
+            ts: Date.now() + 1,
+          },
+        ]);
         setTyping(false);
         return;
       }
     }
 
-    // Fallback to rule-based AI after a short delay
+    // Fallback to rule-based AI with delay and typing animation
     setTimeout(() => {
       const reply = ruleBasedAI(msg);
       setMessages((m) => [...m, { sender: "bot", text: reply, ts: Date.now() + 1 }]);
       setTyping(false);
-    }, 700 + Math.random() * 500);
+    }, 1000 + Math.random() * 800);
   }
 
   return (
@@ -111,15 +174,18 @@ export default function Chatbot() {
         display: "flex",
         flexDirection: "column",
         height: "80vh",
+        fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+        backgroundColor: "#fff",
       }}
     >
       <div
         style={{
-          padding: "10px",
+          padding: "12px 15px",
           borderBottom: "1px solid #ccc",
-          fontWeight: "bold",
-          fontSize: 18,
-          backgroundColor: "#f5f5f5",
+          fontWeight: "700",
+          fontSize: 20,
+          backgroundColor: "#4a90e2",
+          color: "white",
           textAlign: "center",
         }}
       >
@@ -129,9 +195,9 @@ export default function Chatbot() {
       <div
         style={{
           flexGrow: 1,
-          padding: "10px",
+          padding: 12,
           overflowY: "auto",
-          backgroundColor: "#fafafa",
+          backgroundColor: "#f7f9fc",
           fontSize: 15,
         }}
       >
@@ -139,7 +205,7 @@ export default function Chatbot() {
           <div
             key={msg.ts + i}
             style={{
-              marginBottom: 10,
+              marginBottom: 12,
               display: "flex",
               justifyContent: msg.sender === "user" ? "flex-end" : "flex-start",
             }}
@@ -147,42 +213,73 @@ export default function Chatbot() {
             <div
               style={{
                 maxWidth: "75%",
-                backgroundColor: msg.sender === "user" ? "#007bff" : "#e2e3e5",
-                color: msg.sender === "user" ? "white" : "#333",
-                padding: "8px 12px",
-                borderRadius: 15,
+                backgroundColor: msg.sender === "user" ? "#007bff" : "#e0e6f7",
+                color: msg.sender === "user" ? "white" : "#1a1a1a",
+                padding: "10px 14px",
+                borderRadius: 18,
                 whiteSpace: "pre-wrap",
+                boxShadow: msg.sender === "bot" ? "0 0 8px rgba(0,0,0,0.1)" : undefined,
+                position: "relative",
               }}
             >
-              {/* If bot message contains product list, render as clickable links */}
-              {msg.sender === "bot" && msg.text.startsWith("Here are some products for") ? (
-                <ul style={{ paddingLeft: 20, margin: 0 }}>
-                  {msg.text
-                    .split("\n")
-                    .slice(1)
-                    .map((line, idx) => {
-                      const match = line.match(/• (.+) - (.+) \[View Product\]\((.+)\)/);
-                      if (!match) return <li key={idx}>{line}</li>;
-                      const [, brand, name, url] = match;
-                      return (
-                        <li key={idx}>
-                          <strong>{brand}</strong> -{" "}
-                          <a href={url} target="_blank" rel="noopener noreferrer" style={{ color: "#007bff" }}>
-                            {name}
-                          </a>
-                        </li>
-                      );
-                    })}
-                </ul>
+              {/* If bot message has products, render product cards */}
+              {msg.products ? (
+                <>
+                  <p style={{ marginTop: 0, marginBottom: 8 }}>{msg.text}</p>
+                  {msg.products.map((p) => (
+                    <a
+                      key={p.id}
+                      href={p.product_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        background: "white",
+                        padding: 8,
+                        marginBottom: 8,
+                        borderRadius: 10,
+                        boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                        textDecoration: "none",
+                        color: "#333",
+                        gap: 12,
+                      }}
+                    >
+                      <img
+                        src={p.image_url || "https://via.placeholder.com/60"}
+                        alt={p.name}
+                        style={{
+                          width: 60,
+                          height: 60,
+                          borderRadius: 8,
+                          objectFit: "cover",
+                          flexShrink: 0,
+                        }}
+                      />
+                      <div style={{ flexGrow: 1 }}>
+                        <strong>{p.brand}</strong>
+                        <div>{p.name}</div>
+                      </div>
+                      <div
+                        style={{
+                          color: "#4a90e2",
+                          fontWeight: "600",
+                          fontSize: 13,
+                        }}
+                      >
+                        View
+                      </div>
+                    </a>
+                  ))}
+                </>
               ) : (
                 msg.text
               )}
             </div>
           </div>
         ))}
-        {typing && (
-          <div style={{ fontStyle: "italic", color: "#666" }}>Bot is typing...</div>
-        )}
+
+        {typing && <TypingDots />}
         <div ref={chatBottomRef} />
       </div>
 
@@ -193,9 +290,9 @@ export default function Chatbot() {
         }}
         style={{
           display: "flex",
-          padding: 10,
+          padding: "12px 15px",
           borderTop: "1px solid #ccc",
-          backgroundColor: "#f9f9f9",
+          backgroundColor: "#fafafa",
         }}
       >
         <input
@@ -205,11 +302,12 @@ export default function Chatbot() {
           placeholder="Type your message..."
           style={{
             flexGrow: 1,
-            padding: "10px",
-            borderRadius: 20,
-            border: "1px solid #ccc",
+            padding: "12px 15px",
+            borderRadius: 25,
+            border: "1.5px solid #ccc",
             outline: "none",
             fontSize: 15,
+            boxShadow: "inset 0 1px 3px rgb(0 0 0 / 0.1)",
           }}
           disabled={typing}
         />
@@ -217,14 +315,17 @@ export default function Chatbot() {
           type="submit"
           disabled={typing || !input.trim()}
           style={{
-            marginLeft: 8,
-            padding: "10px 18px",
-            borderRadius: 20,
+            marginLeft: 10,
+            padding: "12px 20px",
+            borderRadius: 25,
             border: "none",
-            backgroundColor: "#007bff",
+            backgroundColor: typing ? "#a0bff9" : "#007bff",
             color: "white",
-            fontWeight: "bold",
+            fontWeight: "700",
+            fontSize: 15,
             cursor: typing ? "not-allowed" : "pointer",
+            boxShadow: "0 4px 8px rgb(0 123 255 / 0.4)",
+            transition: "background-color 0.3s ease",
           }}
         >
           Send
