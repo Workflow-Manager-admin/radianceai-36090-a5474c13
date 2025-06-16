@@ -16,7 +16,7 @@ async function fetchRecommendationsFromSupabase(primaryGoal, skinType) {
       category,
       brand_id,
       official_product_url,
-      brands (
+      brand (
         name
       )
     `)
@@ -28,11 +28,13 @@ async function fetchRecommendationsFromSupabase(primaryGoal, skinType) {
     return [];
   }
 
+  console.log("Fetched products with brands:", data); // Debug log
+
   return data.map((product) => ({
     title: product.name,
     description: product.description,
     category: product.category,
-    brand: product.brands.name,
+    brand: product.brand ? product.brand.name : "Unknown Brand",
     link: product.official_product_url,
   }));
 }
