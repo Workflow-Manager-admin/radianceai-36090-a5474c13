@@ -5,7 +5,6 @@ import ProductCard from "./ProductCard";
 const palette = {
   blueDark: "#2050aa",
   blueLight: "#77a6ed",
-  cardBG: "#ebf4ff",
 };
 
 const typeOptions = ["Facewash", "Serum", "Cleanser", "Cream"];
@@ -16,25 +15,45 @@ const priceOptions = [
   { label: "₹1000+", value: "10000" }
 ];
 
+const brandOptions = [
+  "DermaCo", "Kiehl's", "Minimalist", "Wow SkinScience", "Foxtale"
+];
+
 function AllProducts() {
   const [products, setProducts] = useState([]);
   const [filters, setFilters] = useState({
     brand: "",
     concern: "",
     type: "",
+    skin_type: "",
     maxPrice: ""
   });
   const [sortBy, setSortBy] = useState("");
+  const [concernOptions, setConcernOptions] = useState([]);
+  const [skinTypeOptions, setSkinTypeOptions] = useState([]);
 
   useEffect(() => {
-    fetchProducts();
-  }, [filters, sortBy]);
+    fetchDropdownOptions();
+  }, []);
 
-  async function fetchProducts() {
+  useEffect(() => {
+    fetchProducts(); // Fetch all initially
+  }, []);
+
+  const fetchDropdownOptions = async () => {
+    const { data: concerns } = await supabase.from("concerns").select("name");
+    const { data: skinTypes } = await supabase.from("product_skin_types").select("name");
+
+    setConcernOptions(concerns?.map((c) => c.name) || []);
+    setSkinTypeOptions(skinTypes?.map((s) => s.name) || []);
+  };
+
+  const fetchProducts = async () => {
     let query = supabase.from("products").select("*");
 
     if (filters.brand) query = query.ilike("brand", `%${filters.brand}%`);
     if (filters.concern) query = query.ilike("concern", `%${filters.concern}%`);
+    if (filters.skin_type) query = query.ilike("skin_type", `%${filters.skin_type}%`);
     if (filters.type) query = query.ilike("type", `%${filters.type}%`);
     if (filters.maxPrice) query = query.lte("price", filters.maxPrice);
     if (sortBy === "priceLow") query = query.order("price", { ascending: true });
@@ -47,7 +66,7 @@ function AllProducts() {
     } else {
       setProducts(data);
     }
-  }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -66,32 +85,53 @@ function AllProducts() {
           display: "flex",
           flexWrap: "wrap",
           gap: "14px",
-          marginBottom: "24px",
-          alignItems: "flex-start"
+          marginBottom: "20px",
+          alignItems: "flex-end"
         }}
       >
         <div>
           <label style={{ fontWeight: "bold", marginBottom: 6, display: "block" }}>Filter by Brand</label>
-          <input
-            type="text"
+          <select
             name="brand"
             value={filters.brand}
             onChange={handleChange}
-            placeholder="e.g. Minimalist"
-            style={{ padding: 8, borderRadius: 6, border: "1px solid #ccc" }}
-          />
+            style={{ padding: 8, borderRadius: 6 }}
+          >
+            <option value="">All</option>
+            {brandOptions.map((brand) => (
+              <option key={brand} value={brand}>{brand}</option>
+            ))}
+          </select>
         </div>
 
         <div>
           <label style={{ fontWeight: "bold", marginBottom: 6, display: "block" }}>Filter by Concern</label>
-          <input
-            type="text"
+          <select
             name="concern"
             value={filters.concern}
             onChange={handleChange}
-            placeholder="e.g. Acne"
-            style={{ padding: 8, borderRadius: 6, border: "1px solid #ccc" }}
-          />
+            style={{ padding: 8, borderRadius: 6 }}
+          >
+            <option value="">All</option>
+            {concernOptions.map((concern) => (
+              <option key={concern} value={concern}>{concern}</option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label style={{ fontWeight: "bold", marginBottom: 6, display: "block" }}>Filter by Skin Type</label>
+          <select
+            name="skin_type"
+            value={filters.skin_type}
+            onChange={handleChange}
+            style={{ padding: 8, borderRadius: 6 }}
+          >
+            <option value="">All</option>
+            {skinTypeOptions.map((type) => (
+              <option key={type} value={type}>{type}</option>
+            ))}
+          </select>
         </div>
 
         <div>
@@ -136,6 +176,22 @@ function AllProducts() {
             <option value="priceHigh">Price: High to Low</option>
           </select>
         </div>
+
+        <button
+          onClick={fetchProducts}
+          style={{
+            backgroundColor: palette.blueDark,
+            color: "#fff",
+            padding: "10px 16px",
+            borderRadius: 6,
+            border: "none",
+            fontWeight: "bold",
+            cursor: "pointer",
+            marginTop: 28
+          }}
+        >
+          Apply Filters
+        </button>
       </div>
 
       {/* PRODUCT GRID */}
