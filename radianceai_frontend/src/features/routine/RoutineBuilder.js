@@ -1,171 +1,201 @@
-// routinebuilder.js
+// RoutineBuilder.js
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import supabase from "../../api/supabaseClient"; // Keep import, but logic will be commented
+import supabase from "../../api/supabaseClient";
+// You might want to import a dedicated component for each routine step later,
+// but for now, we'll render it directly in this file.
+
+import styles from "./RoutineBuilder.module.css"; // Assuming you have a CSS module
 
 const RoutineBuilder = () => {
   const navigate = useNavigate();
-  const [routineSteps, setRoutineSteps] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [hasAnswers, setHasAnswers] = useState(false);
   const [userAnswers, setUserAnswers] = useState({});
+  const [routineSteps, setRoutineSteps] = useState([]);
+  const [quizAnswersLoaded, setQuizAnswersLoaded] = useState(false); // New state to track if quiz answers are loaded
 
   useEffect(() => {
-    const loadAndProcessRoutine = async () => { // Renamed to reflect no direct fetch
-      setLoading(true);
-      let answersFromStorage = null;
-      let validAnswersExist = false;
+    const loadAnswersAndFetchRoutine = async () => {
+      setLoading(true); // Start loading
+      let answersFromStorage = {};
+      let validAnswers = false;
 
+      // 1. Attempt to load quiz answers from localStorage
       try {
-        const stored = localStorage.getItem("quizAnswers");
-        if (stored) {
-          answersFromStorage = JSON.parse(stored);
-          if (answersFromStorage && answersFromStorage.primaryGoal) {
-            validAnswersExist = true;
+        const storedAnswers = localStorage.getItem("quizAnswers");
+        if (storedAnswers) {
+          answersFromStorage = JSON.parse(storedAnswers);
+          // Check if primaryGoal is present and not an empty string
+          if (answersFromStorage.primaryGoal && answersFromStorage.primaryGoal.trim() !== '') {
+            validAnswers = true;
+          } else {
+            console.warn("Incomplete quiz answers found in localStorage (missing primaryGoal):", answersFromStorage);
           }
+        } else {
+          console.warn("No quiz answers found in localStorage.");
         }
       } catch (error) {
         console.error("Error parsing quiz answers from localStorage:", error);
       }
 
-      setUserAnswers(answersFromStorage || {});
-      setHasAnswers(validAnswersExist);
+      setUserAnswers(answersFromStorage);
+      setQuizAnswersLoaded(validAnswers); // Update state based on whether valid answers were found
 
-      if (!validAnswersExist) {
+      // If no valid quiz answers, stop here and show the "Quiz Not Completed" message
+      if (!validAnswers) {
         setLoading(false);
         return;
       }
 
-      // --- IMPORTANT: ROUTINE_STEPS TABLE DOES NOT EXIST IN SUPABASE ---
-      // The code below assumes you WILL create a 'routine_steps' table in Supabase.
-      // If you do not create this table, this fetch will ALWAYS fail with a 400 error.
-      // For now, it's commented out and a placeholder is used.
+      // 2. Fetch routine steps from Supabase based on the primaryGoal
+      const { primaryGoal } = answersFromStorage;
 
-      // // Define the foreign key constraint name for brands.
-      // // Assuming 'routine_steps_brand_id_fkey' based on common Supabase conventions.
-      // const FK_NAME = "routine_steps_brand_id_fkey";
+      try {
+        const { data, error } = await supabase
+          .from("routine_steps")
+          .select(`
+            id,
+            concern,
+            step_number,
+            time_of_day,
+            notes,
+            products ( // Join to fetch product details for each step
+              id, // It's good practice to get the product's ID too
+              name,
+              description,
+              category,
+              official_product_url,
+              image_url,
+              brands (name) // Nested join to fetch brand name from products' brand_id
+            )
+          `)
+          // IMPORTANT: Match the primaryGoal from quiz to the 'concern' column in routine_steps
+          // Use .toLowerCase() for robust case-insensitive matching
+          .ilike("concern", `%${primaryGoal.toLowerCase()}%`)
+          .order("step_number", { ascending: true }); // Order steps correctly
 
-      // const { data, error } = await supabase
-      //   .from("routine_steps")
-      //   .select(`
-      //     step_order,
-      //     step_name,
-      //     description,
-      //     brand_id, // Include the foreign key column
-      //     official_product_url,
-      //     brands!${FK_NAME}(name) // Use the explicit foreign key relationship name
-      //   `)
-      //   // Using .ilike as requested for 'concerns'
-      //   .ilike("concerns", `%${answersFromStorage.primaryGoal}%`)
-      //   .order("step_order", { ascending: true });
+        if (error) {
+          console.error("Error fetching routine:", error.message);
+          setRoutineSteps([]); // Set to empty on error
+          return;
+        }
 
-      // if (error) {
-      //   console.error("Error fetching routine steps:", error.message);
-      //   setRoutineSteps([]); // Ensure empty array on error
-      // } else {
-      //   setRoutineSteps(data);
-      // }
+        // 3. Map the fetched data to a cleaner format for your component
+        const formattedRoutine = data.map(step => ({
+          id: step.id,
+          stepNumber: step.step_number,
+          concern: step.concern,
+          timeOfDay: step.time_of_day,
+          notes: step.notes,
+          // Ensure products data exists before accessing nested properties
+          product: step.products ? {
+            id: step.products.id,
+            name: step.products.name,
+            description: step.products.description,
+            category: step.products.category,
+            officialProductUrl: step.products.official_product_url,
+            imageUrl: step.products.image_url ?? "/default-product-image.jpg", // Fallback image for products
+            brand: step.products.brands?.name || 'Unknown Brand' // Access nested brand name with optional chaining
+          } : null // If product data is missing for some reason, set to null
+        })).filter(step => step.product !== null); // Filter out any steps that couldn't find a product
 
-      // --- TEMPORARY PLACEHOLDER DATA (REMOVE ONCE SUPABASE TABLE IS READY) ---
-      // You can replace this with a more sophisticated hardcoded logic or
-      // enable the Supabase fetch above once your table is created and populated.
-      if (answersFromStorage.primaryGoal === "acne") {
-        setRoutineSteps([
-          {
-            step_order: 1,
-            step_name: "Gentle Cleansing",
-            description: "Start with a mild, pH-balanced cleanser to remove impurities without stripping the skin.",
-            brand_id: null,
-            official_product_url: "#",
-            brands: { name: "Example Brand A" }
-          },
-          {
-            step_order: 2,
-            step_name: "Targeted Treatment (Salicylic Acid)",
-            description: "Apply a serum with salicylic acid to exfoliate, unclog pores, and reduce inflammation.",
-            brand_id: null,
-            official_product_url: "#",
-            brands: { name: "Example Brand B" }
-          },
-          {
-            step_order: 3,
-            step_name: "Lightweight Hydration",
-            description: "Follow with a non-comedogenic, oil-free moisturizer to keep skin hydrated.",
-            brand_id: null,
-            official_product_url: "#",
-            brands: { name: "Example Brand C" }
-          }
-        ]);
-      } else if (answersFromStorage.primaryGoal === "hydration") {
-         setRoutineSteps([
-          {
-            step_order: 1,
-            step_name: "Hydrating Cleanser",
-            description: "Use a creamy, hydrating cleanser to retain skin's natural moisture.",
-            brand_id: null,
-            official_product_url: "#",
-            brands: { name: "Example Brand D" }
-          },
-          {
-            step_order: 2,
-            step_name: "Hyaluronic Acid Serum",
-            description: "Apply a serum rich in hyaluronic acid to draw moisture into the skin.",
-            brand_id: null,
-            official_product_url: "#",
-            brands: { name: "Example Brand E" }
-          },
-          {
-            step_order: 3,
-            step_name: "Rich Moisturizer",
-            description: "Lock in moisture with a rich, emollient moisturizer.",
-            brand_id: null,
-            official_product_url: "#",
-            brands: { name: "Example Brand F" }
-          }
-        ]);
-      } else {
-        setRoutineSteps([]); // No specific hardcoded routine for this goal
+        setRoutineSteps(formattedRoutine);
+
+      } catch (error) {
+        console.error("Unexpected error during routine fetch:", error);
+        setRoutineSteps([]);
+      } finally {
+        setLoading(false); // End loading, whether success or error
       }
-
-      setLoading(false);
     };
 
-    loadAndProcessRoutine();
-  }, []);
+    loadAnswersAndFetchRoutine();
+  }, []); // Empty dependency array means this runs once on component mount
 
-  // --- Render Logic ---
+  // --- Conditional Rendering ---
 
+  // 1. Loading state
   if (loading) {
     return (
-      <div style={wrapperStyle}>
-        <div style={boxStyle}>
-          <h2 style={headingStyle}>Building your personalized routine...</h2>
+      <div className={styles.loadingContainer}>
+        <div className={styles.spinner}></div> {/* Add a spinner in your CSS */}
+        <div>Building your personalized routine...</div>
+      </div>
+    );
+  }
+
+  // 2. No quiz answers found (user hasn't completed the quiz or data is invalid)
+  if (!quizAnswersLoaded) {
+    return (
+      <div className={styles.empty}>
+        <div
+          className={styles.emptyBox}
+          style={{
+            background: "linear-gradient(95deg, #93bafe 60%, #e3f0ff 100%)",
+            color: "#2a6ae7",
+            border: "2px solid #2a6ae755",
+          }}
+        >
+          <div style={{ fontWeight: 700, fontSize: 21, marginBottom: 5 }}>
+            Quiz Not Completed
+          </div>
+          <div style={{ fontSize: 15.5, marginBottom: 12 }}>
+            To get a personalized routine, please complete the{" "}
+            <a
+              href="/quiz"
+              style={{ color: "#2a6ae7", textDecoration: "underline" }}
+              onClick={(e) => { e.preventDefault(); navigate("/quiz"); }}
+            >
+              quiz
+            </a>{" "}
+            first.
+          </div>
+          <button
+            className={styles.quizBtn}
+            style={{
+              background: "linear-gradient(92deg, #93bafe 54%, #e3f0ff 110%)",
+              color: "#2a6ae7",
+              border: "none",
+              cursor: "pointer",
+            }}
+            onClick={() => navigate("/quiz")}
+          >
+            Take Quiz
+          </button>
         </div>
       </div>
     );
   }
 
-  // If not loading, but no answers or no routine steps were found
-  if (!hasAnswers || routineSteps.length === 0) {
+  // 3. Quiz answers loaded, but no routine found in the database for the given goal
+  if (routineSteps.length === 0) {
     return (
-      <div style={wrapperStyle}>
-        <div style={boxStyle}>
-          <h2 style={headingStyle}>No Routine Available</h2>
-          <p style={paragraphStyle}>
+      <div className={styles.empty}>
+        <div
+          className={styles.emptyBox}
+          style={{
+            background: "linear-gradient(95deg, #93bafe 60%, #e3f0ff 100%)",
+            color: "#2a6ae7",
+            border: "2px solid #2a6ae755",
+          }}
+        >
+          <div style={{ fontWeight: 700, fontSize: 21, marginBottom: 5 }}>
+            No Routine Available
+          </div>
+          <div style={{ fontSize: 15.5, marginBottom: 12 }}>
             We couldn't find a routine matching your primary goal: **{userAnswers.primaryGoal || 'N/A'}**.
             <br />
-            **Action Needed:** To get a personalized routine, you need to:
-            <br />
-            1. **Create a `routine_steps` table in your Supabase project.**
-            <br />
-            2. Populate it with routine data, including a `concerns` column (text) and `brand_id` (foreign key to `brands.id`).
-            <br />
-            3. Uncomment the Supabase fetch logic in `RoutineBuilder.js` and remove this message.
-            <br />
-            Alternatively, you can manually add routine suggestions within the component code.
-          </p>
+            Please ensure there are routine steps in the database for this goal,
+            or try adjusting your quiz answers.
+          </div>
           <button
-            style={buttonStyle}
+            className={styles.quizBtn}
+            style={{
+              background: "linear-gradient(92deg, #93bafe 54%, #e3f0ff 110%)",
+              color: "#2a6ae7",
+              border: "none",
+              cursor: "pointer",
+            }}
             onClick={() => navigate("/quiz")}
           >
             Retake Quiz
@@ -175,132 +205,51 @@ const RoutineBuilder = () => {
     );
   }
 
+  // 4. Routine data successfully loaded and ready to display!
   return (
-    <div style={{ padding: 24, maxWidth: 600, margin: '0 auto' }}>
-      <h2 style={{ ...headingStyle, marginBottom: 24, textAlign: 'center' }}>
-        Your Personalized Skincare Routine
+    <section className={styles.routineSection}>
+      <h2 className={styles.heading} style={{ color: "#2a6ae7" }}>
+        Your Personalized Routine for {userAnswers.primaryGoal}
       </h2>
-      <div style={{ display: "grid", gap: 30 }}>
-        {routineSteps.map((step, idx) => (
-          <div
-            key={idx} // Using index as key is okay for static lists, but if items reorder/change, use a unique ID from Supabase
-            style={{
-              background: "linear-gradient(90deg, #e3f0ff 45%, #93bafe 100%)",
-              border: "2px solid #93bafe",
-              borderRadius: 12,
-              boxShadow: "0 2px 18px #93bafe55",
-              padding: 20,
-              position: "relative",
-            }}
-          >
-            <div
-              style={{
-                position: "absolute",
-                top: -10,
-                left: -10,
-                background: "#2a6ae7",
-                color: "#fff",
-                padding: "6px 12px",
-                borderRadius: 20,
-                fontWeight: 700,
-                fontSize: 14,
-                border: "2px solid #93bafe",
-              }}
-            >
-              Step {step.step_order}
+      <div className={styles.routineList}>
+        {routineSteps.map((step) => (
+          // You could abstract this into a <RoutineStepCard /> component
+          // for better organization, similar to RecommendationCard.
+          <div key={step.id} className={styles.routineStepCard}>
+            <div className={styles.stepHeader}>
+              <span className={styles.stepNumberBadge}>Step {step.stepNumber}</span>
+              <h3>{step.product.name} ({step.timeOfDay})</h3>
             </div>
-
-            <h3 style={{ color: "#2a6ae7", fontWeight: 700, marginTop: 15 }}>
-              {step.step_name || "Unnamed Step"}
-            </h3>
-
-            <p style={{ marginBottom: 4, color: "#47567f" }}>
-              **Brand:** {step.brands?.name || "Unknown"}
+            {step.notes && <p className={styles.stepNotes}>* {step.notes}</p>}
+            {step.product.imageUrl && (
+                <div className={styles.routineImageContainer}>
+                    <img
+                        src={step.product.imageUrl}
+                        alt={step.product.name}
+                        className={styles.routineProductImage}
+                        onError={(e) => { e.target.onerror = null; e.target.src = "/default-product-image.jpg"; }}
+                    />
+                </div>
+            )}
+            <p className={styles.productDescription}>{step.product.description}</p>
+            <p className={styles.productDetails}>
+                <span className={styles.productCategory}>{step.product.category}</span> - {step.product.brand}
             </p>
-
-            <p style={{ color: "#47567f", marginBottom: 15 }}>{step.description}</p>
-
-            {step.official_product_url ? (
+            {step.product.officialProductUrl && (
               <a
-                href={step.official_product_url}
+                href={step.product.officialProductUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                style={buttonStyle}
-                onMouseEnter={(e) =>
-                  (e.currentTarget.style.background =
-                    "linear-gradient(94deg, #1f52c7 52%, #7ea7f3 110%)")
-                }
-                onMouseLeave={(e) =>
-                  (e.currentTarget.style.background =
-                    "linear-gradient(94deg, #2a6ae7 52%, #93bafe 110%)")
-                }
+                className={styles.productLink}
               >
-                Learn More
+                View Product
               </a>
-            ) : (
-              <span
-                style={{
-                  color: "#888",
-                  fontStyle: "italic",
-                  fontSize: 14,
-                }}
-              >
-                No product link available
-              </span>
             )}
           </div>
         ))}
       </div>
-    </div>
+    </section>
   );
-};
-
-// Inline styles (unchanged, just moved for readability)
-const wrapperStyle = {
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  minHeight: "60vh",
-  padding: 20,
-};
-
-const boxStyle = {
-  background: "linear-gradient(95deg, #93bafe 60%, #e3f0ff 100%)",
-  color: "#2a6ae7",
-  border: "2px solid #2a6ae755",
-  padding: 32,
-  borderRadius: 14,
-  textAlign: "center",
-  maxWidth: 420,
-};
-
-const headingStyle = {
-  fontSize: 22,
-  fontWeight: 700,
-  marginBottom: 12,
-};
-
-const paragraphStyle = {
-  fontSize: 15,
-};
-
-const linkStyle = {
-  color: "#2a6ae7",
-  textDecoration: "underline",
-};
-
-const buttonStyle = {
-  marginTop: 14,
-  display: "inline-block",
-  background: "linear-gradient(94deg, #2a6ae7 52%, #93bafe 110%)",
-  color: "#fff",
-  padding: "8px 16px",
-  fontWeight: 700,
-  borderRadius: 6,
-  textDecoration: "none",
-  transition: "background 0.3s ease",
-  fontSize: 14.5,
-  cursor: "pointer",
 };
 
 export default RoutineBuilder;
