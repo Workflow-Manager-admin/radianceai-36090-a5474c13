@@ -1,0 +1,184 @@
+/* RoutineBuilder.module.css */
+
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px; /* Adjust as needed */
+  font-size: 1.2em;
+  color: #2a6ae7;
+}
+
+/* Basic Spinner CSS (you can find more elaborate ones online) */
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left-color: #2a6ae7;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.empty {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px; /* Adjust as needed */
+  text-align: center;
+}
+
+.emptyBox {
+  padding: 30px;
+  border-radius: 15px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.quizBtn {
+  padding: 10px 20px;
+  font-size: 1em;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.quizBtn:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+
+.routineSection {
+  padding: 40px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.heading {
+  text-align: center;
+  margin-bottom: 40px;
+  font-size: 2.5em;
+  color: #2a6ae7; /* Example color */
+}
+
+.routineList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+}
+
+.routineStepCard {
+  background: linear-gradient(90deg, #e3f0ff 45%, #93bafe 100%);
+  border: 2px solid #93bafe;
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Align content to the left */
+  text-align: left;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.routineStepCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.stepHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  width: 100%;
+}
+
+.stepNumberBadge {
+  background: #2a6ae7;
+  color: #fff;
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 0.9em;
+  margin-right: 15px;
+  border: 1px solid #93bafe;
+}
+
+.routineStepCard h3 {
+  color: #2a6ae7;
+  margin: 0;
+  font-size: 1.5em;
+  flex-grow: 1; /* Allows title to take available space */
+}
+
+.stepNotes {
+  font-style: italic;
+  color: #555;
+  margin-bottom: 15px;
+  font-size: 0.95em;
+}
+
+.routineImageContainer {
+  width: 100%;
+  height: 200px; /* Fixed height for consistency */
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  background-color: #fff; /* Optional: background for image container */
+  border: 1px solid #ddd;
+}
+
+.routineProductImage {
+  max-width: 90%; /* Adjust to ensure padding within container */
+  max-height: 90%; /* Adjust to ensure padding within container */
+  object-fit: contain; /* Ensures the whole image is visible without cropping */
+  border-radius: 8px; /* Slightly rounded corners for the image */
+}
+
+.productDescription {
+  color: #47567f;
+  margin-bottom: 15px;
+  line-height: 1.6;
+  flex-grow: 1; /* Allows description to take available space */
+}
+
+.productDetails {
+  font-size: 0.9em;
+  color: #666;
+  margin-bottom: 15px;
+  width: 100%;
+  border-top: 1px solid #eee;
+  padding-top: 15px;
+}
+
+.productCategory {
+  font-weight: bold;
+  color: #2a6ae7;
+}
+
+.productLink {
+  background: linear-gradient(94deg, #2a6ae7 52%, #93bafe 110%);
+  color: #fff;
+  font-weight: 700;
+  padding: 10px 18px;
+  border-radius: 8px;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.3s ease;
+  align-self: flex-end; /* Align button to bottom right */
+  margin-top: auto; /* Push to bottom if card grows */
+}
+
+.productLink:hover {
+  background: linear-gradient(94deg, #1f52c7 52%, #7ea7f3 110%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
