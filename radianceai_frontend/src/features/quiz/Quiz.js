@@ -57,148 +57,54 @@ const getInitialAnswers = () => {
 function Quiz() {
   const navigate = useNavigate();
 
-  const [answers, setAnswers] = useState(getInitialAnswers); // Initialize state from localStorage
+  const [answers, setAnswers] = useState(getInitialAnswers);
   const [step, setStep] = useState(0);
-  const [mode, setMode] = useState("quiz"); // quiz or result only
+  // Removed 'mode' state as it's no longer needed for navigation logic.
+  // The 'result' display logic will now only appear if the quiz is fully submitted
+  // and we explicitly decide to show it before navigating.
 
   // Effect to save answers to localStorage whenever they change
   useEffect(() => {
     localStorage.setItem("quizAnswers", JSON.stringify(answers));
-  }, [answers]); // Dependency array: run this effect whenever 'answers' changes
-
-  // Also, you might want to adjust the initial step if there are already answers
-  // This ensures that if a user refreshes on question 2, they don't go back to 0.
-  // However, for a multi-step quiz, it's often better to restart or implement
-  // more complex "resume" logic. For simplicity, we'll keep it at step 0 for now
-  // unless you explicitly want to save/restore the step.
-  // If you *do* want to persist the step, you'd add:
-  // const [step, setStep] = useState(() => {
-  //   try {
-  //     const storedStep = localStorage.getItem("quizStep");
-  //     return storedStep ? parseInt(storedStep, 10) : 0;
-  //   } catch (error) {
-  //     console.error("Error parsing quiz step from localStorage:", error);
-  //     return 0;
-  //   }
-  // });
-  // useEffect(() => {
-  //   localStorage.setItem("quizStep", String(step));
-  // }, [step]);
-
+  }, [answers]);
 
   const handleSelect = (key) => (value) => {
     setAnswers((a) => ({ ...a, [key]: value }));
   };
 
-  const nextStep = () => {
-    if (step < QUIZ_QUESTIONS.length - 1) setStep((s) => s + 1);
-    else setMode("result");
+  const handleNextQuestion = () => {
+    // Check if the current question has an answer before proceeding
+    const currentQuestionKey = QUIZ_QUESTIONS[step].key;
+    if (!answers[currentQuestionKey]) {
+        console.warn("Please select an answer before proceeding.");
+        return; // Prevent advancing if no answer is selected
+    }
+
+    if (step < QUIZ_QUESTIONS.length - 1) {
+      setStep((s) => s + 1);
+    } else {
+      // This is the last step, so we are submitting the quiz.
+      // Ensure answers are saved BEFORE navigating.
+      // The useEffect will handle saving the last answer to localStorage.
+      // Then navigate to recommendations.
+      navigate("/recommendations");
+    }
   };
 
   const prevStep = () => {
-    if (step > 0) setStep((s) => s - 1);
+    if (step > 0) {
+      setStep((s) => s - 1);
+    }
   };
 
-  const submitQuiz = (e) => {
-    e.preventDefault();
-    setMode("result");
-    // No need to pass answers via state here, as they are in localStorage
-    // But navigate to ensure the URL changes for direct access/refreshability
-    navigate("/recommendations");
-  };
+  // Removed submitQuiz function as its logic is now integrated into handleNextQuestion
+  // when it's the last step. The form's onSubmit will no longer trigger this directly.
 
-  // Rest of your Quiz component render logic remains largely the same
-  // except for the navigate in submitQuiz and the initial state setup.
-
-  if (mode === "result") {
-    return (
-      <section
-        className="container"
-        style={{ maxWidth: 500, margin: "0 auto", padding: "40px 0 32px 0" }}
-      >
-        <AppleFadeTransition>
-          <h2
-            style={{
-              fontSize: "1.31rem",
-              fontWeight: 800,
-              color: blueAccent,
-              margin: "25px 0 9px 0",
-              textAlign: "center",
-            }}
-          >
-            Your Quiz Results
-          </h2>
-          <div
-            style={{
-              margin: "0 0 12px 0",
-              textAlign: "center",
-              color: blue,
-              fontWeight: 700,
-              fontSize: 16,
-            }}
-          >
-            Tailored recommendations based on your answers.
-          </div>
-          <MotionWrapper>
-            <div
-              style={{
-                background: "linear-gradient(97deg,#93bafe 60%,#e3f0ff 100%)",
-                border: "2px solid #2a6ae7",
-                borderRadius: 18,
-                boxShadow: "0 1.5px 10px #93bafe20",
-                padding: "20px 15px 18px 15px",
-                margin: "0 auto",
-                maxWidth: 410,
-                fontWeight: 600,
-                color: blueAccent,
-                textAlign: "center",
-              }}
-            >
-              <span
-                style={{
-                  display: "inline-block",
-                  background: blue2,
-                  color: blueAccent,
-                  fontWeight: 700,
-                  borderRadius: "50em",
-                  fontSize: 14,
-                  padding: "2.5px 10px",
-                  marginBottom: 12,
-                }}
-              >
-                Routine Recommendation
-              </span>
-              <div style={{ fontSize: 17, margin: "7px 0 5px 0" }}>
-                We recommend a <b>{answers.primaryGoal || "hydration"}</b> routine
-                for <b>{answers.skinType || "normal"}</b> skin in the age range{" "}
-                <b>{answers.age || "18-24"}</b>.
-              </div>
-              <div style={{ color: blue, marginTop: 7 }}>
-                <button
-                  onClick={() => navigate("/recommendations")} // Removed state: { answers }
-                  style={{
-                    cursor: "pointer",
-                    color: "#fff",
-                    backgroundColor: blueAccent,
-                    border: "none",
-                    borderRadius: 12,
-                    fontWeight: 700,
-                    padding: "10px 22px",
-                    fontSize: 16,
-                    marginTop: 12,
-                    boxShadow: "0 4px 15px #93bafe70",
-                  }}
-                  aria-label="See Product Recommendations"
-                >
-                  See Product Recommendations →
-                </button>
-              </div>
-            </div>
-          </MotionWrapper>
-        </AppleFadeTransition>
-      </section>
-    );
-  }
+  // If the quiz is finished (all steps completed and we navigated away),
+  // this component won't be rendered.
+  // The 'result' display logic should ideally be part of your Recommendations
+  // or a separate "QuizResultsSummary" component, not within the quiz itself,
+  // if you're navigating immediately.
 
   const q = QUIZ_QUESTIONS[step];
 
@@ -208,7 +114,8 @@ function Quiz() {
       style={{ maxWidth: 500, margin: "0 auto", paddingTop: 40, paddingBottom: 32 }}
     >
       <AppleFadeTransition>
-        <form onSubmit={submitQuiz}>
+        {/* Remove onSubmit={submitQuiz} from the form */}
+        <form>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -318,7 +225,7 @@ function Quiz() {
 
             {step < QUIZ_QUESTIONS.length - 1 ? (
               <button
-                type="button"
+                type="button" // Change to type="button" to prevent form submission
                 style={{
                   background: "linear-gradient(91deg,#2a6ae7 54%,#93bafe 100%)",
                   color: "#fff",
@@ -329,14 +236,14 @@ function Quiz() {
                   padding: "10px 22px",
                   cursor: answers[q.key] ? "pointer" : "not-allowed",
                 }}
-                onClick={nextStep}
+                onClick={handleNextQuestion} // Use the new function
                 disabled={!answers[q.key]}
               >
                 Next
               </button>
             ) : (
               <button
-                type="submit"
+                type="button" // Change to type="button" for consistency or 'submit' if you want a true form submit
                 style={{
                   background: "linear-gradient(91deg,#2a6ae7 54%,#93bafe 100%)",
                   color: "#fff",
@@ -347,9 +254,10 @@ function Quiz() {
                   padding: "10px 22px",
                   cursor: answers[q.key] ? "pointer" : "not-allowed",
                 }}
+                onClick={handleNextQuestion} // Use the new function
                 disabled={!answers[q.key]}
               >
-                Submit Quiz
+                Get My Recommendations
               </button>
             )}
           </div>
