@@ -15,9 +15,29 @@ async function fetchRecommendationsFromSupabase(primaryGoal, skinType) {
     return [];
   }
 
-  // Normalize inputs to lowercase to ensure case-insensitive matching with ilike
-  const normalizedPrimaryGoal = primaryGoal.toLowerCase();
+  // Normalize inputs to lowercase to ensure case-insensitive matching
+  const normalizedPrimaryGoal = primaryGoal.toLowerCase(); // e.g., "antiaging"
   const normalizedSkinType = skinType.toLowerCase();
+
+  // >>> START OF NEW MAPPING LOGIC <<<
+  let queryGoal = normalizedPrimaryGoal; // Default to using the normalized goal directly
+
+  // If the normalized primary goal from the quiz doesn't directly match
+  // what's in your product concerns, define a specific mapping.
+  if (normalizedPrimaryGoal === 'antiaging') {
+    // We map 'antiaging' (from quiz) to 'aging' (which is in 'Aging, Wrinkles' in DB)
+    queryGoal = 'aging';
+  }
+  // Add other mappings here if your quiz goals don't directly map to product concerns
+  // For example, if quiz sends 'acne free' but products only have 'blemishes':
+  // if (normalizedPrimaryGoal === 'acne free') {
+  //   queryGoal = 'acne'; // Or 'blemishes' depending on your DB data
+  // }
+  // You can extend this for any other mismatches.
+  // >>> END OF NEW MAPPING LOGIC <<<
+
+  // Add this for better debugging to see what values are actually being used for the query
+  console.log("Querying recommendations for Goal (mapped):", queryGoal, "and Skin Type:", normalizedSkinType);
 
   const { data, error } = await supabase
     .from("products")
@@ -30,14 +50,9 @@ async function fetchRecommendationsFromSupabase(primaryGoal, skinType) {
       brand_id,
       brands!products_brand_id_fkey(name)
     `)
-    // CONCERNS: Still using ilike, assuming your concerns field might be a comma-separated string
-    // and 'acne' will be present as a substring (e.g., 'Acne, Oiliness').
-    // If your DB only has 'Blemishes' for an 'Acne' goal, you might need a mapping here.
-    .ilike("concerns", `%${normalizedPrimaryGoal}%`)
+    // Now use the 'queryGoal' in the ilike filter
+    .ilike("concerns", `%${queryGoal}%`)
     // SKIN_TYPE: Use .or() to check for specific skin type OR 'All' skin type.
-    // The .ilike() for skin_type will match if the normalizedSkinType is a substring
-    // (e.g., 'oily' matches 'Dry, Oily, Combination').
-    // The .eq() will match if the skin_type column is exactly 'All' (case-sensitive for 'All').
     .or(`skin_type.ilike.%${normalizedSkinType}%,skin_type.eq.All`);
 
 
@@ -45,6 +60,9 @@ async function fetchRecommendationsFromSupabase(primaryGoal, skinType) {
     console.error("Error fetching recommendations:", error.message);
     return [];
   }
+
+  // This console log will now show what data came back from Supabase AFTER mapping.
+  console.log("Raw recommendations data from Supabase:", data);
 
   return data.map((product) => ({
     title: product.name,
@@ -102,7 +120,7 @@ const Recommendations = () => {
     };
 
     loadAndFetchRecommendations();
-  }, []); // Empty dependency array means this runs once on mount
+  }, []);
 
   if (loading) {
     return (
