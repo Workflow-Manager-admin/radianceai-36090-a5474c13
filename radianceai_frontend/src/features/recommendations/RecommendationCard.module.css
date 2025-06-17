@@ -1,3 +1,34 @@
+/* RecommendationCard.module.css */
+
+.card {
+  /* Existing styles */
+  display: flex; /* Make it a flex container */
+  flex-direction: column; /* Stack items vertically */
+  /* Other existing styles */
+}
+
+.imageContainer {
+  width: 100%; /* Take full width of the card */
+  /* You might want a fixed height or aspect ratio here */
+  height: 200px; /* Example fixed height */
+  overflow: hidden; /* Hide any overflow if image is larger */
+  display: flex; /* Use flex to center image */
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  margin-bottom: 15px; /* Space between image and content */
+  border-bottom: 1px solid #eee; /* Optional separator */
+  padding-bottom: 10px; /* Space within the image container */
+}
+
+.productImage {
+  max-width: 100%; /* Ensure image doesn't overflow its container */
+  max-height: 100%; /* Ensure image doesn't overflow its container */
+  object-fit: contain; /* Scales the image to fit the content box without cropping or stretching */
+  /* Alternative: object-fit: cover; // Fills the container, potentially cropping edges */
+  /* Optional: border-radius: 8px; for rounded corners */
+}
+
+
 .card {
   width: 330px;
   background: linear-gradient(90deg, #e3f0ff 45%, #93bafe 100%);

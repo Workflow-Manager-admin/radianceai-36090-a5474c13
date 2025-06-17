@@ -1,3 +1,4 @@
+// recommendations.js
 import React from "react";
 import styles from "./RecommendationCard.module.css";
 
@@ -28,6 +29,24 @@ function RecommendationCard({ data, index }) {
       >
         #{index + 1}
       </div>
+
+      {/* --- ADDED: Product Image Display --- */}
+      {data.imageUrl && ( // Only render image if imageUrl exists
+        <div className={styles.imageContainer}>
+          <img
+            src={data.imageUrl}
+            alt={data.title || "Product Image"} // Provide a meaningful alt text for accessibility
+            className={styles.productImage}
+            onError={(e) => {
+              // Optional: Handle broken image links
+              e.target.onerror = null; // Prevent infinite loop
+              e.target.src = "/default-product-image.jpg"; // Fallback image
+            }}
+          />
+        </div>
+      )}
+      {/* --- END ADDED --- */}
+
       <div className={styles.cardContent}>
         <div className={styles.cardTitle}>
           <span
