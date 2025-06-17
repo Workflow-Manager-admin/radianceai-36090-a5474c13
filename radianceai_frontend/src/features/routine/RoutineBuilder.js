@@ -1,66 +1,137 @@
+// routinebuilder.js
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
-import supabase from "../../api/supabaseClient";
+import { useNavigate } from "react-router-dom";
+import supabase from "../../api/supabaseClient"; // Keep import, but logic will be commented
 
 const RoutineBuilder = () => {
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
   const [routineSteps, setRoutineSteps] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [hasAnswers, setHasAnswers] = useState(false); // Track if valid answers exist
+  const [hasAnswers, setHasAnswers] = useState(false);
+  const [userAnswers, setUserAnswers] = useState({});
 
   useEffect(() => {
-    const loadAndFetchRoutine = async () => {
+    const loadAndProcessRoutine = async () => { // Renamed to reflect no direct fetch
       setLoading(true);
-      let answers = null;
+      let answersFromStorage = null;
+      let validAnswersExist = false;
+
       try {
         const stored = localStorage.getItem("quizAnswers");
         if (stored) {
-          answers = JSON.parse(stored);
-          // Check for essential answers for the routine builder
-          if (answers && answers.primaryGoal) {
-            setHasAnswers(true);
+          answersFromStorage = JSON.parse(stored);
+          if (answersFromStorage && answersFromStorage.primaryGoal) {
+            validAnswersExist = true;
           }
         }
       } catch (error) {
         console.error("Error parsing quiz answers from localStorage:", error);
       }
 
-      if (!answers || !answers.primaryGoal) {
-        // No valid answers, or primaryGoal is missing
+      setUserAnswers(answersFromStorage || {});
+      setHasAnswers(validAnswersExist);
+
+      if (!validAnswersExist) {
         setLoading(false);
-        setHasAnswers(false); // Ensure this is false
-        // Optionally, you might want to navigate here immediately if no answers at all
-        // navigate("/quiz"); // Uncomment if you want immediate redirect
         return;
       }
 
-      // If we have answers, proceed to fetch the routine
-      const { data, error } = await supabase
-        .from("routine_steps")
-        .select(`
-          step_order,
-          step_name,
-          description,
-          brand_id,
-          official_product_url,
-          brands!routine_steps_brand_id_fkey (
-            name
-          )
-        `)
-        .eq("concerns", answers.primaryGoal)
-        .order("step_order", { ascending: true });
+      // --- IMPORTANT: ROUTINE_STEPS TABLE DOES NOT EXIST IN SUPABASE ---
+      // The code below assumes you WILL create a 'routine_steps' table in Supabase.
+      // If you do not create this table, this fetch will ALWAYS fail with a 400 error.
+      // For now, it's commented out and a placeholder is used.
 
-      if (error) {
-        console.error("Error fetching routine steps:", error);
-        setRoutineSteps([]); // Ensure empty array on error
+      // // Define the foreign key constraint name for brands.
+      // // Assuming 'routine_steps_brand_id_fkey' based on common Supabase conventions.
+      // const FK_NAME = "routine_steps_brand_id_fkey";
+
+      // const { data, error } = await supabase
+      //   .from("routine_steps")
+      //   .select(`
+      //     step_order,
+      //     step_name,
+      //     description,
+      //     brand_id, // Include the foreign key column
+      //     official_product_url,
+      //     brands!${FK_NAME}(name) // Use the explicit foreign key relationship name
+      //   `)
+      //   // Using .ilike as requested for 'concerns'
+      //   .ilike("concerns", `%${answersFromStorage.primaryGoal}%`)
+      //   .order("step_order", { ascending: true });
+
+      // if (error) {
+      //   console.error("Error fetching routine steps:", error.message);
+      //   setRoutineSteps([]); // Ensure empty array on error
+      // } else {
+      //   setRoutineSteps(data);
+      // }
+
+      // --- TEMPORARY PLACEHOLDER DATA (REMOVE ONCE SUPABASE TABLE IS READY) ---
+      // You can replace this with a more sophisticated hardcoded logic or
+      // enable the Supabase fetch above once your table is created and populated.
+      if (answersFromStorage.primaryGoal === "acne") {
+        setRoutineSteps([
+          {
+            step_order: 1,
+            step_name: "Gentle Cleansing",
+            description: "Start with a mild, pH-balanced cleanser to remove impurities without stripping the skin.",
+            brand_id: null,
+            official_product_url: "#",
+            brands: { name: "Example Brand A" }
+          },
+          {
+            step_order: 2,
+            step_name: "Targeted Treatment (Salicylic Acid)",
+            description: "Apply a serum with salicylic acid to exfoliate, unclog pores, and reduce inflammation.",
+            brand_id: null,
+            official_product_url: "#",
+            brands: { name: "Example Brand B" }
+          },
+          {
+            step_order: 3,
+            step_name: "Lightweight Hydration",
+            description: "Follow with a non-comedogenic, oil-free moisturizer to keep skin hydrated.",
+            brand_id: null,
+            official_product_url: "#",
+            brands: { name: "Example Brand C" }
+          }
+        ]);
+      } else if (answersFromStorage.primaryGoal === "hydration") {
+         setRoutineSteps([
+          {
+            step_order: 1,
+            step_name: "Hydrating Cleanser",
+            description: "Use a creamy, hydrating cleanser to retain skin's natural moisture.",
+            brand_id: null,
+            official_product_url: "#",
+            brands: { name: "Example Brand D" }
+          },
+          {
+            step_order: 2,
+            step_name: "Hyaluronic Acid Serum",
+            description: "Apply a serum rich in hyaluronic acid to draw moisture into the skin.",
+            brand_id: null,
+            official_product_url: "#",
+            brands: { name: "Example Brand E" }
+          },
+          {
+            step_order: 3,
+            step_name: "Rich Moisturizer",
+            description: "Lock in moisture with a rich, emollient moisturizer.",
+            brand_id: null,
+            official_product_url: "#",
+            brands: { name: "Example Brand F" }
+          }
+        ]);
       } else {
-        setRoutineSteps(data);
+        setRoutineSteps([]); // No specific hardcoded routine for this goal
       }
+
       setLoading(false);
     };
 
-    loadAndFetchRoutine();
-  }, []); // Empty dependency array means this runs once on mount
+    loadAndProcessRoutine();
+  }, []);
 
   // --- Render Logic ---
 
@@ -81,30 +152,38 @@ const RoutineBuilder = () => {
         <div style={boxStyle}>
           <h2 style={headingStyle}>No Routine Available</h2>
           <p style={paragraphStyle}>
-            Please complete the{" "}
-            <a href="/quiz" style={linkStyle} onClick={(e) => {
-              e.preventDefault();
-              navigate("/quiz");
-            }}>
-              quiz
-            </a>{" "}
-            to get a personalized routine tailored to your needs.
+            We couldn't find a routine matching your primary goal: **{userAnswers.primaryGoal || 'N/A'}**.
+            <br />
+            **Action Needed:** To get a personalized routine, you need to:
+            <br />
+            1. **Create a `routine_steps` table in your Supabase project.**
+            <br />
+            2. Populate it with routine data, including a `concerns` column (text) and `brand_id` (foreign key to `brands.id`).
+            <br />
+            3. Uncomment the Supabase fetch logic in `RoutineBuilder.js` and remove this message.
+            <br />
+            Alternatively, you can manually add routine suggestions within the component code.
           </p>
+          <button
+            style={buttonStyle}
+            onClick={() => navigate("/quiz")}
+          >
+            Retake Quiz
+          </button>
         </div>
       </div>
     );
   }
 
-  // If routineSteps exist, render the routine
   return (
-    <div style={{ padding: 24, maxWidth: 600, margin: '0 auto' }}> {/* Added max-width for better layout */}
+    <div style={{ padding: 24, maxWidth: 600, margin: '0 auto' }}>
       <h2 style={{ ...headingStyle, marginBottom: 24, textAlign: 'center' }}>
         Your Personalized Skincare Routine
       </h2>
-      <div style={{ display: "grid", gap: 30 }}> {/* Increased gap for better spacing */}
+      <div style={{ display: "grid", gap: 30 }}>
         {routineSteps.map((step, idx) => (
           <div
-            key={idx}
+            key={idx} // Using index as key is okay for static lists, but if items reorder/change, use a unique ID from Supabase
             style={{
               background: "linear-gradient(90deg, #e3f0ff 45%, #93bafe 100%)",
               border: "2px solid #93bafe",
@@ -114,7 +193,6 @@ const RoutineBuilder = () => {
               position: "relative",
             }}
           >
-            {/* Step badge */}
             <div
               style={{
                 position: "absolute",
@@ -132,20 +210,16 @@ const RoutineBuilder = () => {
               Step {step.step_order}
             </div>
 
-            {/* Title */}
-            <h3 style={{ color: "#2a6ae7", fontWeight: 700, marginTop: 15 }}> {/* Adjusted margin */}
+            <h3 style={{ color: "#2a6ae7", fontWeight: 700, marginTop: 15 }}>
               {step.step_name || "Unnamed Step"}
             </h3>
 
-            {/* Brand */}
             <p style={{ marginBottom: 4, color: "#47567f" }}>
-              <strong>Brand:</strong> {step.brands?.name || "Unknown"}
+              **Brand:** {step.brands?.name || "Unknown"}
             </p>
 
-            {/* Description */}
-            <p style={{ color: "#47567f", marginBottom: 15 }}>{step.description}</p> {/* Added margin-bottom */}
+            <p style={{ color: "#47567f", marginBottom: 15 }}>{step.description}</p>
 
-            {/* Learn More */}
             {step.official_product_url ? (
               <a
                 href={step.official_product_url}
@@ -226,7 +300,7 @@ const buttonStyle = {
   textDecoration: "none",
   transition: "background 0.3s ease",
   fontSize: 14.5,
-  cursor: "pointer", // Added cursor for clarity
+  cursor: "pointer",
 };
 
 export default RoutineBuilder;

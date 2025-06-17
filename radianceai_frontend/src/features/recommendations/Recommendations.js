@@ -17,15 +17,16 @@ async function fetchRecommendationsFromSupabase(primaryGoal, skinType) {
 
   const { data, error } = await supabase
     .from("products")
+    // IMPORTANT: Assuming your foreign key constraint from products.brand_id to brands.id is named 'products_brand_id_fkey'.
+    // If it's different, you MUST replace 'products_brand_id_fkey' with your actual foreign key name.
     .select(`
       name,
       description,
       category,
       official_product_url,
       image_url,
-      brand (
-        name
-      )
+      brand_id, // Include the foreign key column to ensure the join works robustly
+      brands!products_brand_id_fkey(name) // Explicitly use the foreign key relationship name
     `)
     .ilike("concerns", `%${primaryGoal}%`)
     .ilike("skin_type", `%${skinType}%`);
@@ -35,13 +36,11 @@ async function fetchRecommendationsFromSupabase(primaryGoal, skinType) {
     return [];
   }
 
-  // console.log("Fetched products:", data); // Uncomment for debugging if you need to see raw data
-
   return data.map((product) => ({
     title: product.name,
     description: product.description,
     category: product.category,
-    brand: product.brand?.name ?? "Unknown Brand",
+    brand: product.brands?.name ?? "Unknown Brand", // Access through 'brands' alias
     link: product.official_product_url,
     imageUrl: product.image_url ?? "/default-product-image.jpg",
   }));
@@ -52,19 +51,18 @@ const Recommendations = () => {
   const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [quizAnswersLoaded, setQuizAnswersLoaded] = useState(false);
-  const [userAnswers, setUserAnswers] = useState({}); // <--- NEW STATE ADDED HERE
+  const [userAnswers, setUserAnswers] = useState({});
 
   useEffect(() => {
     const loadAndFetchRecommendations = async () => {
       setLoading(true);
-      let answersFromStorage = {}; // Use a temporary variable for answers during loading
+      let answersFromStorage = {};
       let validAnswers = false;
 
       try {
         const storedAnswers = localStorage.getItem("quizAnswers");
         if (storedAnswers) {
           answersFromStorage = JSON.parse(storedAnswers);
-          // Crucial check: ensure the necessary properties exist
           if (answersFromStorage.primaryGoal && answersFromStorage.skinType) {
             validAnswers = true;
           } else {
@@ -77,31 +75,27 @@ const Recommendations = () => {
         console.error("Error parsing quiz answers from localStorage:", error);
       }
 
-      setUserAnswers(answersFromStorage); // <--- SET THE NEW STATE HERE
+      setUserAnswers(answersFromStorage);
       setQuizAnswersLoaded(validAnswers);
 
       if (!validAnswers) {
         setLoading(false);
-        // navigate("/quiz"); // Uncomment if you want immediate redirect
         return;
       }
 
-      const { primaryGoal, skinType } = answersFromStorage; // Use answersFromStorage here
+      const { primaryGoal, skinType } = answersFromStorage;
       const fetchedRecs = await fetchRecommendationsFromSupabase(primaryGoal, skinType);
       setRecommendations(fetchedRecs);
       setLoading(false);
     };
 
     loadAndFetchRecommendations();
-  }, []); // Empty dependency array, runs once on mount
-
-  // --- Render Logic ---
+  }, []);
 
   if (loading) {
-    return <div>Loading recommendations...</div>; // Render simple loading message
+    return <div>Loading recommendations...</div>;
   }
 
-  // If not loading and no valid quiz answers were loaded
   if (!quizAnswersLoaded) {
     return (
       <div className={styles.empty}>
@@ -144,7 +138,6 @@ const Recommendations = () => {
     );
   }
 
-  // If not loading, answers loaded, but no recommendations found
   if (recommendations.length === 0) {
     return (
       <div className={styles.empty}>
@@ -162,7 +155,7 @@ const Recommendations = () => {
           <div style={{ fontSize: 15.5, marginBottom: 12 }}>
             We couldn't find products matching your selections:
             <br />
-            Skin Type: <strong>{userAnswers.skinType || 'N/A'}</strong>, Goal: <strong>{userAnswers.primaryGoal || 'N/A'}</strong>. {/* <--- USED userAnswers HERE */}
+            Skin Type: **{userAnswers.skinType || 'N/A'}**, Goal: **{userAnswers.primaryGoal || 'N/A'}**.
             <br />
             Please try adjusting your quiz answers or check back later for more options.
           </div>
