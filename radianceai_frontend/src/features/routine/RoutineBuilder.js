@@ -2,21 +2,19 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import supabase from "../../api/supabaseClient";
-// You might want to import a dedicated component for each routine step later,
-// but for now, we'll render it directly in this file.
 
-import styles from "./RoutineBuilder.module.css"; // Assuming you have a CSS module
+import styles from "./RoutineBuilder.module.css"; // Ensure this file exists and has styles
 
 const RoutineBuilder = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [userAnswers, setUserAnswers] = useState({});
   const [routineSteps, setRoutineSteps] = useState([]);
-  const [quizAnswersLoaded, setQuizAnswersLoaded] = useState(false); // New state to track if quiz answers are loaded
+  const [quizAnswersLoaded, setQuizAnswersLoaded] = useState(false);
 
   useEffect(() => {
     const loadAnswersAndFetchRoutine = async () => {
-      setLoading(true); // Start loading
+      setLoading(true);
       let answersFromStorage = {};
       let validAnswers = false;
 
@@ -25,7 +23,6 @@ const RoutineBuilder = () => {
         const storedAnswers = localStorage.getItem("quizAnswers");
         if (storedAnswers) {
           answersFromStorage = JSON.parse(storedAnswers);
-          // Check if primaryGoal is present and not an empty string
           if (answersFromStorage.primaryGoal && answersFromStorage.primaryGoal.trim() !== '') {
             validAnswers = true;
           } else {
@@ -39,7 +36,7 @@ const RoutineBuilder = () => {
       }
 
       setUserAnswers(answersFromStorage);
-      setQuizAnswersLoaded(validAnswers); // Update state based on whether valid answers were found
+      setQuizAnswersLoaded(validAnswers);
 
       // If no valid quiz answers, stop here and show the "Quiz Not Completed" message
       if (!validAnswers) {
@@ -59,26 +56,27 @@ const RoutineBuilder = () => {
             step_number,
             time_of_day,
             notes,
-            products ( // Join to fetch product details for each step
-              id, // It's good practice to get the product's ID too
-              name,
-              description,
-              category,
-              official_product_url,
-              image_url,
-              brands (name) // Nested join to fetch brand name from products' brand_id
-            )
-          `)
-          // IMPORTANT: Match the primaryGoal from quiz to the 'concern' column in routine_steps
-          // Use .toLowerCase() for robust case-insensitive matching
+            products (
+            id,
+            name,
+            description,
+            category,
+            official_product_url,
+            image_url,
+            brands (name)
+          )
+          `) // <--- ALL COMMENTS REMOVED FROM THIS SELECT STRING!
           .ilike("concern", `%${primaryGoal.toLowerCase()}%`)
-          .order("step_number", { ascending: true }); // Order steps correctly
+          .order("step_number", { ascending: true });
 
         if (error) {
           console.error("Error fetching routine:", error.message);
-          setRoutineSteps([]); // Set to empty on error
+          setRoutineSteps([]);
           return;
         }
+
+        // This console log is still here for your debugging benefit!
+        console.log("Raw data from Supabase:", data);
 
         // 3. Map the fetched data to a cleaner format for your component
         const formattedRoutine = data.map(step => ({
@@ -94,9 +92,9 @@ const RoutineBuilder = () => {
             description: step.products.description,
             category: step.products.category,
             officialProductUrl: step.products.official_product_url,
-            imageUrl: step.products.image_url ?? "/default-product-image.jpg", // Fallback image for products
-            brand: step.products.brands?.name || 'Unknown Brand' // Access nested brand name with optional chaining
-          } : null // If product data is missing for some reason, set to null
+            imageUrl: step.products.image_url ?? "/default-product-image.jpg",
+            brand: step.products.brands?.name || 'Unknown Brand'
+          } : null
         })).filter(step => step.product !== null); // Filter out any steps that couldn't find a product
 
         setRoutineSteps(formattedRoutine);
@@ -105,12 +103,12 @@ const RoutineBuilder = () => {
         console.error("Unexpected error during routine fetch:", error);
         setRoutineSteps([]);
       } finally {
-        setLoading(false); // End loading, whether success or error
+        setLoading(false);
       }
     };
 
     loadAnswersAndFetchRoutine();
-  }, []); // Empty dependency array means this runs once on component mount
+  }, []);
 
   // --- Conditional Rendering ---
 
@@ -118,7 +116,7 @@ const RoutineBuilder = () => {
   if (loading) {
     return (
       <div className={styles.loadingContainer}>
-        <div className={styles.spinner}></div> {/* Add a spinner in your CSS */}
+        <div className={styles.spinner}></div>
         <div>Building your personalized routine...</div>
       </div>
     );
