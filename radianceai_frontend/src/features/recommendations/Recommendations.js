@@ -15,21 +15,31 @@ async function fetchRecommendationsFromSupabase(primaryGoal, skinType) {
     return [];
   }
 
+  // Normalize inputs to lowercase to ensure case-insensitive matching with ilike
+  const normalizedPrimaryGoal = primaryGoal.toLowerCase();
+  const normalizedSkinType = skinType.toLowerCase();
+
   const { data, error } = await supabase
     .from("products")
-    // IMPORTANT: Assuming your foreign key constraint from products.brand_id to brands.id is named 'products_brand_id_fkey'.
-    // If it's different, you MUST replace 'products_brand_id_fkey' with your actual foreign key name.
     .select(`
       name,
       description,
       category,
       official_product_url,
       image_url,
-      brand_id, // Include the foreign key column to ensure the join works robustly
-      brands!products_brand_id_fkey(name) // Explicitly use the foreign key relationship name
+      brand_id,
+      brands!products_brand_id_fkey(name)
     `)
-    .ilike("concerns", `%${primaryGoal}%`)
-    .ilike("skin_type", `%${skinType}%`);
+    // CONCERNS: Still using ilike, assuming your concerns field might be a comma-separated string
+    // and 'acne' will be present as a substring (e.g., 'Acne, Oiliness').
+    // If your DB only has 'Blemishes' for an 'Acne' goal, you might need a mapping here.
+    .ilike("concerns", `%${normalizedPrimaryGoal}%`)
+    // SKIN_TYPE: Use .or() to check for specific skin type OR 'All' skin type.
+    // The .ilike() for skin_type will match if the normalizedSkinType is a substring
+    // (e.g., 'oily' matches 'Dry, Oily, Combination').
+    // The .eq() will match if the skin_type column is exactly 'All' (case-sensitive for 'All').
+    .or(`skin_type.ilike.%${normalizedSkinType}%,skin_type.eq.All`);
+
 
   if (error) {
     console.error("Error fetching recommendations:", error.message);
@@ -63,7 +73,9 @@ const Recommendations = () => {
         const storedAnswers = localStorage.getItem("quizAnswers");
         if (storedAnswers) {
           answersFromStorage = JSON.parse(storedAnswers);
-          if (answersFromStorage.primaryGoal && answersFromStorage.skinType) {
+          // Check if both primaryGoal and skinType are present and not empty strings
+          if (answersFromStorage.primaryGoal && answersFromStorage.primaryGoal.trim() !== '' &&
+              answersFromStorage.skinType && answersFromStorage.skinType.trim() !== '') {
             validAnswers = true;
           } else {
             console.warn("Incomplete quiz answers found in localStorage:", answersFromStorage);
@@ -90,10 +102,15 @@ const Recommendations = () => {
     };
 
     loadAndFetchRecommendations();
-  }, []);
+  }, []); // Empty dependency array means this runs once on mount
 
   if (loading) {
-    return <div>Loading recommendations...</div>;
+    return (
+      <div className={styles.loadingContainer}>
+        <div className={styles.spinner}></div>
+        <div>Loading recommendations...</div>
+      </div>
+    );
   }
 
   if (!quizAnswersLoaded) {
