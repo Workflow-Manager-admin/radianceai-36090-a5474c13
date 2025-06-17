@@ -1,3 +1,4 @@
+// quiz.js
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -42,13 +43,48 @@ const QUIZ_QUESTIONS = [
   },
 ];
 
+// Helper function to initialize state from localStorage
+const getInitialAnswers = () => {
+  try {
+    const storedAnswers = localStorage.getItem("quizAnswers");
+    return storedAnswers ? JSON.parse(storedAnswers) : {};
+  } catch (error) {
+    console.error("Error parsing quiz answers from localStorage:", error);
+    return {};
+  }
+};
+
 function Quiz() {
   const navigate = useNavigate();
 
-  // Answers state (no localStorage persistence needed)
-  const [answers, setAnswers] = useState({});
+  const [answers, setAnswers] = useState(getInitialAnswers); // Initialize state from localStorage
   const [step, setStep] = useState(0);
   const [mode, setMode] = useState("quiz"); // quiz or result only
+
+  // Effect to save answers to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem("quizAnswers", JSON.stringify(answers));
+  }, [answers]); // Dependency array: run this effect whenever 'answers' changes
+
+  // Also, you might want to adjust the initial step if there are already answers
+  // This ensures that if a user refreshes on question 2, they don't go back to 0.
+  // However, for a multi-step quiz, it's often better to restart or implement
+  // more complex "resume" logic. For simplicity, we'll keep it at step 0 for now
+  // unless you explicitly want to save/restore the step.
+  // If you *do* want to persist the step, you'd add:
+  // const [step, setStep] = useState(() => {
+  //   try {
+  //     const storedStep = localStorage.getItem("quizStep");
+  //     return storedStep ? parseInt(storedStep, 10) : 0;
+  //   } catch (error) {
+  //     console.error("Error parsing quiz step from localStorage:", error);
+  //     return 0;
+  //   }
+  // });
+  // useEffect(() => {
+  //   localStorage.setItem("quizStep", String(step));
+  // }, [step]);
+
 
   const handleSelect = (key) => (value) => {
     setAnswers((a) => ({ ...a, [key]: value }));
@@ -66,7 +102,13 @@ function Quiz() {
   const submitQuiz = (e) => {
     e.preventDefault();
     setMode("result");
+    // No need to pass answers via state here, as they are in localStorage
+    // But navigate to ensure the URL changes for direct access/refreshability
+    navigate("/recommendations");
   };
+
+  // Rest of your Quiz component render logic remains largely the same
+  // except for the navigate in submitQuiz and the initial state setup.
 
   if (mode === "result") {
     return (
@@ -133,7 +175,7 @@ function Quiz() {
               </div>
               <div style={{ color: blue, marginTop: 7 }}>
                 <button
-                  onClick={() => navigate("/recommendations", { state: { answers } })}
+                  onClick={() => navigate("/recommendations")} // Removed state: { answers }
                   style={{
                     cursor: "pointer",
                     color: "#fff",
@@ -158,7 +200,6 @@ function Quiz() {
     );
   }
 
-  // Quiz mode
   const q = QUIZ_QUESTIONS[step];
 
   return (

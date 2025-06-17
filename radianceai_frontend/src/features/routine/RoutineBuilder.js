@@ -1,29 +1,40 @@
 import React, { useEffect, useState } from "react";
-import supabase from "../../api/supabaseClient"; // Import your existing Supabase client
+import { useNavigate } from "react-router-dom"; // Import useNavigate
+import supabase from "../../api/supabaseClient";
 
 const RoutineBuilder = () => {
-  const [answers, setAnswers] = useState(null);
+  const navigate = useNavigate(); // Initialize useNavigate
   const [routineSteps, setRoutineSteps] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [hasAnswers, setHasAnswers] = useState(false); // Track if valid answers exist
 
-  // Load answers from localStorage
   useEffect(() => {
-    const stored = localStorage.getItem("quizAnswers");
-    if (stored) {
-      setAnswers(JSON.parse(stored));
-    } else {
-      setLoading(false); // No answers, stop loading
-    }
-  }, []);
+    const loadAndFetchRoutine = async () => {
+      setLoading(true);
+      let answers = null;
+      try {
+        const stored = localStorage.getItem("quizAnswers");
+        if (stored) {
+          answers = JSON.parse(stored);
+          // Check for essential answers for the routine builder
+          if (answers && answers.primaryGoal) {
+            setHasAnswers(true);
+          }
+        }
+      } catch (error) {
+        console.error("Error parsing quiz answers from localStorage:", error);
+      }
 
-  // Fetch routine from Supabase
-  useEffect(() => {
-    const fetchRoutine = async () => {
-      if (!answers?.primaryGoal) {
+      if (!answers || !answers.primaryGoal) {
+        // No valid answers, or primaryGoal is missing
         setLoading(false);
+        setHasAnswers(false); // Ensure this is false
+        // Optionally, you might want to navigate here immediately if no answers at all
+        // navigate("/quiz"); // Uncomment if you want immediate redirect
         return;
       }
 
+      // If we have answers, proceed to fetch the routine
       const { data, error } = await supabase
         .from("routine_steps")
         .select(`
@@ -41,48 +52,56 @@ const RoutineBuilder = () => {
 
       if (error) {
         console.error("Error fetching routine steps:", error);
+        setRoutineSteps([]); // Ensure empty array on error
       } else {
         setRoutineSteps(data);
       }
       setLoading(false);
     };
 
-    fetchRoutine();
-  }, [answers]);
+    loadAndFetchRoutine();
+  }, []); // Empty dependency array means this runs once on mount
+
+  // --- Render Logic ---
 
   if (loading) {
     return (
       <div style={wrapperStyle}>
         <div style={boxStyle}>
-          <h2 style={headingStyle}>Building your routine...</h2>
+          <h2 style={headingStyle}>Building your personalized routine...</h2>
         </div>
       </div>
     );
   }
 
-  if (!answers || routineSteps.length === 0) {
+  // If not loading, but no answers or no routine steps were found
+  if (!hasAnswers || routineSteps.length === 0) {
     return (
       <div style={wrapperStyle}>
         <div style={boxStyle}>
-          <h2 style={headingStyle}>No routine available</h2>
+          <h2 style={headingStyle}>No Routine Available</h2>
           <p style={paragraphStyle}>
             Please complete the{" "}
-            <a href="/quiz" style={linkStyle}>
+            <a href="/quiz" style={linkStyle} onClick={(e) => {
+              e.preventDefault();
+              navigate("/quiz");
+            }}>
               quiz
             </a>{" "}
-            to get a personalized routine.
+            to get a personalized routine tailored to your needs.
           </p>
         </div>
       </div>
     );
   }
 
+  // If routineSteps exist, render the routine
   return (
-    <div style={{ padding: 24 }}>
-      <h2 style={{ ...headingStyle, marginBottom: 24 }}>
+    <div style={{ padding: 24, maxWidth: 600, margin: '0 auto' }}> {/* Added max-width for better layout */}
+      <h2 style={{ ...headingStyle, marginBottom: 24, textAlign: 'center' }}>
         Your Personalized Skincare Routine
       </h2>
-      <div style={{ display: "grid", gap: 20 }}>
+      <div style={{ display: "grid", gap: 30 }}> {/* Increased gap for better spacing */}
         {routineSteps.map((step, idx) => (
           <div
             key={idx}
@@ -114,7 +133,7 @@ const RoutineBuilder = () => {
             </div>
 
             {/* Title */}
-            <h3 style={{ color: "#2a6ae7", fontWeight: 700 }}>
+            <h3 style={{ color: "#2a6ae7", fontWeight: 700, marginTop: 15 }}> {/* Adjusted margin */}
               {step.step_name || "Unnamed Step"}
             </h3>
 
@@ -124,7 +143,7 @@ const RoutineBuilder = () => {
             </p>
 
             {/* Description */}
-            <p style={{ color: "#47567f" }}>{step.description}</p>
+            <p style={{ color: "#47567f", marginBottom: 15 }}>{step.description}</p> {/* Added margin-bottom */}
 
             {/* Learn More */}
             {step.official_product_url ? (
@@ -162,7 +181,7 @@ const RoutineBuilder = () => {
   );
 };
 
-// Inline styles
+// Inline styles (unchanged, just moved for readability)
 const wrapperStyle = {
   display: "flex",
   justifyContent: "center",
@@ -207,6 +226,7 @@ const buttonStyle = {
   textDecoration: "none",
   transition: "background 0.3s ease",
   fontSize: 14.5,
+  cursor: "pointer", // Added cursor for clarity
 };
 
 export default RoutineBuilder;

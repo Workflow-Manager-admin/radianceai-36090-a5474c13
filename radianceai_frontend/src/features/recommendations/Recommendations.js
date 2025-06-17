@@ -1,5 +1,6 @@
+// recommendations.js
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom"; // No need for useLocation here anymore
 import RecommendationCard from "./RecommendationCard";
 import styles from "./Recommendations.module.css";
 import supabase from "../../api/supabaseClient";
@@ -46,8 +47,19 @@ const Recommendations = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const answers = JSON.parse(localStorage.getItem("quizAnswers"));
-    if (!answers) {
+    // Read answers from localStorage
+    let answers = {};
+    try {
+      const storedAnswers = localStorage.getItem("quizAnswers");
+      if (storedAnswers) {
+        answers = JSON.parse(storedAnswers);
+      }
+    } catch (error) {
+      console.error("Error parsing quiz answers from localStorage:", error);
+    }
+
+    if (!answers || Object.keys(answers).length === 0 || !answers.primaryGoal || !answers.skinType) {
+      console.warn("Quiz answers not found or incomplete in localStorage. Redirecting to quiz.");
       navigate("/quiz");
       return;
     }
@@ -55,8 +67,12 @@ const Recommendations = () => {
     const { primaryGoal, skinType } = answers;
     fetchRecommendationsFromSupabase(primaryGoal, skinType)
       .then(setRecommendations)
+      .catch(error => {
+         console.error("Failed to fetch recommendations:", error);
+         setRecommendations([]);
+      })
       .finally(() => setLoading(false));
-  }, [navigate]);
+  }, [navigate]); // Dependency array only needs navigate
 
   if (loading) {
     return <div>Loading recommendations...</div>;
